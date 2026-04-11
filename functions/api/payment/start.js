@@ -42,7 +42,7 @@ export async function onRequestPost(ctx) {
     return new Response(JSON.stringify({ error: 'Geçersiz istek formatı.' }), { status: 400, headers: corsHeaders });
   }
 
-  const { name, email, phone, city, address, diploma, package: packageName, priceLabel } = body;
+  const { name, email, phone, city, address, diploma, package: packageName, price: bodyPrice, priceLabel } = body;
 
   if (!name || name.trim().length < 3) return err('Ad Soyad en az 3 karakter olmalıdır.', corsHeaders);
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err('Geçerli bir e-posta giriniz.', corsHeaders);
@@ -62,7 +62,7 @@ export async function onRequestPost(ctx) {
 
   // ─── BUILD INVOICE ───────────────────────────────────────────────
   const invoiceId = crypto.randomUUID();
-  const price = (env.PRODUCT_PRICE_TRY || '149').toString();
+  const price = (bodyPrice || env.PRODUCT_PRICE_USD || '149').toString();
   const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
   const merchantId = env.MERCHANT_ID || '74096';
 
@@ -73,7 +73,7 @@ export async function onRequestPost(ctx) {
   const invoice = {
     invoice_id: invoiceId,
     total: price,
-    currency: 'TRY',
+    currency: 'EUR',
     return_url: `${baseUrl}/odeme-basarili.html`,
     cancel_url: `${baseUrl}/odeme-hatasi.html`,
     items: [
@@ -100,7 +100,7 @@ export async function onRequestPost(ctx) {
     const formData = new URLSearchParams();
     formData.append('merchant_key', env.MERCHANT_KEY);
     formData.append('invoice', JSON.stringify(invoice));
-    formData.append('currency_code', 'TRY');
+    formData.append('currency_code', 'EUR');
     formData.append('name', firstName);
     formData.append('surname', lastName);
 
