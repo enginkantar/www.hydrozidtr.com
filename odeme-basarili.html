@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ödeme Başarılı | Hydrozid®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #070B14; color: #CBD5E1; font-family: 'Nunito Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .card {
+      background: #0D1421;
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 20px;
+      padding: 48px 36px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(34,197,94,0.08);
+    }
+    .icon {
+      width: 72px; height: 72px;
+      background: rgba(34,197,94,0.12);
+      border: 2px solid rgba(34,197,94,0.4);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .icon svg { color: #22C55E; }
+    h1 { font-family: 'Rubik', sans-serif; font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+    p { font-size: 0.95rem; color: #94A3B8; line-height: 1.6; margin-bottom: 8px; }
+    .order-no { font-size: 0.85rem; color: #64748B; margin-top: 16px; }
+    .order-no span { color: #00D4FF; font-weight: 700; }
+    .btn { display: inline-block; margin-top: 32px; background: #22C55E; color: #fff; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 0.95rem; padding: 14px 32px; border-radius: 10px; text-decoration: none; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.88; }
+    .brand { margin-top: 40px; font-size: 0.75rem; color: #334155; }
+    .brand a { color: #475569; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h1>Ödeme Başarılı!</h1>
+    <p>Siparişiniz alındı. En kısa sürede kargoya verilecektir.</p>
+    <p>Onay ve kargo bilgileri e-posta adresinize gönderilecektir.</p>
+    <div class="order-no" id="orderInfo"></div>
+    <a href="/" class="btn">Ana Sayfaya Dön</a>
+  </div>
+  <div class="brand">
+    <a href="https://www.hydrozidtr.com">Hydrozid® Türkiye</a> — FDA 510(k) onaylı, CE belgeli
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const orderNo = params.get('order_no');
+    const invoiceId = params.get('invoice_id');
+    const info = document.getElementById('orderInfo');
+    if (orderNo) {
+      info.innerHTML = 'Sipariş No: <span>' + orderNo + '</span>';
+    } else if (invoiceId) {
+      info.innerHTML = 'Fatura No: <span>' + invoiceId + '</span>';
+    }
+  </script>
+</body>
+</html>

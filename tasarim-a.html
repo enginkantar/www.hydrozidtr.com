@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hydrozid® — 30 Saniyede Kriyoterapi | FDA Onaylı Kriyocerrahi Cihazı</title>
+  <meta name="description" content="Hydrozid® FDA onaylı kriyocerrahi cihazı. Sıvı nitrojen gerekmez. Norfluran teknolojisi ile 30 saniyede siğil, keratoz ve molluskum tedavisi. 149 EUR + KDV." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --navy: #0A2540;
+      --navy-mid: #1A3A5C;
+      --ice-blue: #B8DEFF;
+      --sky: #7EC8E3;
+      --deep-blue: #1A6FA8;
+      --white: #ffffff;
+      --font-heading: 'Rubik', sans-serif;
+      --font-body: 'Nunito Sans', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: linear-gradient(135deg, #B8DEFF 0%, #7EC8E3 45%, #3A9BC8 70%, #1A6FA8 100%);
+      min-height: 100vh;
+      color: var(--navy);
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 2rem;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow: 0 1px 0 rgba(10, 37, 64, 0.08);
+    }
+
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--navy);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo sup {
+      font-size: 0.6em;
+      vertical-align: super;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--navy);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-cta {
+      background: var(--navy);
+      color: var(--white) !important;
+      opacity: 1 !important;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-weight: 700 !important;
+      font-size: 0.85rem !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(10, 37, 64, 0.25) !important;
+    }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--navy);
+      border-radius: 2px;
+      transition: transform 0.3s;
+    }
+
+    /* ── TRUST BAR ── */
+    .trust-bar {
+      margin-top: 68px;
+      background: rgba(10, 37, 64, 0.08);
+      border-bottom: 1px solid rgba(10, 37, 64, 0.1);
+      padding: 10px 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      overflow: hidden;
+    }
+
+    .trust-bar-inner {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .trust-item {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 2px 16px;
+    }
+
+    .trust-sep {
+      color: rgba(10, 37, 64, 0.3);
+      font-size: 1rem;
+      user-select: none;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 68px - 41px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 2rem 80px;
+      overflow: hidden;
+    }
+
+    /* Background decorative circles */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -80px;
+      left: -80px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      max-width: 1100px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      z-index: 1;
+    }
+
+    /* ── HERO TEXT ── */
+    .hero-text {
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1.25rem;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      background: #00C853;
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.3); }
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: clamp(2.8rem, 5.5vw, 5rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--navy);
+      margin-bottom: 1.25rem;
+    }
+
+    h1 span.highlight {
+      position: relative;
+      display: inline-block;
+    }
+
+    h1 span.highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #00C6FF, #0072FF);
+      border-radius: 3px;
+      opacity: 0.4;
+      z-index: -1;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--navy-mid);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      max-width: 420px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(10, 37, 64, 0.35);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-decoration: none;
+      border-bottom: 2px solid rgba(10, 37, 64, 0.25);
+      padding-bottom: 2px;
+      transition: border-color 0.2s, gap 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--navy);
+      gap: 10px;
+    }
+
+    .hero-price-note {
+      margin-top: 1.5rem;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--navy-mid);
+      opacity: 0.7;
+    }
+
+    .hero-price-note strong {
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    /* ── HERO VISUAL ── */
+    .hero-visual {
+      position: relative;
+      height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── FLOATING CARDS ── */
+    .float-card {
+      position: absolute;
+      border-radius: 20px;
+      padding: 16px 20px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1);
+      color: white;
+      backdrop-filter: blur(8px);
+      cursor: default;
+      user-select: none;
+    }
+
+    .float-card .card-value {
+      font-family: var(--font-heading);
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .float-card .card-label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      opacity: 0.88;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .float-card .card-icon {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+
+    /* Card 1 — 30 Saniye — top-left */
+    .card-1 {
+      background: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
+      top: 20px;
+      left: -10px;
+      transform: rotate(-8deg);
+      min-width: 140px;
+      animation: float1 5.5s ease-in-out infinite;
+    }
+
+    /* Card 2 — FDA Onaylı — top-right */
+    .card-2 {
+      background: linear-gradient(135deg, #00B894 0%, #00CEC9 100%);
+      top: 30px;
+      right: -10px;
+      transform: rotate(6deg);
+      min-width: 130px;
+      animation: float2 6.2s ease-in-out infinite;
+    }
+
+    /* Card 3 — Sıvı Nitrojensiz — bottom-left */
+    .card-3 {
+      background: linear-gradient(135deg, #6C3CE1 0%, #A855F7 100%);
+      bottom: 50px;
+      left: -15px;
+      transform: rotate(-4deg);
+      min-width: 155px;
+      animation: float3 4.8s ease-in-out infinite;
+    }
+
+    /* Card 4 — 5+ Yaş Güvenli — bottom-right */
+    .card-4 {
+      background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+      bottom: 40px;
+      right: -5px;
+      transform: rotate(5deg);
+      min-width: 135px;
+      animation: float4 7s ease-in-out infinite;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: rotate(-8deg) translateY(0); }
+      50% { transform: rotate(-8deg) translateY(-12px); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: rotate(6deg) translateY(0); }
+      50% { transform: rotate(6deg) translateY(-16px); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: rotate(-4deg) translateY(0); }
+      50% { transform: rotate(-4deg) translateY(-10px); }
+    }
+
+    @keyframes float4 {
+      0%, 100% { transform: rotate(5deg) translateY(0); }
+      50% { transform: rotate(5deg) translateY(-14px); }
+    }
+
+    /* ── DEVICE ILLUSTRATION (SVG-style div art) ── */
+    .device-wrap {
+      position: relative;
+      z-index: 2;
+    }
+
+    .device-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 65%);
+      border-radius: 50%;
+      animation: glow-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .device-svg-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── FEATURES ROW ── */
+    .features-section {
+      padding: 0 2rem 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .features-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 28px 24px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(10, 37, 64, 0.15);
+    }
+
+    .feature-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--deep-blue) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .feature-icon-wrap svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+
+    .feature-desc {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--navy-mid);
+      line-height: 1.5;
+    }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      text-align: center;
+      padding: 24px 2rem 40px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--navy);
+      opacity: 0.45;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 68px;
+        left: 0;
+        right: 0;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 1.5rem 2rem;
+        gap: 1rem;
+        box-shadow: 0 8px 32px rgba(10,37,64,0.12);
+      }
+      .nav-links.open { display: flex; }
+      .nav-hamburger { display: flex; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-visual { height: 400px; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .trust-item { padding: 2px 10px; }
+      .card-1 { left: 0; }
+      .card-2 { right: 0; }
+      .card-3 { left: 0; }
+      .card-4 { right: 0; }
+      h1 { font-size: clamp(2.4rem, 8vw, 3.2rem); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">Hydrozid<sup>®</sup></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#ozellikler">Özellikler</a></li>
+      <li><a href="#uygulamalar">Uygulamalar</a></li>
+      <li><a href="#doktor">Doktor Bilgisi</a></li>
+      <li><a href="#siparis">Sipariş</a></li>
+      <li><a href="#demo" class="nav-cta">Demo Talep Et</a></li>
+    </ul>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menüyü aç">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── TRUST BAR ── -->
+  <div class="trust-bar">
+    <div class="trust-bar-inner">
+      <span class="trust-item">FDA Onaylı</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item">CE Belgeli</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item">3 Yıl Raf Ömrü</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item">5+ Yaş Güvenli</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item">Norfluran Teknolojisi</span>
+    </div>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-inner">
+
+      <!-- LEFT: Text -->
+      <div class="hero-text">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          Doktorlara Özel Fiyat Aktif
+        </div>
+
+        <h1>
+          <span class="highlight">30 Saniyede</span><br>
+          Kriyoterapi
+        </h1>
+
+        <p class="hero-sub">
+          Sıvı nitrojen gerekmez. Hazırlık gerekmez.<br>
+          FDA onaylı norfluran teknolojisi.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#demo" class="btn-primary">Demo Talep Et</a>
+          <a href="#teknik" class="btn-secondary">Teknik Bilgi Al →</a>
+        </div>
+
+        <p class="hero-price-note">
+          Başlangıç fiyatı <strong>149 EUR + KDV</strong> &nbsp;·&nbsp; Doktora özel fiyatlandırma
+        </p>
+      </div>
+
+      <!-- RIGHT: Visual + Cards -->
+      <div class="hero-visual">
+
+        <!-- Floating Card 1: 30 Saniye -->
+        <div class="float-card card-1">
+          <div class="card-icon">⏱</div>
+          <div class="card-value">30 sn</div>
+          <div class="card-label">Tek uygulama süresi</div>
+        </div>
+
+        <!-- Floating Card 2: FDA Onaylı -->
+        <div class="float-card card-2">
+          <div class="card-icon">✅</div>
+          <div class="card-value">FDA</div>
+          <div class="card-label">Onaylı cihaz</div>
+        </div>
+
+        <!-- Floating Card 3: Sıvı Nitrojensiz -->
+        <div class="float-card card-3">
+          <div class="card-icon">❄️</div>
+          <div class="card-value">N₂O'suz</div>
+          <div class="card-label">Sıvı nitrojensiz</div>
+        </div>
+
+        <!-- Floating Card 4: 5+ Yaş -->
+        <div class="float-card card-4">
+          <div class="card-icon">👦</div>
+          <div class="card-value">5+ Yaş</div>
+          <div class="card-label">Güvenle uygulanır</div>
+        </div>
+
+        <!-- Center: Device Illustration -->
+        <div class="device-wrap">
+          <div class="device-glow"></div>
+          <div class="device-svg-wrap">
+            <svg width="200" height="340" viewBox="0 0 200 340" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hydrozid kriyocerrahi cihazı">
+
+              <!-- Can body shadow -->
+              <ellipse cx="100" cy="326" rx="52" ry="10" fill="rgba(10,37,64,0.15)" />
+
+              <!-- Main canister body -->
+              <defs>
+                <linearGradient id="canGrad" x1="60" y1="0" x2="160" y2="340" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#EAF6FF"/>
+                  <stop offset="35%" stop-color="#B8DEFF"/>
+                  <stop offset="70%" stop-color="#5BAED6"/>
+                  <stop offset="100%" stop-color="#1A6FA8"/>
+                </linearGradient>
+                <linearGradient id="sheen" x1="65" y1="60" x2="80" y2="280" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.7)"/>
+                  <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                </linearGradient>
+                <linearGradient id="capGrad" x1="70" y1="30" x2="130" y2="90" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#C5E8FF"/>
+                  <stop offset="100%" stop-color="#3A9BC8"/>
+                </linearGradient>
+                <linearGradient id="labelGrad" x1="60" y1="130" x2="140" y2="230" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.25)"/>
+                  <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
+                </linearGradient>
+                <clipPath id="canClip">
+                  <rect x="48" y="80" width="104" height="230" rx="52"/>
+                </clipPath>
+              </defs>
+
+              <!-- Nozzle tip -->
+              <rect x="87" y="0" width="26" height="34" rx="7" fill="url(#capGrad)" />
+              <rect x="91" y="28" width="18" height="10" rx="4" fill="#2A7FB5" />
+
+              <!-- Nozzle collar -->
+              <rect x="72" y="34" width="56" height="14" rx="7" fill="url(#capGrad)" />
+              <rect x="72" y="42" width="56" height="6" rx="3" fill="rgba(255,255,255,0.4)" />
+
+              <!-- Main body -->
+              <rect x="48" y="80" width="104" height="230" rx="52" fill="url(#canGrad)" />
+
+              <!-- Metallic sheen stripe -->
+              <rect x="48" y="80" width="104" height="230" rx="52" fill="url(#sheen)" clip-path="url(#canClip)" />
+              <rect x="62" y="82" width="18" height="220" rx="9" fill="rgba(255,255,255,0.18)" />
+
+              <!-- Shoulder -->
+              <path d="M48 104 Q48 80 100 80 Q152 80 152 104" fill="url(#capGrad)" />
+
+              <!-- Label area -->
+              <rect x="54" y="130" width="92" height="100" rx="14" fill="url(#labelGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+
+              <!-- Label: Hydrozid® text -->
+              <text x="100" y="168" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="800" font-size="17" fill="white" opacity="0.95" letter-spacing="-0.5">Hydrozid</text>
+              <text x="136" y="163" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="400" font-size="9" fill="white" opacity="0.8">®</text>
+
+              <!-- Label: sub text -->
+              <text x="100" y="186" text-anchor="middle" font-family="Nunito Sans, sans-serif" font-weight="600" font-size="8.5" fill="rgba(255,255,255,0.75)" letter-spacing="1">KRIYOTERAPI</text>
+
+              <!-- Label: FDA badge -->
+              <rect x="76" y="196" width="48" height="22" rx="11" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.45)" stroke-width="1" />
+              <text x="100" y="211" text-anchor="middle" font-family="Nunito Sans, sans-serif" font-weight="700" font-size="8" fill="white" letter-spacing="0.5">FDA ONAYLI</text>
+
+              <!-- Bottom dome -->
+              <path d="M48 286 Q48 310 100 310 Q152 310 152 286" fill="#0F5A8A" />
+
+              <!-- Highlight rim top -->
+              <path d="M52 104 Q100 84 148 104" stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none" stroke-linecap="round" />
+
+              <!-- Ice particle 1 -->
+              <circle cx="168" cy="120" r="4" fill="rgba(255,255,255,0.55)" />
+              <circle cx="178" cy="140" r="2.5" fill="rgba(255,255,255,0.4)" />
+              <circle cx="162" cy="155" r="3" fill="rgba(255,255,255,0.45)" />
+              <!-- Ice particle 2 -->
+              <circle cx="32" cy="130" r="3" fill="rgba(255,255,255,0.45)" />
+              <circle cx="22" cy="150" r="2" fill="rgba(255,255,255,0.35)" />
+              <circle cx="38" cy="165" r="2.5" fill="rgba(255,255,255,0.4)" />
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ROW ── -->
+  <section class="features-section" id="ozellikler">
+    <div class="features-inner">
+      <div class="features-grid">
+
+        <!-- Feature 1: Hızlı Tedavi -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <!-- Clock icon -->
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <polyline points="12 7 12 12 15 15"/>
+            </svg>
+          </div>
+          <div class="feature-title">Hızlı Tedavi</div>
+          <div class="feature-desc">30 saniyenin altında uygulama — hastanın klinikte geçirdiği süreyi minimize eder.</div>
+        </div>
+
+        <!-- Feature 2: Ekipmansız -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <!-- Checkmark / shield icon -->
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2L4 6v6c0 5 4 9.3 8 11 4-1.7 8-6 8-11V6L12 2z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <div class="feature-title">Ekipmansız</div>
+          <div class="feature-desc">Koruyucu ekipman gerektirmez — sıvı nitrojen depolama, özel eğitim veya ek altyapı yok.</div>
+        </div>
+
+        <!-- Feature 3: Geniş Endikasyon -->
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <!-- Medical cross / plus icon -->
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <div class="feature-title">Geniş Endikasyon</div>
+          <div class="feature-desc">Siğil, keratoz, molluskum ve fazlası — dermatoloji, üroloji ve jinekolojide kullanım.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER NOTE ── -->
+  <footer class="footer-note">
+    © 2026 Hydrozid®. Tüm hakları saklıdır. · FDA onaylı · CE belgeli · Yalnızca sağlık profesyonellerine yönelik tanıtım materyalidir.
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile hamburger
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    // Close nav on link click (mobile)
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>

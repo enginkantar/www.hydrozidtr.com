@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gizlilik Politikası | Hydrozid®</title>
+  <meta name="description" content="Hydrozid® Gizlilik ve Kişisel Veri Güvenliği Politikası. KVKK ve GDPR uyumlu.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://www.hydrozidtr.com/gizlilik-politikasi.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #070B14;
+      --bg2: #0D1421;
+      --accent: #00D4FF;
+      --red: #EF4444;
+      --text: #CBD5E1;
+      --text-h: #F1F5F9;
+      --border: rgba(0,212,255,0.15);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,11,20,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 900;
+      font-size: 1.25rem;
+      color: var(--text-h);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .nav-back:hover { opacity: 0.75; }
+
+    /* ─── CONTAINER ─── */
+    .legal-wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ─── HEADER ─── */
+    .legal-head {
+      text-align: center;
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .legal-eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 99px;
+      padding: 4px 14px;
+      margin-bottom: 16px;
+    }
+    .legal-title {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 900;
+      font-size: 2rem;
+      color: var(--text-h);
+      margin-bottom: 8px;
+    }
+    .legal-date {
+      font-size: 0.82rem;
+      color: #475569;
+    }
+
+    /* ─── SECTIONS ─── */
+    .legal-section {
+      margin-bottom: 36px;
+    }
+    .legal-section h2 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--accent);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,212,255,0.12);
+    }
+    .legal-section p {
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .legal-section strong { color: var(--text-h); }
+    .legal-section ul {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    .legal-section ul li {
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .legal-section a { color: var(--accent); text-decoration: none; }
+    .legal-section a:hover { text-decoration: underline; }
+
+    /* ─── INFO BOX ─── */
+    .info-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 10px;
+    }
+    .info-box p { margin-bottom: 4px; }
+    .info-box p:last-child { margin-bottom: 0; }
+
+    /* ─── RIGHTS TABLE ─── */
+    .rights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .rights-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+    .rights-item::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    /* ─── ACCEPTANCE ─── */
+    .acceptance-box {
+      background: rgba(0,212,255,0.06);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 48px;
+      text-align: center;
+    }
+    .acceptance-box p { color: var(--text-h); margin: 0; font-weight: 600; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+    }
+    footer p { font-size: 0.82rem; color: #475569; margin-bottom: 6px; }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      .legal-title { font-size: 1.5rem; }
+      .legal-wrap { padding: 32px 16px 60px; }
+      .rights-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="tasarim-b.html" class="nav-brand">Hydrozid<span>®</span></a>
+  <a href="tasarim-b.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M10 12L6 8L10 4" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Ana Sayfaya Dön
+  </a>
+</nav>
+
+<!-- ─── CONTENT ─── -->
+<div class="legal-wrap">
+
+  <div class="legal-head">
+    <div class="legal-eyebrow">Yasal Belge</div>
+    <h1 class="legal-title">GİZLİLİK VE KİŞİSEL VERİ POLİTİKASI</h1>
+    <p class="legal-date"><strong>Son Güncelleme:</strong> 07.04.2026</p>
+  </div>
+
+  <div class="legal-section">
+    <p><strong>Batu Ticaret</strong> (bundan böyle "Şirket" olarak anılacaktır), <a href="https://www.hydrozidtr.com" target="_blank" rel="noopener">www.hydrozidtr.com</a> web sitesini ziyaret eden ve sipariş veren kullanıcıların kişisel verilerinin gizliliğini ve güvenliğini sağlamayı öncelikli sorumluluk olarak kabul etmektedir.</p>
+    <p>İşbu <strong>Gizlilik Politikası</strong>; <strong>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK)</strong> ve Avrupa Genel Veri Koruma Tüzüğü (GDPR) kapsamında hazırlanmıştır.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>1. TOPLANAN KİŞİSEL VERİLER</h2>
+    <p>Sipariş ve hizmet süreçlerinde aşağıdaki veriler toplanmaktadır:</p>
+    <ul>
+      <li><strong>Kimlik Bilgileri:</strong> Ad, soyad</li>
+      <li><strong>Mesleki Bilgiler:</strong> Doktor diploma numarası (tıbbi cihaz satışı zorunluluğu)</li>
+      <li><strong>İletişim Bilgileri:</strong> E-posta adresi, telefon numarası, açık adres, şehir</li>
+      <li><strong>İşlem Bilgileri:</strong> Sipariş numarası, ödeme durumu, fatura bilgileri</li>
+      <li><strong>Teknik Veriler:</strong> IP adresi, tarayıcı bilgisi, site kullanım verileri (Google Analytics)</li>
+      <li><strong>Talep/Şikayet Verileri:</strong> WhatsApp veya e-posta ile iletilen mesajlar</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <h2>2. KİŞİSEL VERİLERİN İŞLENME AMAÇLARI</h2>
+    <ul>
+      <li>Sipariş ve teslimat süreçlerinin yürütülmesi</li>
+      <li>Fatura ve muhasebe işlemlerinin yapılması</li>
+      <li>Tıbbi cihaz satışında yasal meslek belgesi doğrulaması</li>
+      <li>Müşteri destek ve şikayet yönetimi</li>
+      <li>Yasal yükümlülüklerin (5651, 6502 sayılı kanunlar) yerine getirilmesi</li>
+      <li>Bilgi güvenliği ve dolandırıcılık önleme</li>
+      <li>Ürün geliştirme ve kullanıcı deneyimi analizi</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <h2>3. KİŞİSEL VERİLERİN AKTARILMASI</h2>
+    <p>Kişisel verileriniz aşağıdaki taraflarla KVKK'nın 8. ve 9. maddeleri kapsamında paylaşılabilir:</p>
+    <ul>
+      <li><strong>Kargo firmaları:</strong> Teslimat için ad, adres, telefon bilgisi</li>
+      <li><strong>Ödeme altyapısı (Platformode / Halkode):</strong> Güvenli ödeme işlemi için gerekli minimum veri</li>
+      <li><strong>Yetkili kamu kurumları:</strong> Mahkeme, vergi dairesi, BTK gibi yasal mercilerin talebi halinde</li>
+      <li><strong>Analitik araçlar:</strong> Google Analytics (anonim trafik verisi)</li>
+    </ul>
+    <p>Verileriniz üçüncü taraflara pazarlama amacıyla satılmaz ve devredilmez.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>4. VERİ SAHİBİNİN HAKLARI (KVKK MADDE 11)</h2>
+    <p>Kişisel verilerinize ilişkin aşağıdaki haklara sahipsiniz:</p>
+    <div class="rights-grid">
+      <div class="rights-item">Verilerinizin işlenip işlenmediğini öğrenme</div>
+      <div class="rights-item">İşlenen veriler hakkında bilgi talep etme</div>
+      <div class="rights-item">İşleme amacını ve uygunluğunu öğrenme</div>
+      <div class="rights-item">Yurt içi/dışı aktarımları öğrenme</div>
+      <div class="rights-item">Eksik/hatalı verilerin düzeltilmesini isteme</div>
+      <div class="rights-item">Verilerin silinmesini veya yok edilmesini isteme</div>
+      <div class="rights-item">Otomatik kararalma süreçlerine itiraz etme</div>
+      <div class="rights-item">Kanuna aykırı işlemden kaynaklanan zararın tazmini</div>
+    </div>
+    <p style="margin-top:16px;">Haklarınızı kullanmak için: <a href="mailto:info@hydrozidtr.com">info@hydrozidtr.com</a> adresine yazılı başvuru yapabilirsiniz. Başvurular 30 gün içinde yanıtlanır.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>5. VERİ GÜVENLİĞİ</h2>
+    <p>Şirketimiz kişisel verilerinizin korunması için gerekli teknik ve idari tedbirleri almaktadır:</p>
+    <ul>
+      <li>Site SSL/TLS sertifikası ile şifreli bağlantı üzerinden çalışmaktadır.</li>
+      <li>Ödeme verileri SATICI sunucularında tutulmaz; doğrudan Platformode güvenli altyapısına iletilir.</li>
+      <li>Cloudflare Pages altyapısı üzerinde barındırılan site, DDoS koruması ve güvenlik duvarından yararlanmaktadır.</li>
+      <li>Diploma numaraları yalnızca sipariş doğrulama amacıyla saklanır, üçüncü taraflarla paylaşılmaz.</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <h2>6. ÇEREZ (COOKIE) KULLANIMI</h2>
+    <p>Web sitemizde kullanıcı deneyimini iyileştirmek ve site trafiğini analiz etmek amacıyla çerezler kullanılmaktadır:</p>
+    <ul>
+      <li><strong>Zorunlu çerezler:</strong> Sitenin temel işlevleri için gereklidir, devre dışı bırakılamaz.</li>
+      <li><strong>Analitik çerezler (Google Analytics):</strong> Anonim ziyaret verisi toplar; tarayıcı ayarlarından engellenebilir.</li>
+    </ul>
+    <p>Çerezleri tarayıcı ayarlarınızdan dilediğiniz zaman silebilir veya engelleyebilirsiniz.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>7. VERİ SAKLAMA SÜRESİ</h2>
+    <p>Kişisel verileriniz, işleme amacının gerektirdiği süre boyunca ve yasal zorunluluklar çerçevesinde saklanır:</p>
+    <ul>
+      <li>Sipariş ve fatura kayıtları: 10 yıl (Türk Ticaret Kanunu gereği)</li>
+      <li>Müşteri iletişim kayıtları: 3 yıl</li>
+      <li>Teknik loglar (IP vb.): 2 yıl (5651 sayılı Kanun gereği)</li>
+    </ul>
+    <p>Saklama süreleri dolduktan sonra veriler güvenli şekilde silinir veya anonim hale getirilir.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>8. İLETİŞİM VE BAŞVURU</h2>
+    <div class="info-box">
+      <p><strong>Şirket Ünvanı:</strong> Batu Ticaret</p>
+      <p><strong>Adres:</strong> Bahçelievler Mah. Melikgazi 2. Sk. No:2B Merkez / Çorum</p>
+      <p><strong>Telefon:</strong> 0553 475 90 32</p>
+      <p><strong>E-posta:</strong> <a href="mailto:info@hydrozidtr.com">info@hydrozidtr.com</a></p>
+      <p><strong>Yetkili Kişi:</strong> Engin Kantar</p>
+    </div>
+    <p style="margin-top:12px; font-size:0.85rem; color:#475569;">Bu politika metni periyodik olarak güncellenebilir. Güncel versiyon her zaman bu sayfada yayınlanır.</p>
+  </div>
+
+  <div class="acceptance-box">
+    <p>Sitemizi kullanarak ve sipariş vererek bu Gizlilik Politikası'nı okuduğunuzu ve kabul ettiğinizi beyan edersiniz.</p>
+  </div>
+
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <p>&copy; 2026 Hydrozid® Türkiye — Batu Ticaret. Tüm Hakları Saklıdır.</p>
+  <p>
+    <a href="tasarim-b.html">Ana Sayfa</a> &nbsp;|&nbsp;
+    <a href="mesafeli-satis-sozlesmesi.html">Mesafeli Satış Sözleşmesi</a> &nbsp;|&nbsp;
+    <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+  </p>
+</footer>
+
+</body>
+</html>

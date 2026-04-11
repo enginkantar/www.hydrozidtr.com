@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Siğil Tedavisi Yöntemleri: İlaçlar, Kriyoterapi ve Klinik Seçenekler | Hydrozid</title>
+  <meta name="description" content="Siğil nasıl geçer? Evde tedavi, ilaç ve klinik kriyoterapi arasındaki farklar. FDA onaylı norfluran teknolojisiyle kliniğinizde 30 saniyede siğil tedavisi." />
+  <link rel="canonical" href="https://www.hydrozidtr.com/blog/sigil-tedavisi-yontemleri.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #070B14;
+      --bg-card:     #0D1421;
+      --accent:      #00D4FF;
+      --accent2:     #0099CC;
+      --accent-dim:  rgba(0, 212, 255, 0.08);
+      --text-h:      #FFFFFF;
+      --text-b:      #94A3B8;
+      --text-dim:    #64748B;
+      --border:      rgba(0, 212, 255, 0.15);
+      --border-med:  rgba(0, 212, 255, 0.25);
+      --glow-sm:     0 0 8px rgba(0, 212, 255, 0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-b);
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,212,255,0.05) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(0,212,255,0.09) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,11,20,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 32px;
+    }
+
+    .nav-logo {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 900;
+      font-size: 1.25rem;
+      text-decoration: none;
+      background: linear-gradient(90deg, #fff 0%, var(--accent) 60%, #fff 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-logo .reg { font-size: 0.85em; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-h);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.85;
+      transition: color 0.2s, opacity 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--accent); opacity: 1; }
+
+    .nav-cta {
+      border: 1.5px solid rgba(0,212,255,0.6);
+      color: #fff !important;
+      padding: 7px 18px;
+      border-radius: 8px;
+    }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-h);
+      border-radius: 2px;
+    }
+
+    /* ─── ARTICLE LAYOUT ─── */
+    .article-wrap {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+      padding: 56px 0 96px;
+      align-items: start;
+    }
+
+    /* ─── ARTICLE HEADER ─── */
+    .article-header {
+      margin-bottom: 40px;
+    }
+
+    .article-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .article-breadcrumb a {
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+
+    .article-breadcrumb a:hover { color: var(--accent); }
+
+    .article-tag {
+      display: inline-block;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-med);
+      border-radius: 999px;
+      padding: 3px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      color: var(--text-h);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .article-lead {
+      font-size: 1.05rem;
+      color: var(--text-b);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .article-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ─── ARTICLE BODY ─── */
+    .article-body h2 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--text-h);
+      margin: 40px 0 16px;
+      padding-top: 8px;
+    }
+
+    .article-body h3 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-h);
+      margin: 28px 0 10px;
+    }
+
+    .article-body p {
+      margin-bottom: 16px;
+      color: var(--text-b);
+      line-height: 1.75;
+    }
+
+    .article-body ul, .article-body ol {
+      margin: 0 0 20px 20px;
+      color: var(--text-b);
+    }
+
+    .article-body li {
+      margin-bottom: 8px;
+      line-height: 1.65;
+    }
+
+    .article-body strong {
+      color: var(--text-h);
+      font-weight: 700;
+    }
+
+    /* ─── INFO BOX ─── */
+    .info-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .info-box p {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .warning-box {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-left: 3px solid #EF4444;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .warning-box p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: #FCA5A5;
+    }
+
+    /* ─── COMPARISON TABLE ─── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.9rem;
+    }
+
+    .compare-table th {
+      background: #0D1421;
+      color: var(--accent);
+      font-weight: 700;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--border-med);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .compare-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-b);
+      vertical-align: top;
+    }
+
+    .compare-table tr:last-child td { border-bottom: none; }
+
+    .compare-table tr:hover td { background: rgba(0,212,255,0.02); }
+
+    .td-good { color: #10B981; font-weight: 600; }
+    .td-warn { color: #F59E0B; }
+    .td-bad  { color: #EF4444; }
+
+    /* ─── INLINE CTA ─── */
+    .inline-cta {
+      background: #0D1421;
+      border: 1px solid var(--border-med);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 40px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .inline-cta p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-b);
+    }
+
+    .inline-cta strong { color: var(--text-h); }
+
+    .inline-cta-btns {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37,211,102,0.12);
+      border: 1px solid rgba(37,211,102,0.3);
+      color: #25D366;
+      padding: 9px 16px;
+      border-radius: 7px;
+      font: 600 0.85rem 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn-mail {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 9px 16px;
+      border-radius: 7px;
+      font: 600 0.85rem 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn-wa:hover, .btn-mail:hover, .btn-satin:hover { opacity: 0.75; }
+
+    .btn-satin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239,68,68,0.12);
+      border: 1.5px solid rgba(239,68,68,0.4);
+      color: #EF4444;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 9px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    /* ─── FAQ ─── */
+    .faq-section { margin-top: 48px; }
+
+    .faq-section h2 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--text-h);
+      margin-bottom: 20px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: #0D1421;
+    }
+
+    .faq-item.open { border-color: var(--border-med); }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-q span {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-h);
+    }
+
+    .faq-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+
+    .faq-item.open .faq-icon svg { transform: rotate(45deg); }
+
+    .faq-a {
+      display: none;
+      padding: 0 20px 16px;
+      font-size: 0.9rem;
+      color: var(--text-b);
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .faq-item.open .faq-a { display: block; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar { position: sticky; top: 88px; }
+
+    .sidebar-card {
+      background: #0D1421;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-card h3 {
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-h);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-card p {
+      font-size: 0.85rem;
+      color: var(--text-b);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .sidebar-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-cta a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 7px;
+      font: 600 0.85rem 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .sidebar-cta .wa { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.3); color: #25D366; }
+    .sidebar-cta .mail { background: var(--accent-dim); border: 1px solid var(--border); color: var(--accent); }
+    .sidebar-cta a:hover { opacity: 0.75; }
+
+    .toc { list-style: none; }
+    .toc li { margin-bottom: 8px; }
+    .toc a { font-size: 0.82rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 40px 0 32px;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      text-decoration: none;
+      background: linear-gradient(90deg, #fff 0%, var(--accent) 60%, #fff 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a { font-size: 0.82rem; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-size: 0.78rem; color: var(--text-dim); }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+    @media (max-width: 900px) {
+      .article-wrap { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Siğil Tedavisi Yöntemleri: İlaçlar, Kriyoterapi ve Klinik Seçenekler",
+      "description": "Siğil nasıl geçer? Evde tedavi, ilaç ve klinik kriyoterapi arasındaki farklar. FDA onaylı norfluran teknolojisiyle kliniğinizde 30 saniyede siğil tedavisi.",
+      "author": { "@type": "Organization", "name": "Hydrozid Türkiye" },
+      "publisher": { "@type": "Organization", "name": "Hydrozid Türkiye", "url": "https://www.hydrozidtr.com" },
+      "datePublished": "2026-04-06",
+      "dateModified": "2026-04-06",
+      "mainEntityOfPage": "https://www.hydrozidtr.com/blog/sigil-tedavisi-yontemleri.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Siğil kendi kendine geçer mi?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Bazı siğiller bağışıklık sistemi tarafından aylar veya yıllar içinde kendiliğinden temizlenebilir; ancak bu süre öngörülemez ve bu süreçte bulaşma riski devam eder. Klinik kriyoterapi gibi tedaviler süreci hızlandırır ve tekrarlama riskini azaltır." }
+        },
+        {
+          "@type": "Question",
+          "name": "Siğil tedavisinde kriyoterapi ne kadar sürer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Lezyon boyutuna ve türüne göre değişmekle birlikte, FDA onaylı norfluran bazlı kriyoterapi (Hydrozid) ile tek seans 10–30 saniye sürer. Sıvı nitrojen gerektirmez." }
+        },
+        {
+          "@type": "Question",
+          "name": "Evde siğil tedavisi güvenli midir?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Eczanede satılan salisilik asit ürünleri hafif vakalarda kullanılabilir; ancak genital siğil, yüz bölgesindeki lezyonlar veya büyük/yaygın siğiller için mutlaka bir sağlık profesyoneline başvurulmalıdır." }
+        },
+        {
+          "@type": "Question",
+          "name": "Kriyoterapi için sıvı nitrojen şart mı?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Hayır. Hydrozid, sıvı nitrojen yerine FDA onaylı norfluran (HFA 134a) gazı kullanır. –50°C ile –54°C arasında çalışır, özel depolama veya güvenlik ekipmanı gerektirmez." }
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Hydrozid Türkiye", "item": "https://www.hydrozidtr.com" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.hydrozidtr.com/blog.html" },
+        { "@type": "ListItem", "position": 3, "name": "Siğil Tedavisi Yöntemleri", "item": "https://www.hydrozidtr.com/blog/sigil-tedavisi-yontemleri.html" }
+      ]
+    }
+  ]
+  </script>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../tasarim-b.html" class="nav-logo">Hydrozid<span class="reg">®</span></a>
+      <ul class="nav-links">
+        <li><a href="../tasarim-b.html#ozellikler">Özellikler</a></li>
+        <li><a href="../tasarim-b.html#endikasyonlar">Endikasyonlar</a></li>
+        <li><a href="../tasarim-b.html#nasil-calisir">Nasıl Çalışır</a></li>
+        <li><a href="../sss.html">SSS</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../tasarim-b.html#iletisim">İletişim</a></li>
+        <li><a href="../tasarim-b.html#demo" class="nav-cta">Satın Al</a></li>
+      </ul>
+      <div class="nav-hamburger" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="article-wrap">
+
+    <!-- ─── MAIN ARTICLE ─── -->
+    <main>
+      <div class="article-header">
+        <div class="article-breadcrumb">
+          <a href="../tasarim-b.html">Ana Sayfa</a>
+          <span>›</span>
+          <a href="../blog.html">Blog</a>
+          <span>›</span>
+          <span>Siğil Tedavisi Yöntemleri</span>
+        </div>
+        <div class="article-tag">Klinik Rehber</div>
+        <h1 class="article-title">Siğil Tedavisi Yöntemleri: İlaçlar, Evde Tedavi ve Kriyoterapi Arasındaki Fark</h1>
+        <p class="article-lead">Siğil tedavisinde hastalar ve klinisyenler farklı seçeneklerle karşılaşır. Bu rehberde mevcut yöntemler, etkinlik profilleri ve FDA onaylı norfluran kriyoterapisinin kliniğe kattığı avantajlar ele alınmaktadır.</p>
+        <div class="article-meta">
+          <div class="article-meta-item">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#64748B" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            7 dk okuma
+          </div>
+          <div class="article-meta-item">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="10" height="9" rx="1.5" stroke="#64748B" stroke-width="1.2"/><path d="M5 2v2M9 2v2M2 6h10" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Nisan 2026
+          </div>
+          <div class="article-meta-item">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2a5 5 0 100 10A5 5 0 007 2z" stroke="#64748B" stroke-width="1.2"/><path d="M7 5v2.5L9 9" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Hydrozid Türkiye
+          </div>
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <h2 id="sigil-nedir">Siğil Nedir ve Neden Oluşur?</h2>
+        <p>Siğil (verruca), İnsan Papilloma Virüsü'nün (HPV) ciltte yol açtığı iyi huylu, viral kaynaklı lezyonlardır. HPV'nin 100'den fazla alt tipi vardır; bunların bir kısmı el ve ayak tabanı siğillerinden, diğerleri genital bölge lezyonlarından sorumludur.</p>
+        <p>Virüs, çatlak ya da sıyrık gibi cilt bütünlüğü bozulmuş alanlara doğrudan temas yoluyla geçer. Havuz kenarları, soyunma odaları ve paylaşılan terlikler başlıca bulaşma ortamlarıdır. Bağışıklık sistemi baskılanmış bireylerde hem görülme sıklığı hem de tedaviye direnç artar.</p>
+
+        <div class="info-box">
+          <p><strong>Klinisyen notu:</strong> Siğilin spontan remisyonu mümkündür; ancak bu süre öngörülemez ve bu sırada bulaşma riski devam eder. Tedavi kararı lezyon lokalizasyonu, boyutu, hasta bağışıklık durumu ve hasta talebine göre bireyselleştirilmelidir.</p>
+        </div>
+
+        <h2 id="tedavi-yontemleri">Siğil Tedavisinde Hangi Yöntemler Kullanılır?</h2>
+        <p>Güncel klinik pratikte dört ana tedavi kategorisi mevcuttur: topikal ilaçlar, fiziksel/kimyasal ablasyon, cerrahi ve kriyoterapi. Bunların yanı sıra hastalar sıklıkla evde tedavi yollarını araştırır.</p>
+
+        <h3 id="topical">1. Topikal İlaçlar</h3>
+        <p>Salisilik asit (%15–26 konsantrasyonlarda) reçetesiz satılan en yaygın siğil ilacıdır. Lezyonu yumuşatarak ve keratoliz oluşturarak etki eder. Hafif vakalarda işe yarasa da uygulamanın haftalarca düzenli sürdürülmesi gerekir ve başarı oranı değişkendir.</p>
+        <p>İmikimod ve podofillotoksin, özellikle genital siğillerde kullanılan reçeteli topikal ajanlardır. Bağışıklık modülasyonu ve antiviral etki mekanizmalarıyla çalışırlar. Uygulama süresi birkaç haftadan birkaç aya uzanabilir.</p>
+
+        <h3 id="evde">2. Evde Tedavi Yöntemleri</h3>
+        <p>Sarımsak, elma sirkesi, çay ağacı yağı ve bant oklüzyon yöntemi halk arasında yaygın kullanılan yaklaşımlardır. Bu yöntemlere ilişkin yüksek kaliteli klinik kanıt son derece sınırlıdır. Hastalara yüz bölgesi, genital alan veya büyük lezyonlar için bu yöntemleri denemeden önce klinisyene başvurmaları önerilmelidir.</p>
+
+        <div class="warning-box">
+          <p><strong>Uyarı:</strong> Evde kryyo spreyi veya yüksek konsantrasyonlu kimyasal uygulamak derin doku hasarı, skar ve enfeksiyona yol açabilir. Bu ürünler klinik kriyoterapi cihazlarının eşdeğeri değildir.</p>
+        </div>
+
+        <h3 id="lazer">3. Lazer ve Elektrokoterizasyon</h3>
+        <p>CO₂ lazer ve elektrokoterizasyon dirençli lezyonlarda tercih edilir. Pahalı ekipman gerektirir, anestezi uygulanması gerekebilir ve iyileşme süresi uzar. Küçük ve orta büyüklükteki lezyonlar için birinci basamak tercih olarak önerilmez.</p>
+
+        <h3 id="kriyoterapi">4. Kriyoterapi</h3>
+        <p>Kriyoterapi, dondurma-çözme döngüleriyle lezyon dokusunu seçici olarak tahrip eden fiziksel bir tedavi yöntemidir. Geleneksel yöntemde sıvı azot (–196°C) kullanılır ve özel depolama ile güvenlik protokolleri gerektirir.</p>
+        <p>Modern norfluran bazlı cihazlar (örn. Hydrozid®) –50°C ile –54°C arasında çalışarak klinik olarak yeterli dondurma derinliğine ulaşır; sıvı azot, depolama tankı veya koruyucu ekipman gerektirmez.</p>
+
+        <div class="inline-cta">
+          <p><strong>Kliniğinize Hydrozid eklemek ister misiniz?</strong><br>Türkiye yetkili distribütörümüzden aynı gün kargo ile güvenle temin edebilirsiniz.</p>
+          <div class="inline-cta-btns">
+            <a href="https://wa.me/905534759032?text=Hydrozid%20Satin%20Almak%20Istiyorum%20Bazi%20Sorularim%20Olacak" class="btn-wa" target="_blank" rel="noopener">WhatsApp</a>
+            <a href="mailto:info@hydrozidtr.com" class="btn-mail">E-posta</a>
+            <a href="javascript:void(0)" class="btn-satin" onclick="openOrderModal()">Satın Al</a>
+          </div>
+        </div>
+
+        <h2 id="karsilastirma">Yöntemlerin Karşılaştırması</h2>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Yöntem</th>
+              <th>Seans Süresi</th>
+              <th>Anestezi</th>
+              <th>Ekipman</th>
+              <th>Bütçe</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Salisilik asit</strong></td>
+              <td>Haftalar–aylar</td>
+              <td class="td-good">Yok</td>
+              <td class="td-good">Yok</td>
+              <td class="td-good">Düşük</td>
+            </tr>
+            <tr>
+              <td><strong>Sıvı azot kriyoterapi</strong></td>
+              <td>10–60 sn/seans</td>
+              <td class="td-good">Çoğunlukla yok</td>
+              <td class="td-warn">Tank + ekipman</td>
+              <td class="td-warn">Orta–Yüksek</td>
+            </tr>
+            <tr>
+              <td><strong>Hydrozid® (norfluran)</strong></td>
+              <td class="td-good">10–30 sn/seans</td>
+              <td class="td-good">Yok</td>
+              <td class="td-good">Yalnızca cihaz</td>
+              <td class="td-good">Orta</td>
+            </tr>
+            <tr>
+              <td><strong>CO₂ lazer</strong></td>
+              <td>15–30 dk</td>
+              <td class="td-bad">Lokal anestezi</td>
+              <td class="td-bad">Lazer ünitesi</td>
+              <td class="td-bad">Yüksek</td>
+            </tr>
+            <tr>
+              <td><strong>Cerrahi eksizyon</strong></td>
+              <td>20–45 dk</td>
+              <td class="td-bad">Lokal anestezi</td>
+              <td class="td-warn">Cerrahi set</td>
+              <td class="td-bad">Yüksek</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="hangi-lesyon">Hangi Siğil Türü İçin Hangi Tedavi?</h2>
+
+        <h3>Plantar Siğil (Ayak Tabanı)</h3>
+        <p>Dermal tabakalara penetre olabilen dirençli lezyonlardır. Kriyoterapi birinci basamak tercih olarak önerilmektedir. Hydrozid protokolü: 6 saniye × 4–6 döngü. Birden fazla seans gerekebilir.</p>
+
+        <h3>Verruca Vulgaris (Yaygın Siğil)</h3>
+        <p>El, parmak, diz ve dirsek bölgesinde sık görülür. Kriyoterapi ve topikal tedavi kombine edilebilir. Küçük lezyonlar için tek seans yeterli olabilir.</p>
+
+        <h3>Et Beni (Acrochordon)</h3>
+        <p>Boyn, aksilla ve kıvrım bölgelerinde sık görülen fibroepitelyal poliplerdir. Hydrozid protokolü: 3–6 saniye × 2 döngü. Anestezi gerekmez; hasta işlem sonrası hemen kliniği terk edebilir.</p>
+
+        <h3>Seboreik Keratoz ve Lentigo</h3>
+        <p>Yaşlı hastalarda sık görülen selim lezyonlardır. Kriyoterapi hızlı ve etkili bir seçenek sunar. Hydrozid protokolü: seboreik keratoz için 6 sn × 2–3 döngü; lentigo için 3 sn × 2 döngü.</p>
+
+        <h3>Molluskum Kontagiosum</h3>
+        <p>Çocuklarda sık görülen viral bir cilt hastalığıdır. Hydrozid, 5 yaş ve üzeri çocuklarda kullanım için onaylanmıştır. Protokol: 3–6 saniye × 2 döngü.</p>
+
+        <div class="inline-cta">
+          <p><strong>Hydrozid'in tüm endikasyon protokollerini öğrenmek ister misiniz?</strong><br>Türkiye ekibimiz aynı gün yanıt verir. hydrozidtr.com'dan güvenle sipariş verin.</p>
+          <div class="inline-cta-btns">
+            <a href="https://wa.me/905534759032?text=Hydrozid%20Satin%20Almak%20Istiyorum%20Bazi%20Sorularim%20Olacak" class="btn-wa" target="_blank" rel="noopener">WhatsApp</a>
+            <a href="mailto:info@hydrozidtr.com" class="btn-mail">E-posta</a>
+            <a href="javascript:void(0)" class="btn-satin" onclick="openOrderModal()">Satın Al</a>
+          </div>
+        </div>
+
+        <h2 id="norfluran-avantaj">Norfluran Bazlı Kriyoterapi: Kliniğe Kattığı Avantajlar</h2>
+        <p>Geleneksel sıvı azot kriyoterapisi, soğuğun kanıtlanmış etkinliğini yanında ciddi lojistik yük getirir: depolama tankı, düzenli temin, güvenlik protokolleri ve eğitim. Bu yük, özellikle küçük kliniklerde ve pratisyen hekimlerde uygulamayı sınırlar.</p>
+        <p>Hydrozid® bu sorunu FDA 510(k) onaylı norfluran (HFA 134a) gazıyla çözer:</p>
+        <ul>
+          <li>–50°C ile –54°C arasında çalışır, klinik olarak yeterli dondurma derinliği sağlar</li>
+          <li>Toksik değil, yanıcı değil, ozon tabakasına zararı yok</li>
+          <li>Oda sıcaklığında 3 yıl raf ömrü; özel depolama gerekmez</li>
+          <li>Anestezi veya koruyucu ekipman gerekmez</li>
+          <li>5 yaş ve üzeri çocuklarda kullanım için onaylı</li>
+          <li>CE belgeli; Avrupa'da geniş kullanım geçmişi</li>
+        </ul>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+          <h2>Sıkça Sorulan Sorular</h2>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Siğil kendi kendine geçer mi?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Bazı siğiller bağışıklık sistemi tarafından aylar veya yıllar içinde kendiliğinden temizlenebilir; ancak bu süre öngörülemez ve bu süreçte bulaşma riski devam eder. Klinik kriyoterapi süreci hızlandırır ve tekrarlama riskini azaltır.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Siğil tedavisinde kriyoterapi ne kadar sürer?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Lezyon boyutu ve türüne göre değişmekle birlikte, Hydrozid ile tek seans 10–30 saniye sürer. Plantar siğil gibi derin lezyonlarda birden fazla seans gerekebilir.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Evde siğil tedavisi güvenli midir?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Eczanede satılan salisilik asit ürünleri hafif vakalarda kullanılabilir. Ancak genital siğil, yüz bölgesindeki lezyonlar veya büyük/yaygın siğiller için mutlaka bir sağlık profesyoneline başvurulmalıdır.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Kriyoterapi için sıvı azot şart mı?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Hayır. Hydrozid, sıvı nitrojen yerine FDA onaylı norfluran (HFA 134a) gazı kullanır. –50°C ile –54°C arasında çalışır, özel depolama veya güvenlik ekipmanı gerektirmez.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Siğil tedavisinde kaç seans gerekir?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Lezyon türü, boyutu ve hastanın bağışıklık durumuna göre değişir. Et beni ve lentigo gibi yüzeysel lezyonlar genellikle 1–2 seanste yanıt verir. Plantar siğil gibi derin lezyonlar 3–6 seans gerektirebilir.</div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Hydrozid'i Kliniğinize Alın</h3>
+        <p>FDA 510(k) onaylı, CE belgeli. Türkiye yetkili distribütörümüzden aynı gün kargo.</p>
+        <div class="sidebar-cta">
+          <a href="https://wa.me/905534759032" class="wa">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+          <a href="mailto:info@hydrozidtr.com" class="mail">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 4l6 4 6-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            info@hydrozidtr.com
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Bu Makalede</h3>
+        <ul class="toc">
+          <li><a href="#sigil-nedir">Siğil nedir ve neden oluşur?</a></li>
+          <li><a href="#tedavi-yontemleri">Tedavi yöntemleri</a></li>
+          <li><a href="#topical">— Topikal ilaçlar</a></li>
+          <li><a href="#evde">— Evde tedavi</a></li>
+          <li><a href="#lazer">— Lazer ve elektrokoterizasyon</a></li>
+          <li><a href="#kriyoterapi">— Kriyoterapi</a></li>
+          <li><a href="#karsilastirma">Yöntem karşılaştırması</a></li>
+          <li><a href="#hangi-lesyon">Hangi lezyon, hangi tedavi?</a></li>
+          <li><a href="#norfluran-avantaj">Norfluran avantajları</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>İlgili Makaleler</h3>
+        <ul class="toc">
+          <li><a href="../blog.html">Plantar Siğil Kriyoterapi Protokolü</a></li>
+          <li><a href="../blog.html">Molluskum: Çocuklarda Kriyoterapi</a></li>
+          <li><a href="../blog.html">Seboreik Keratoz ve Kriyoterapi</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="../tasarim-b.html" class="footer-logo">Hydrozid<span style="font-size:0.85em;">®</span></a>
+      <ul class="footer-links">
+        <li><a href="#">Gizlilik Politikası</a></li>
+        <li><a href="../sss.html">SSS</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 Hydrozid. FDA 510(k) onaylı. CE belgeli.</div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .order-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(7,11,20,0.88); backdrop-filter: blur(8px);
+    z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+  }
+  .order-overlay.active { display: flex; }
+  .order-modal {
+    background: #0D1421; border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 16px; width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto; padding: 28px;
+    position: relative; box-shadow: 0 0 40px rgba(0,212,255,0.12);
+  }
+  .order-modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; color: #64748B;
+    font-size: 1.4rem; cursor: pointer; line-height: 1; transition: color 0.2s;
+  }
+  .order-modal-close:hover { color: #fff; }
+  .order-modal h3 { font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 20px; }
+  .om-steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 24px; }
+  .om-step { display:flex; flex-direction:column; align-items:center; gap:6px; flex:1; opacity:0; }
+  .om-step:nth-child(1) { animation:omStep1 5s cubic-bezier(0.16,1,0.3,1) infinite; }
+  .om-step:nth-child(3) { animation:omStep2 5s cubic-bezier(0.16,1,0.3,1) infinite; }
+  .om-step:nth-child(5) { animation:omStep3 5s cubic-bezier(0.16,1,0.3,1) infinite; }
+  @keyframes omStep1 { 0%{opacity:0;transform:translateX(-14px);} 10%{opacity:1;transform:translateX(0);} 70%{opacity:1;transform:translateX(0);} 90%,100%{opacity:0;transform:translateX(0);} }
+  @keyframes omStep2 { 0%,14%{opacity:0;transform:translateX(-14px);} 22%{opacity:1;transform:translateX(0);} 70%{opacity:1;transform:translateX(0);} 90%,100%{opacity:0;transform:translateX(0);} }
+  @keyframes omStep3 { 0%,28%{opacity:0;transform:translateX(-14px);} 36%{opacity:1;transform:translateX(0);} 70%{opacity:1;transform:translateX(0);} 90%,100%{opacity:0;transform:translateX(0);} }
+  .om-conn { flex:1; height:2px; background:rgba(0,212,255,0.25); flex-shrink:0; transform-origin:left center; margin-bottom:20px; opacity:0; }
+  .om-conn:nth-child(2) { animation:omConn1 5s ease-in-out infinite; }
+  .om-conn:nth-child(4) { animation:omConn2 5s ease-in-out infinite; }
+  @keyframes omConn1 { 0%,8%{opacity:0;transform:scaleX(0);} 14%{opacity:1;transform:scaleX(1);} 70%{opacity:1;transform:scaleX(1);} 90%,100%{opacity:0;transform:scaleX(1);} }
+  @keyframes omConn2 { 0%,22%{opacity:0;transform:scaleX(0);} 28%{opacity:1;transform:scaleX(1);} 70%{opacity:1;transform:scaleX(1);} 90%,100%{opacity:0;transform:scaleX(1);} }
+  .om-shape { width:38px; height:38px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .om-circle { border-radius:50%; background:rgba(0,212,255,0.12); border:2px solid #00D4FF; box-shadow:0 0 14px rgba(0,212,255,0.55); }
+  .om-triangle { width:0; height:0; background:transparent !important; border-left:19px solid transparent; border-right:19px solid transparent; border-bottom:33px solid #00D4FF; filter:drop-shadow(0 0 8px rgba(0,212,255,0.6)); }
+  .om-square { border-radius:7px; background:rgba(0,212,255,0.12); border:2px solid #00D4FF; box-shadow:0 0 14px rgba(0,212,255,0.55); animation:omSquareBg 5s ease-in-out infinite; }
+  @keyframes omSquareBg { 0%,28%{background:rgba(0,212,255,0.12);border-color:#00D4FF;box-shadow:0 0 14px rgba(0,212,255,0.55);} 40%{background:rgba(16,185,129,0.18);border-color:#10B981;box-shadow:0 0 18px rgba(16,185,129,0.6);} 70%{background:rgba(16,185,129,0.18);border-color:#10B981;box-shadow:0 0 18px rgba(16,185,129,0.6);} 90%,100%{background:rgba(0,212,255,0.12);border-color:#00D4FF;box-shadow:0 0 14px rgba(0,212,255,0.55);} }
+  .om-check path { stroke-dasharray:28; stroke-dashoffset:28; animation:omCheckDraw 5s ease-in-out infinite; }
+  @keyframes omCheckDraw { 0%,28%{stroke-dashoffset:28;stroke-width:1.2;} 40%{stroke-dashoffset:0;stroke-width:2.2;} 55%{stroke-dashoffset:0;stroke-width:3.5;} 70%{stroke-dashoffset:0;stroke-width:3.5;} 90%,100%{stroke-dashoffset:28;stroke-width:1.2;} }
+  @media (prefers-reduced-motion:reduce) { .om-step,.om-conn,.om-square,.om-check path{animation:none;opacity:1;transform:none;} }
+  .om-label { font-size: 0.65rem; color: #64748B; text-align: center; line-height: 1.3; }
+  .om-field { margin-bottom: 14px; }
+  .om-field label { display: block; font-size: 0.8rem; color: #94A3B8; margin-bottom: 5px; font-weight: 600; }
+  .om-field input, .om-field select, .om-field textarea { width: 100%; background: #070B14; border: 1px solid rgba(0,212,255,0.2); border-radius: 8px; color: #fff; font-size: 0.9rem; padding: 10px 14px; outline: none; transition: border-color 0.2s; resize: none; box-sizing: border-box; }
+  .om-field input:focus, .om-field select:focus, .om-field textarea:focus { border-color: rgba(0,212,255,0.6); }
+  .om-field input::placeholder, .om-field textarea::placeholder { color: #475569; }
+  .om-field select option { background: #0D1421; }
+  .om-submit { width: 100%; background: #EF4444; border: none; border-radius: 10px; color: #fff; font-weight: 700; font-size: 1rem; padding: 14px; cursor: pointer; transition: opacity 0.2s; margin-top: 6px; }
+  .om-submit:hover { opacity: 0.88; }
+  .om-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .om-note { text-align: center; font-size: 0.72rem; color: #475569; margin-top: 10px; }
+</style>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-q').setAttribute('aria-expanded', 'false'); });
+      if (!isOpen) { item.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+    });
+  });
+
+  // Hamburger
+  const ham = document.querySelector('.nav-hamburger');
+  const links = document.querySelector('.nav-links');
+  ham.addEventListener('click', () => {
+    const open = links.style.display === 'flex';
+    links.style.display = open ? 'none' : 'flex';
+    links.style.flexDirection = 'column';
+    links.style.position = 'absolute';
+    links.style.top = '68px';
+    links.style.left = '0';
+    links.style.right = '0';
+    links.style.background = 'rgba(7,11,20,0.98)';
+    links.style.padding = '20px 24px';
+    links.style.gap = '20px';
+    links.style.borderBottom = '1px solid rgba(0,212,255,0.15)';
+  });
+
+  // ─── ORDER MODAL ────────────────────────────────────────────────
+  function openOrderModal() {
+    document.getElementById('orderOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeOrderModal() {
+    document.getElementById('orderOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('orderOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeOrderModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeOrderModal();
+  });
+
+  const CITIES = ['Adana','Adıyaman','Afyonkarahisar','Ağrı','Aksaray','Amasya','Ankara','Antalya','Ardahan','Artvin','Aydın','Balıkesir','Bartın','Batman','Bayburt','Bilecik','Bingöl','Bitlis','Bolu','Burdur','Bursa','Çanakkale','Çankırı','Çorum','Denizli','Diyarbakır','Düzce','Edirne','Elazığ','Erzincan','Erzurum','Eskişehir','Gaziantep','Giresun','Gümüşhane','Hakkari','Hatay','Iğdır','Isparta','İstanbul','İzmir','Kahramanmaraş','Karabük','Karaman','Kars','Kastamonu','Kayseri','Kilis','Kırıkkale','Kırklareli','Kırşehir','Kocaeli','Konya','Kütahya','Malatya','Manisa','Mardin','Mersin','Muğla','Muş','Nevşehir','Niğde','Ordu','Osmaniye','Rize','Sakarya','Samsun','Şanlıurfa','Siirt','Sinop','Şırnak','Sivas','Tekirdağ','Tokat','Trabzon','Tunceli','Uşak','Van','Yalova','Yozgat','Zonguldak'];
+  const sel = document.getElementById('omCity');
+  CITIES.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+
+  document.getElementById('omForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('omSubmit');
+    const name = document.getElementById('omName').value.trim();
+    const email = document.getElementById('omEmail').value.trim();
+    const phone = document.getElementById('omPhone').value.trim();
+    const city = document.getElementById('omCity').value;
+    const address = document.getElementById('omAddress').value.trim();
+    const diploma = document.getElementById('omDiploma').value.trim();
+    if (!name || !email || !phone || !city || !address || !diploma) return;
+    btn.disabled = true;
+    btn.textContent = 'Yönlendiriliyor...';
+    try {
+      const resp = await fetch('/api/payment/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, city, address, diploma })
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data.link) {
+        alert(data.error || 'Ödeme başlatılamadı. Lütfen tekrar deneyin.');
+        btn.disabled = false; btn.textContent = 'Güvenli Ödemeye Geç →'; return;
+      }
+      window.location.href = data.link;
+    } catch {
+      alert('Bağlantı hatası. Lütfen tekrar deneyin.');
+      btn.disabled = false; btn.textContent = 'Güvenli Ödemeye Geç →';
+    }
+  });
+</script>
+
+<!-- ─── ORDER MODAL ─── -->
+<div class="order-overlay" id="orderOverlay" role="dialog" aria-modal="true" aria-labelledby="omTitle">
+  <div class="order-modal">
+    <button class="order-modal-close" onclick="closeOrderModal()" aria-label="Kapat">×</button>
+    <h3 id="omTitle">Sipariş Bilgileri</h3>
+    <div class="om-steps" aria-hidden="true">
+      <div class="om-step"><div class="om-shape om-circle"></div><div class="om-label">Bilgilerinizi<br>Girin</div></div>
+      <div class="om-conn"></div>
+      <div class="om-step"><div class="om-shape om-triangle"></div><div class="om-label">Ödemeyi<br>Yapınız</div></div>
+      <div class="om-conn"></div>
+      <div class="om-step"><div class="om-shape om-square"><svg class="om-check" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4 10.5L8.5 15L16 6" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="om-label">Ürünü Teslim<br>Alınız</div></div>
+    </div>
+    <form id="omForm" novalidate>
+      <div class="om-field">
+        <label for="omName">Ad Soyad <span style="color:#EF4444">*</span></label>
+        <input type="text" id="omName" placeholder="Ahmet Yılmaz" required minlength="3" autocomplete="name">
+      </div>
+      <div class="om-field">
+        <label for="omEmail">E-posta <span style="color:#EF4444">*</span></label>
+        <input type="email" id="omEmail" placeholder="ornek@email.com" required autocomplete="email">
+      </div>
+      <div class="om-field">
+        <label for="omPhone">Telefon <span style="color:#EF4444">*</span></label>
+        <input type="tel" id="omPhone" placeholder="05XXXXXXXXX" required pattern="0[5][0-9]{9}" maxlength="11" inputmode="numeric" autocomplete="tel">
+      </div>
+      <div class="om-field">
+        <label for="omCity">Şehir <span style="color:#EF4444">*</span></label>
+        <select id="omCity" required autocomplete="address-level2">
+          <option value="" disabled selected>— Şehir seçiniz —</option>
+        </select>
+      </div>
+      <div class="om-field">
+        <label for="omAddress">Adres <span style="color:#EF4444">*</span></label>
+        <textarea id="omAddress" rows="2" placeholder="Mahalle, sokak, kapı no..." required minlength="10" autocomplete="street-address"></textarea>
+      </div>
+      <div class="om-field">
+        <label for="omDiploma">Doktor Diploma No <span style="color:#EF4444">*</span></label>
+        <input type="text" id="omDiploma" placeholder="Diploma numaranızı giriniz" required minlength="5">
+      </div>
+      <button type="submit" class="om-submit" id="omSubmit">Güvenli Ödemeye Geç →</button>
+      <p class="om-note">🔒 Platformode güvenli ödeme sayfasına yönlendirileceksiniz</p>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>
