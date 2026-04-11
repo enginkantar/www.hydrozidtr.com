@@ -1,4 +1,5 @@
 name = "www-hydrozid-com-tr"
+type = "javascript"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "."
 
