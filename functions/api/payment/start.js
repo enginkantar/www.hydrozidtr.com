@@ -10,6 +10,13 @@ const TOKEN_KV_KEY = 'token:platformode';
 const RATE_LIMIT_WINDOW = 60; // seconds
 const RATE_LIMIT_MAX = 10;
 
+// Server-side fiyat tablosu (EUR) — client'tan gelen price görmezden gelinir
+const PACKAGE_PRICES_EUR = {
+  'Temel Paket':    149,
+  'Klinik Paketi':  695,   // 139 × 5
+  'Kurumsal Paket': 1290,  // 129 × 10
+};
+
 export async function onRequestPost(ctx) {
   const { request, env } = ctx;
 
@@ -42,7 +49,7 @@ export async function onRequestPost(ctx) {
     return new Response(JSON.stringify({ error: 'Geçersiz istek formatı.' }), { status: 400, headers: corsHeaders });
   }
 
-  const { name, email, phone, city, address, diploma, package: packageName, price: bodyPrice, priceLabel } = body;
+  const { name, email, phone, city, address, diploma, package: packageName, currency: reqCurrency } = body;
 
   if (!name || name.trim().length < 3) return err('Ad Soyad en az 3 karakter olmalıdır.', corsHeaders);
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err('Geçerli bir e-posta giriniz.', corsHeaders);
@@ -50,6 +57,20 @@ export async function onRequestPost(ctx) {
   if (!city || city.trim().length < 2) return err('Şehir seçiniz.', corsHeaders);
   if (!address || address.trim().length < 10) return err('Adres en az 10 karakter olmalıdır.', corsHeaders);
   if (!diploma || diploma.trim().length < 5) return err('Doktor diploma no giriniz.', corsHeaders);
+
+  // ─── SERVER-SIDE FİYAT HESAPLAMA ─────────────────────────────────
+  const eurBase = PACKAGE_PRICES_EUR[packageName];
+  if (!eurBase) return err('Geçersiz paket seçimi.', corsHeaders);
+
+  const currency = reqCurrency === 'EUR' ? 'EUR' : 'TRY';
+  let finalPrice;
+  if (currency === 'EUR') {
+    finalPrice = eurBase.toString();
+  } else {
+    const rate = await fetchEurTryRate();
+    if (!rate) return err('Döviz kuru alınamadı. Lütfen tekrar deneyin.', corsHeaders, 502);
+    finalPrice = Math.round(eurBase * rate).toString();
+  }
 
   // ─── TOKEN ────────────────────────────────────────────────────────
   let token;
@@ -62,9 +83,7 @@ export async function onRequestPost(ctx) {
 
   // ─── BUILD INVOICE ───────────────────────────────────────────────
   const invoiceId = crypto.randomUUID();
-  const price = (bodyPrice || env.PRODUCT_PRICE_USD || '149').toString();
   const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
-  const merchantId = env.MERCHANT_ID || '74096';
 
   const nameParts = name.trim().split(' ');
   const firstName = nameParts.slice(0, -1).join(' ') || name.trim();
@@ -72,15 +91,15 @@ export async function onRequestPost(ctx) {
 
   const invoice = {
     invoice_id: invoiceId,
-    total: price,
-    currency: 'EUR',
+    total: finalPrice,
+    currency: currency,
     return_url: `${baseUrl}/odeme-basarili.html`,
     cancel_url: `${baseUrl}/odeme-hatasi.html`,
     items: [
       {
         id: 'hydrozid-001',
         name: 'Hydrozid® Kriyocerrahi Cihazı',
-        price: price,
+        price: finalPrice,
         quantity: 1,
       }
     ],
@@ -91,7 +110,7 @@ export async function onRequestPost(ctx) {
     billing_city: city.trim(),
     billing_address: address.trim(),
     billing_country: 'TR',
-    billing_note: `Diploma No: ${diploma.trim()}${packageName ? ' | Paket: ' + packageName : ''}${priceLabel ? ' | Fiyat: ' + priceLabel : ''}`,
+    billing_note: `Diploma No: ${diploma.trim()} | Paket: ${packageName} | ${finalPrice} ${currency}`,
   };
 
   // ─── PURCHASE LINK ───────────────────────────────────────────────
@@ -100,7 +119,7 @@ export async function onRequestPost(ctx) {
     const formData = new URLSearchParams();
     formData.append('merchant_key', env.MERCHANT_KEY);
     formData.append('invoice', JSON.stringify(invoice));
-    formData.append('currency_code', 'EUR');
+    formData.append('currency_code', currency);
     formData.append('name', firstName);
     formData.append('surname', lastName);
 
@@ -146,6 +165,16 @@ export async function onRequestOptions() {
 
 function err(message, headers, status = 400) {
   return new Response(JSON.stringify({ error: message }), { status, headers });
+}
+
+async function fetchEurTryRate() {
+  try {
+    const res = await fetch('https://hydrozidtr.com/api/currency');
+    const data = await res.json();
+    return data.eur_try || null;
+  } catch {
+    return null;
+  }
 }
 
 async function getToken(env) {

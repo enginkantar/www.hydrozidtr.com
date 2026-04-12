@@ -3402,7 +3402,7 @@
         <!-- TEMEL -->
         <div class="pricing-card">
           <div class="pc-name">TEMEL</div>
-          <div class="pc-price">149 <span class="pc-currency">EUR</span></div>
+          <div class="pc-price" data-eur="149">149 <span class="pc-currency">EUR</span></div>
           <div class="pc-sub">1 adet · KDV dahil</div>
           <ul class="pc-features">
             <li>Hızlı kargo</li>
@@ -3416,7 +3416,7 @@
         <div class="pricing-card pricing-card--featured">
           <div class="pc-badge">En Çok Tercih</div>
           <div class="pc-name">KLİNİK PAKETİ</div>
-          <div class="pc-price">139 <span class="pc-currency">EUR</span></div>
+          <div class="pc-price" data-eur="139">139 <span class="pc-currency">EUR</span></div>
           <div class="pc-sub">5 adet · adet başı · KDV dahil</div>
           <ul class="pc-features">
             <li>Hızlı kargo</li>
@@ -3430,7 +3430,7 @@
         <!-- KURUMSAL -->
         <div class="pricing-card">
           <div class="pc-name">KURUMSAL</div>
-          <div class="pc-price">129 <span class="pc-currency">EUR</span></div>
+          <div class="pc-price" data-eur="129">129 <span class="pc-currency">EUR</span></div>
           <div class="pc-sub">10 adet · adet başı · KDV dahil</div>
           <ul class="pc-features">
             <li>Hastane zincirleri</li>
@@ -4235,6 +4235,17 @@
           </select>
         </div>
         <div id="omPriceDisplay" style="display:none; font-size:1.1rem; font-weight:700; color:#00D4FF; margin: -4px 0 10px; text-align:center;"></div>
+        <div class="om-field" style="margin-bottom:16px;">
+          <label style="display:block; margin-bottom:8px; font-weight:500; font-size:.93rem; color:#94A3B8;">Ödeme Para Birimi</label>
+          <div style="display:flex; gap:16px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:.95rem;">
+              <input type="radio" name="currency" value="TRY" checked> <span>Türk Lirası (₺)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:.95rem;">
+              <input type="radio" name="currency" value="EUR"> <span>Euro (€)</span>
+            </label>
+          </div>
+        </div>
         <div class="om-field">
           <label for="omName">Ad Soyad <span style="color:#EF4444">*</span></label>
           <input type="text" id="omName" placeholder="Ahmet Yılmaz" required minlength="3" autocomplete="name">
@@ -4300,13 +4311,14 @@
     function updatePriceDisplay() {
       const sel = document.getElementById('omPackage');
       const display = document.getElementById('omPriceDisplay');
-      const price = sel.options[sel.selectedIndex].dataset.price;
-      if (price) {
-        display.textContent = 'Toplam: ' + Number(price).toLocaleString('tr-TR') + ' EUR';
-        display.style.display = 'block';
-      } else {
-        display.style.display = 'none';
-      }
+      const opt = sel.options[sel.selectedIndex];
+      if (!opt || !opt.dataset.price) { display.style.display = 'none'; return; }
+      const currencyRadio = document.querySelector('input[name="currency"]:checked');
+      const isTRY = currencyRadio && currencyRadio.value === 'TRY' && opt.dataset.tryPrice;
+      const displayPrice = isTRY ? parseInt(opt.dataset.tryPrice) : parseInt(opt.dataset.price);
+      const sym = isTRY ? '₺' : 'EUR';
+      display.textContent = 'Toplam: ' + displayPrice.toLocaleString('tr-TR') + ' ' + sym;
+      display.style.display = 'block';
     }
     document.getElementById('omPackage').addEventListener('change', updatePriceDisplay);
     function closeOrderModal() {
@@ -4337,8 +4349,7 @@
       const diploma = document.getElementById('omDiploma').value.trim();
       const pkgSel = document.getElementById('omPackage');
       const selectedPackage = pkgSel.value;
-      const selectedPrice = pkgSel.options[pkgSel.selectedIndex].dataset.price || '';
-      const priceLabel = pkgSel.options[pkgSel.selectedIndex].text;
+      const currency = (document.querySelector('input[name="currency"]:checked') || {}).value || 'TRY';
       if (!selectedPackage) { alert('Lütfen bir paket seçiniz.'); return; }
       if (!name || !email || !phone || !city || !address || !diploma) return;
       btn.disabled = true;
@@ -4347,7 +4358,7 @@
         const resp = await fetch('/api/payment/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone, city, address, diploma, package: selectedPackage, price: selectedPrice, priceLabel })
+          body: JSON.stringify({ name, email, phone, city, address, diploma, package: selectedPackage, currency })
         });
         const data = await resp.json();
         if (!resp.ok || !data.link) {
@@ -4363,6 +4374,79 @@
         btn.textContent = 'Güvenli Ödemeye Geç →';
       }
     });
+  </script>
+
+  <script>
+    // ─── DÖVİZ KURUNA GÖRE TRY FİYAT GÜNCELLEME ─────────────────────────────
+    const PACKAGES = [
+      { value: 'Temel Paket',    eurUnit: 149, qty: 1  },
+      { value: 'Klinik Paketi',  eurUnit: 139, qty: 5  },
+      { value: 'Kurumsal Paket', eurUnit: 129, qty: 10 }
+    ];
+
+    function applyDropdownLabels(isTRY) {
+      const sel = document.getElementById('omPackage');
+      PACKAGES.forEach(function (pkg) {
+        const opt = Array.from(sel.options).find(function (o) { return o.value === pkg.value; });
+        if (!opt) return;
+        if (isTRY && opt.dataset.tryPrice) {
+          const unitTry  = Math.round(pkg.eurUnit * window.eurTryRate);
+          const totalTry = parseInt(opt.dataset.tryPrice);
+          if (pkg.qty === 1) {
+            opt.textContent = pkg.value + ' — ' + unitTry.toLocaleString('tr-TR') + ' ₺ (1 adet)';
+          } else {
+            opt.textContent = pkg.value + ' — ' + unitTry.toLocaleString('tr-TR') + ' ₺ × ' + pkg.qty + ' = ' + totalTry.toLocaleString('tr-TR') + ' ₺';
+          }
+        } else {
+          const totalEur = pkg.eurUnit * pkg.qty;
+          if (pkg.qty === 1) {
+            opt.textContent = pkg.value + ' — ' + pkg.eurUnit + ' EUR (1 adet)';
+          } else {
+            opt.textContent = pkg.value + ' — ' + pkg.eurUnit + ' EUR × ' + pkg.qty + ' = ' + totalEur.toLocaleString('tr-TR') + ' EUR';
+          }
+        }
+      });
+    }
+
+    // Currency toggle → dropdown etiketleri + fiyat göstergesi güncelle
+    document.querySelectorAll('input[name="currency"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        applyDropdownLabels(this.value === 'TRY');
+        updatePriceDisplay();
+      });
+    });
+
+    (async function () {
+      try {
+        const res = await fetch('https://hydrozidtr.com/api/currency');
+        const data = await res.json();
+        const rate = data.eur_try;
+        if (!rate) return;
+
+        window.eurTryRate = rate;
+
+        // Fiyat kartlarını EUR → TRY'ye çevir
+        document.querySelectorAll('.pc-price[data-eur]').forEach(function (el) {
+          const tryPrice = Math.round(parseFloat(el.dataset.eur) * rate);
+          el.innerHTML = tryPrice.toLocaleString('tr-TR') + ' <span class="pc-currency">₺</span>';
+        });
+
+        // Dropdown'a data-try-price ekle (data-price EUR olarak kalır)
+        const sel = document.getElementById('omPackage');
+        PACKAGES.forEach(function (pkg) {
+          const opt = Array.from(sel.options).find(function (o) { return o.value === pkg.value; });
+          if (!opt) return;
+          opt.dataset.tryPrice = Math.round(pkg.eurUnit * rate) * pkg.qty;
+        });
+
+        // Seçili para birimine göre etiketleri güncelle
+        const isTRY = (document.querySelector('input[name="currency"]:checked') || {}).value !== 'EUR';
+        applyDropdownLabels(isTRY);
+        updatePriceDisplay();
+      } catch (e) {
+        // API'ye ulaşılamazsa EUR gösterimi olduğu gibi kalır
+      }
+    })();
   </script>
 
 </body>
