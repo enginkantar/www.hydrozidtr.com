@@ -3424,7 +3424,8 @@
             <li>Demo videosu erişimi</li>
             <li>Zincir / çok şubeli klinikler</li>
           </ul>
-          <button class="pc-btn pc-btn--featured" onclick="openOrderModal('139 EUR × 5', 5, 'Klinik Paketi')">Sipariş Ver</button>
+          <button class="pc-btn pc-btn--featured" onclick="openOrderModal('139 EUR × 5', 5, 'Klinik Paketi')">Sipariş
+            Ver</button>
         </div>
 
         <!-- KURUMSAL -->
@@ -4234,9 +4235,12 @@
             <option value="Kurumsal Paket" data-price="1290">Kurumsal Paket — 129 EUR × 10 = 1.290 EUR</option>
           </select>
         </div>
-        <div id="omPriceDisplay" style="display:none; font-size:1.1rem; font-weight:700; color:#00D4FF; margin: -4px 0 10px; text-align:center;"></div>
+        <div id="omPriceDisplay"
+          style="display:none; font-size:1.1rem; font-weight:700; color:#00D4FF; margin: -4px 0 10px; text-align:center;">
+        </div>
         <div class="om-field" style="margin-bottom:16px;">
-          <label style="display:block; margin-bottom:8px; font-weight:500; font-size:.93rem; color:#94A3B8;">Ödeme Para Birimi</label>
+          <label style="display:block; margin-bottom:8px; font-weight:500; font-size:.93rem; color:#94A3B8;">Ödeme Para
+            Birimi</label>
           <div style="display:flex; gap:16px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:.95rem;">
               <input type="radio" name="currency" value="TRY" checked> <span>Türk Lirası (₺)</span>
@@ -4379,8 +4383,8 @@
   <script>
     // ─── DÖVİZ KURUNA GÖRE TRY FİYAT GÜNCELLEME ─────────────────────────────
     const PACKAGES = [
-      { value: 'Temel Paket',    eurUnit: 149, qty: 1  },
-      { value: 'Klinik Paketi',  eurUnit: 139, qty: 5  },
+      { value: 'Temel Paket', eurUnit: 149, qty: 1 },
+      { value: 'Klinik Paketi', eurUnit: 139, qty: 5 },
       { value: 'Kurumsal Paket', eurUnit: 129, qty: 10 }
     ];
 
@@ -4390,7 +4394,7 @@
         const opt = Array.from(sel.options).find(function (o) { return o.value === pkg.value; });
         if (!opt) return;
         if (isTRY && opt.dataset.tryPrice) {
-          const unitTry  = Math.round(pkg.eurUnit * window.eurTryRate);
+          const unitTry = Math.round(pkg.eurUnit * window.eurTryRate);
           const totalTry = parseInt(opt.dataset.tryPrice);
           if (pkg.qty === 1) {
             opt.textContent = pkg.value + ' — ' + unitTry.toLocaleString('tr-TR') + ' ₺ (1 adet)';
@@ -4448,7 +4452,7 @@
       }
     })();
   </script>
-
+  <!-- test deploy 2026-04-13 01:55 -->
 </body>
 
 </html>
