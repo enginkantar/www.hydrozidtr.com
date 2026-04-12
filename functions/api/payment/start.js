@@ -93,6 +93,7 @@ export async function onRequestPost(ctx) {
     invoice_id: invoiceId,
     total: finalPrice,
     currency: currency,
+    sale_web_hook_key: env.WEBHOOK_SECRET,
     return_url: `${baseUrl}/odeme-basarili.html`,
     cancel_url: `${baseUrl}/odeme-hatasi.html`,
     items: [
