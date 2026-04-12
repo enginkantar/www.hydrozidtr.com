@@ -1,0 +1,24 @@
+export default {
+  async fetch(request) {
+    try {
+      const url = 'https://www.tcmb.gov.tr/kurlar/today.xml';
+      const res = await fetch(url);
+      const xml = await res.text();
+      
+      // EUR kuru çıkar
+      const eurMatch = xml.match(/CurrencyCode="EUR".*?<BanknoteSelling>(.*?)<\/BanknoteSelling>/s);
+      
+      const eur_try = eurMatch ? parseFloat(eurMatch[1].replace(',', '.')) : null;
+      
+      return new Response(JSON.stringify({ eur_try, timestamp: new Date().toISOString() }), {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'max-age=3600',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+    }
+  }
+};
