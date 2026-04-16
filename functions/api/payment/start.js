@@ -1,154 +1,233 @@
 /**
- * POST /api/payment/start
- * Body: { name, email, phone, city, address, diploma }
- * Returns: { link } → redirect to Platformode hosted payment page
+ * DEBUG VERSION — start.js
+ * Farklar: Her hatada gerçek error detail'i response'a ekliyor ve console.log'a detay basıyor.
+ * Sorun çözüldükten sonra orijinal start.js'e geri dön.
  */
 
 const ALLOWED_ORIGINS = ['https://www.hydrozidtr.com', 'https://hydrozidtr.com'];
 const PLATFORMODE_BASE = 'https://app.halkode.com.tr/ccpayment';
 const TOKEN_KV_KEY = 'token:platformode';
-const RATE_LIMIT_WINDOW = 60; // seconds
+const RATE_LIMIT_WINDOW = 60;
 const RATE_LIMIT_MAX = 10;
 
-// Server-side fiyat tablosu (EUR) — client'tan gelen price görmezden gelinir
 const PACKAGE_PRICES_EUR = {
   'Temel Paket':    149,
-  'Klinik Paketi':  695,   // 139 × 5
-  'Kurumsal Paket': 1290,  // 129 × 10
+  'Klinik Paketi':  695,
+  'Kurumsal Paket': 1290,
 };
 
 export async function onRequestPost(ctx) {
   const { request, env } = ctx;
-
-  // ─── CORS ────────────────────────────────────────────────────────
-  const origin = request.headers.get('Origin') || '';
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
+  const debugLog = [];
+  const log = (msg, data) => {
+    const entry = { ts: new Date().toISOString(), msg, data };
+    debugLog.push(entry);
+    console.log('[DEBUG]', msg, data || '');
   };
 
-  // ─── RATE LIMIT ──────────────────────────────────────────────────
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `rl:${ip}:${Math.floor(Date.now() / 1000 / RATE_LIMIT_WINDOW)}`;
-  const currentCount = parseInt((await env.PAYMENT_KV.get(rateLimitKey)) || '0', 10);
-  if (currentCount >= RATE_LIMIT_MAX) {
-    return new Response(
-      JSON.stringify({ error: 'Çok fazla istek. Lütfen bir dakika bekleyip tekrar deneyin.' }),
-      { status: 429, headers: corsHeaders }
-    );
-  }
-  await env.PAYMENT_KV.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW + 10 });
-
-  // ─── PARSE & VALIDATE ─────────────────────────────────────────────
-  let body;
   try {
-    body = await request.json();
-  } catch {
-    return new Response(JSON.stringify({ error: 'Geçersiz istek formatı.' }), { status: 400, headers: corsHeaders });
-  }
+    // ─── CORS ────────────────────────────────────────────────────────
+    const origin = request.headers.get('Origin') || '';
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Content-Type': 'application/json',
+    };
 
-  const { name, email, phone, city, address, diploma, package: packageName, currency: reqCurrency } = body;
+    // ─── ENV CHECK (EN ÖNEMLİ!) ──────────────────────────────────────
+    const envStatus = {
+      APP_ID: env.APP_ID ? `SET (${String(env.APP_ID).length} chars)` : 'MISSING',
+      APP_SECRET: env.APP_SECRET ? `SET (${String(env.APP_SECRET).length} chars)` : 'MISSING',
+      MERCHANT_KEY: env.MERCHANT_KEY ? `SET (${String(env.MERCHANT_KEY).length} chars)` : 'MISSING',
+      WEBHOOK_SECRET: env.WEBHOOK_SECRET ? 'SET' : 'MISSING',
+      BASE_URL: env.BASE_URL || 'not set (will default)',
+      PAYMENT_KV: env.PAYMENT_KV ? 'BOUND' : 'NOT BOUND',
+    };
+    log('Environment check', envStatus);
 
-  if (!name || name.trim().length < 3) return err('Ad Soyad en az 3 karakter olmalıdır.', corsHeaders);
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err('Geçerli bir e-posta giriniz.', corsHeaders);
-  if (!phone || !/^0[5][0-9]{9}$/.test(phone)) return err('Telefon 05XXXXXXXXX formatında olmalıdır.', corsHeaders);
-  if (!city || city.trim().length < 2) return err('Şehir seçiniz.', corsHeaders);
-  if (!address || address.trim().length < 10) return err('Adres en az 10 karakter olmalıdır.', corsHeaders);
-  if (!diploma || diploma.trim().length < 5) return err('Doktor diploma no giriniz.', corsHeaders);
+    if (!env.APP_ID || !env.APP_SECRET || !env.MERCHANT_KEY) {
+      return new Response(JSON.stringify({
+        error: 'Environment variables eksik',
+        debug: envStatus,
+        log: debugLog,
+      }), { status: 500, headers: corsHeaders });
+    }
 
-  // ─── SERVER-SIDE FİYAT HESAPLAMA ─────────────────────────────────
-  const eurBase = PACKAGE_PRICES_EUR[packageName];
-  if (!eurBase) return err('Geçersiz paket seçimi.', corsHeaders);
+    if (!env.PAYMENT_KV) {
+      return new Response(JSON.stringify({
+        error: 'KV binding yok (PAYMENT_KV)',
+        debug: envStatus,
+        log: debugLog,
+      }), { status: 500, headers: corsHeaders });
+    }
 
-  const currency = reqCurrency === 'EUR' ? 'EUR' : 'TRY';
-  let finalPrice;
-  if (currency === 'EUR') {
-    finalPrice = eurBase.toString();
-  } else {
-    const rate = await fetchEurTryRate();
-    if (!rate) return err('Döviz kuru alınamadı. Lütfen tekrar deneyin.', corsHeaders, 502);
-    finalPrice = Math.round(eurBase * rate).toString();
-  }
+    // ─── RATE LIMIT ──────────────────────────────────────────────────
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const rateLimitKey = `rl:${ip}:${Math.floor(Date.now() / 1000 / RATE_LIMIT_WINDOW)}`;
+    const currentCount = parseInt((await env.PAYMENT_KV.get(rateLimitKey)) || '0', 10);
+    if (currentCount >= RATE_LIMIT_MAX) {
+      return new Response(
+        JSON.stringify({ error: 'Çok fazla istek.' }),
+        { status: 429, headers: corsHeaders }
+      );
+    }
+    await env.PAYMENT_KV.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW + 10 });
+    log('Rate limit OK', { count: currentCount });
 
-  // ─── TOKEN ────────────────────────────────────────────────────────
-  let token;
-  try {
-    token = await getToken(env);
-  } catch (e) {
-    console.error('Token error:', e);
-    return err('Ödeme sistemi bağlantısı kurulamadı. Lütfen tekrar deneyin.', corsHeaders, 502);
-  }
+    // ─── PARSE & VALIDATE ─────────────────────────────────────────────
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response(JSON.stringify({ error: 'Geçersiz JSON' }), { status: 400, headers: corsHeaders });
+    }
 
-  // ─── BUILD INVOICE ───────────────────────────────────────────────
-  const invoiceId = crypto.randomUUID();
-  const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
+    const { name, email, phone, city, address, diploma, package: packageName, currency: reqCurrency } = body;
+    log('Request body', { name, email, phone, city, packageName, currency: reqCurrency });
 
-  const nameParts = name.trim().split(' ');
-  const firstName = nameParts.slice(0, -1).join(' ') || name.trim();
-  const lastName = nameParts.slice(-1)[0] || '-';
+    if (!name || name.trim().length < 3) return errDebug('Ad Soyad kısa', corsHeaders, debugLog);
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errDebug('Email geçersiz', corsHeaders, debugLog);
+    if (!phone || !/^0[5][0-9]{9}$/.test(phone)) return errDebug('Telefon geçersiz', corsHeaders, debugLog);
+    if (!city || city.trim().length < 2) return errDebug('Şehir geçersiz', corsHeaders, debugLog);
+    if (!address || address.trim().length < 10) return errDebug('Adres kısa', corsHeaders, debugLog);
+    if (!diploma || diploma.trim().length < 5) return errDebug('Diploma kısa', corsHeaders, debugLog);
 
-  const invoice = {
-    invoice_id: invoiceId,
-    total: finalPrice,
-    currency: currency,
-    sale_web_hook_key: env.WEBHOOK_SECRET,
-    return_url: `${baseUrl}/odeme-basarili.html`,
-    cancel_url: `${baseUrl}/odeme-hatasi.html`,
-    items: [
-      {
+    // ─── FİYAT ───────────────────────────────────────────────────────
+    const eurBase = PACKAGE_PRICES_EUR[packageName];
+    if (!eurBase) return errDebug('Geçersiz paket: ' + packageName, corsHeaders, debugLog);
+
+    const currency = reqCurrency === 'EUR' ? 'EUR' : 'TRY';
+    let finalPrice;
+    if (currency === 'EUR') {
+      finalPrice = eurBase.toString();
+    } else {
+      const rate = await fetchEurTryRate();
+      if (!rate) {
+        log('EUR/TRY rate alınamadı');
+        return errDebug('Kur alınamadı', corsHeaders, debugLog, 502);
+      }
+      finalPrice = Math.round(eurBase * rate).toString();
+      log('Rate fetched', { rate, finalPrice });
+    }
+
+    // ─── TOKEN ───────────────────────────────────────────────────────
+    let token;
+    try {
+      token = await getTokenDebug(env, log);
+      log('Token alındı', { length: token.length, preview: token.substring(0, 20) + '...' });
+    } catch (e) {
+      log('Token ERROR', { message: e.message, stack: e.stack });
+      return new Response(JSON.stringify({
+        error: 'Token alınamadı',
+        debug_message: e.message,
+        log: debugLog,
+      }), { status: 502, headers: corsHeaders });
+    }
+
+    // ─── BUILD INVOICE ───────────────────────────────────────────────
+    const invoiceId = crypto.randomUUID();
+    const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
+
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts.slice(0, -1).join(' ') || name.trim();
+    const lastName = nameParts.slice(-1)[0] || '-';
+
+    const invoice = {
+      invoice_id: invoiceId,
+      total: finalPrice,
+      currency: currency,
+      sale_web_hook_key: env.WEBHOOK_SECRET,
+      return_url: `${baseUrl}/odeme-basarili.html`,
+      cancel_url: `${baseUrl}/odeme-hatasi.html`,
+      items: [{
         id: 'hydrozid-001',
-        name: 'Hydrozid® Kriyocerrahi Cihazı',
+        name: 'Hydrozid Kriyocerrahi Cihazi',
         price: finalPrice,
         quantity: 1,
+      }],
+      // DÜZELTME: bill_* prefix'i (doküman section 2.0)
+      bill_address1: address.trim().substring(0, 100),
+      bill_city: city.trim(),
+      bill_state: city.trim(),
+      bill_country: 'TR',
+      bill_email: email.trim(),
+      bill_phone: phone.trim(),
+    };
+
+    log('Invoice prepared', { invoice_id: invoiceId, total: finalPrice, currency });
+
+    // ─── PURCHASE LINK ───────────────────────────────────────────────
+    let paymentLink;
+    try {
+      const formData = new URLSearchParams();
+      formData.append('merchant_key', env.MERCHANT_KEY);
+      formData.append('invoice', JSON.stringify(invoice));
+      formData.append('currency_code', currency);
+      formData.append('name', firstName);
+      formData.append('surname', lastName);
+
+      log('Calling Platformode purchase/link', {
+        url: `${PLATFORMODE_BASE}/purchase/link`,
+        bodyLength: formData.toString().length,
+      });
+
+      const resp = await fetch(`${PLATFORMODE_BASE}/purchase/link`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData.toString(),
+      });
+
+      const rawText = await resp.text();
+      log('Platformode raw response', { status: resp.status, body: rawText.substring(0, 500) });
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        return new Response(JSON.stringify({
+          error: 'Platformode JSON parse hatası',
+          raw: rawText.substring(0, 500),
+          http_status: resp.status,
+          log: debugLog,
+        }), { status: 502, headers: corsHeaders });
       }
-    ],
-    billing_first_name: firstName,
-    billing_last_name: lastName,
-    billing_email: email.trim(),
-    billing_phone: phone.trim(),
-    billing_city: city.trim(),
-    billing_address: address.trim(),
-    billing_country: 'TR',
-    billing_note: `Diploma No: ${diploma.trim()} | Paket: ${packageName} | ${finalPrice} ${currency}`,
-  };
 
-  // ─── PURCHASE LINK ───────────────────────────────────────────────
-  let paymentLink;
-  try {
-    const formData = new URLSearchParams();
-    formData.append('merchant_key', env.MERCHANT_KEY);
-    formData.append('invoice', JSON.stringify(invoice));
-    formData.append('currency_code', currency);
-    formData.append('name', firstName);
-    formData.append('surname', lastName);
-
-    const resp = await fetch(`${PLATFORMODE_BASE}/purchase/link`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: formData.toString(),
-    });
-
-    const data = await resp.json();
-    if (data.status !== 'True' || !data.link) {
-      console.error('Platformode error:', JSON.stringify(data));
-      return err('Ödeme linki alınamadı. Lütfen tekrar deneyin.', corsHeaders, 502);
+      if (data.status !== 'True' || !data.link) {
+        return new Response(JSON.stringify({
+          error: 'Platformode link dönmedi',
+          platformode_response: data,
+          log: debugLog,
+        }), { status: 502, headers: corsHeaders });
+      }
+      paymentLink = data.link;
+      log('Link alındı', { link: paymentLink });
+    } catch (e) {
+      log('Purchase link exception', { message: e.message });
+      return new Response(JSON.stringify({
+        error: 'Purchase link exception',
+        debug_message: e.message,
+        log: debugLog,
+      }), { status: 502, headers: corsHeaders });
     }
-    paymentLink = data.link;
+
+    // ─── SAVE PENDING ORDER ──────────────────────────────────────────
+    const orderData = { invoiceId, name, email, phone, city, diploma: diploma.trim(), package: packageName, price_final: finalPrice, currency, createdAt: Date.now() };
+    await env.PAYMENT_KV.put(`order:${invoiceId}`, JSON.stringify(orderData), { expirationTtl: 3600 });
+
+    return new Response(JSON.stringify({ link: paymentLink }), { status: 200, headers: corsHeaders });
+
   } catch (e) {
-    console.error('Purchase link error:', e);
-    return err('Ödeme sistemi bağlantı hatası.', corsHeaders, 502);
+    return new Response(JSON.stringify({
+      error: 'Üst seviye exception',
+      message: e.message,
+      stack: e.stack,
+      log: debugLog,
+    }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
   }
-
-  // ─── SAVE PENDING ORDER ──────────────────────────────────────────
-  const orderData = { invoiceId, name, email, phone, city, diploma: diploma.trim(), createdAt: Date.now() };
-  await env.PAYMENT_KV.put(`order:${invoiceId}`, JSON.stringify(orderData), { expirationTtl: 3600 });
-
-  return new Response(JSON.stringify({ link: paymentLink }), { status: 200, headers: corsHeaders });
 }
 
 export async function onRequestOptions() {
@@ -162,10 +241,8 @@ export async function onRequestOptions() {
   });
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-
-function err(message, headers, status = 400) {
-  return new Response(JSON.stringify({ error: message }), { status, headers });
+function errDebug(message, headers, log, status = 400) {
+  return new Response(JSON.stringify({ error: message, log }), { status, headers });
 }
 
 async function fetchEurTryRate() {
@@ -178,12 +255,15 @@ async function fetchEurTryRate() {
   }
 }
 
-async function getToken(env) {
-  // Try KV cache first
+async function getTokenDebug(env, log) {
   const cached = await env.PAYMENT_KV.get(TOKEN_KV_KEY, { type: 'text' });
-  if (cached) return cached;
+  if (cached) {
+    log('Token from KV cache', { length: cached.length });
+    return cached;
+  }
 
-  // Fetch new token
+  log('Fetching new token from Platformode', { url: `${PLATFORMODE_BASE}/api/token`, app_id_preview: String(env.APP_ID).substring(0, 8) + '...' });
+
   const resp = await fetch(`${PLATFORMODE_BASE}/api/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -193,14 +273,20 @@ async function getToken(env) {
     }),
   });
 
-  if (!resp.ok) throw new Error(`Token fetch failed: ${resp.status}`);
+  const rawText = await resp.text();
+  log('Token response raw', { status: resp.status, body: rawText.substring(0, 300) });
 
-  const data = await resp.json();
+  if (!resp.ok) {
+    throw new Error(`Token HTTP ${resp.status}: ${rawText.substring(0, 200)}`);
+  }
+
+  const data = JSON.parse(rawText);
   const token = data.token || data.access_token || data.data?.token;
-  if (!token) throw new Error('No token in response: ' + JSON.stringify(data));
 
-  // Cache for 110 minutes (token valid 2h, leave 10min buffer)
+  if (!token) {
+    throw new Error(`Token yok — status_code: ${data.status_code}, desc: ${data.status_description}, raw: ${rawText.substring(0, 200)}`);
+  }
+
   await env.PAYMENT_KV.put(TOKEN_KV_KEY, token, { expirationTtl: 110 * 60 });
-
   return token;
 }
