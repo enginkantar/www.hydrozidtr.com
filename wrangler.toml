@@ -6,6 +6,9 @@ compatibility_date = "2026-03-09"
 directory = "."
 binding = "ASSETS"
 
+[vars]
+BASE_URL = "https://www.hydrozidtr.com"
+
 [[kv_namespaces]]
 binding = "PAYMENT_KV"
 id = "895fa32fe29d4157a77fbdc33a4d8b5a"
