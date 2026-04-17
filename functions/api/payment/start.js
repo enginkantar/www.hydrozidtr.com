@@ -1,292 +1,275 @@
-/**
- * DEBUG VERSION — start.js
- * Farklar: Her hatada gerçek error detail'i response'a ekliyor ve console.log'a detay basıyor.
- * Sorun çözüldükten sonra orijinal start.js'e geri dön.
- */
+// POST /api/payment/start
+// HalkÖde (Platformode) purchase/link — 10 TL gerçek ödeme testi ile doğrulanmış format.
+//
+// KRITIK FARKLAR (denemeyle bulundu, resmi dokümanda yanıltıcı):
+//   - invoice_description (description DEĞİL)
+//   - total: NUMBER (string değil)
+//   - bill_* prefix (billing_* değil)
+//   - bill_country: "TURKEY" (TR değil)
+//   - items'da id yok, description zorunlu
+//
+// Environment variables (Cloudflare dashboard → Settings → Variables and Secrets):
+//   HALKODE_APP_ID         (secret) — HalkÖde Uygulama Anahtarı
+//   HALKODE_APP_SECRET     (secret) — HalkÖde Uygulama Parolası
+//   HALKODE_MERCHANT_KEY   (secret) — HalkÖde Üyeişyeri Anahtarı ($2y$10$... başlıyor)
+//   WEBHOOK_SECRET         (secret) — HalkÖde panelinde tanımladığın sale_web_hook_key adı (opsiyonel)
+//   BASE_URL               (plain)  — https://www.hydrozidtr.com
 
-const ALLOWED_ORIGINS = ['https://www.hydrozidtr.com', 'https://hydrozidtr.com'];
 const PLATFORMODE_BASE = 'https://app.halkode.com.tr/ccpayment';
-const TOKEN_KV_KEY = 'token:platformode';
-const RATE_LIMIT_WINDOW = 60;
-const RATE_LIMIT_MAX = 10;
+const TOKEN_KV_KEY = 'token:halkode';
 
+// EUR fiyatları — SERVER-SIDE (client manipüle edemesin)
 const PACKAGE_PRICES_EUR = {
   'Temel Paket':    149,
-  'Klinik Paketi':  695,
-  'Kurumsal Paket': 1290,
+  'Klinik Paketi':  695,   // 139 × 5
+  'Kurumsal Paket': 1290,  // 129 × 10
 };
 
-export async function onRequestPost(ctx) {
-  const { request, env } = ctx;
-  const debugLog = [];
-  const log = (msg, data) => {
-    const entry = { ts: new Date().toISOString(), msg, data };
-    debugLog.push(entry);
-    console.log('[DEBUG]', msg, data || '');
-  };
+const PACKAGE_QTY = {
+  'Temel Paket':    1,
+  'Klinik Paketi':  5,
+  'Kurumsal Paket': 10,
+};
 
-  try {
-    // ─── CORS ────────────────────────────────────────────────────────
-    const origin = request.headers.get('Origin') || '';
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Content-Type': 'application/json',
-    };
-
-    // ─── ENV CHECK (EN ÖNEMLİ!) ──────────────────────────────────────
-    const envStatus = {
-      APP_ID: env.APP_ID ? `SET (${String(env.APP_ID).length} chars)` : 'MISSING',
-      APP_SECRET: env.APP_SECRET ? `SET (${String(env.APP_SECRET).length} chars)` : 'MISSING',
-      MERCHANT_KEY: env.MERCHANT_KEY ? `SET (${String(env.MERCHANT_KEY).length} chars)` : 'MISSING',
-      WEBHOOK_SECRET: env.WEBHOOK_SECRET ? 'SET' : 'MISSING',
-      BASE_URL: env.BASE_URL || 'not set (will default)',
-      PAYMENT_KV: env.PAYMENT_KV ? 'BOUND' : 'NOT BOUND',
-    };
-    log('Environment check', envStatus);
-
-    if (!env.APP_ID || !env.APP_SECRET || !env.MERCHANT_KEY) {
-      return new Response(JSON.stringify({
-        error: 'Environment variables eksik',
-        debug: envStatus,
-        log: debugLog,
-      }), { status: 500, headers: corsHeaders });
-    }
-
-    if (!env.PAYMENT_KV) {
-      return new Response(JSON.stringify({
-        error: 'KV binding yok (PAYMENT_KV)',
-        debug: envStatus,
-        log: debugLog,
-      }), { status: 500, headers: corsHeaders });
-    }
-
-    // ─── RATE LIMIT ──────────────────────────────────────────────────
-    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    const rateLimitKey = `rl:${ip}:${Math.floor(Date.now() / 1000 / RATE_LIMIT_WINDOW)}`;
-    const currentCount = parseInt((await env.PAYMENT_KV.get(rateLimitKey)) || '0', 10);
-    if (currentCount >= RATE_LIMIT_MAX) {
-      return new Response(
-        JSON.stringify({ error: 'Çok fazla istek.' }),
-        { status: 429, headers: corsHeaders }
-      );
-    }
-    await env.PAYMENT_KV.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW + 10 });
-    log('Rate limit OK', { count: currentCount });
-
-    // ─── PARSE & VALIDATE ─────────────────────────────────────────────
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return new Response(JSON.stringify({ error: 'Geçersiz JSON' }), { status: 400, headers: corsHeaders });
-    }
-
-    const { name, email, phone, city, address, diploma, package: packageName, currency: reqCurrency } = body;
-    log('Request body', { name, email, phone, city, packageName, currency: reqCurrency });
-
-    if (!name || name.trim().length < 3) return errDebug('Ad Soyad kısa', corsHeaders, debugLog);
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errDebug('Email geçersiz', corsHeaders, debugLog);
-    if (!phone || !/^0[5][0-9]{9}$/.test(phone)) return errDebug('Telefon geçersiz', corsHeaders, debugLog);
-    if (!city || city.trim().length < 2) return errDebug('Şehir geçersiz', corsHeaders, debugLog);
-    if (!address || address.trim().length < 10) return errDebug('Adres kısa', corsHeaders, debugLog);
-    if (!diploma || diploma.trim().length < 5) return errDebug('Diploma kısa', corsHeaders, debugLog);
-
-    // ─── FİYAT ───────────────────────────────────────────────────────
-    const eurBase = PACKAGE_PRICES_EUR[packageName];
-    if (!eurBase) return errDebug('Geçersiz paket: ' + packageName, corsHeaders, debugLog);
-
-    const currency = reqCurrency === 'EUR' ? 'EUR' : 'TRY';
-    let finalPrice;
-    if (currency === 'EUR') {
-      finalPrice = eurBase.toString();
-    } else {
-      const rate = await fetchEurTryRate();
-      if (!rate) {
-        log('EUR/TRY rate alınamadı');
-        return errDebug('Kur alınamadı', corsHeaders, debugLog, 502);
-      }
-      finalPrice = Math.round(eurBase * rate).toString();
-      log('Rate fetched', { rate, finalPrice });
-    }
-
-    // ─── TOKEN ───────────────────────────────────────────────────────
-    let token;
-    try {
-      token = await getTokenDebug(env, log);
-      log('Token alındı', { length: token.length, preview: token.substring(0, 20) + '...' });
-    } catch (e) {
-      log('Token ERROR', { message: e.message, stack: e.stack });
-      return new Response(JSON.stringify({
-        error: 'Token alınamadı',
-        debug_message: e.message,
-        log: debugLog,
-      }), { status: 502, headers: corsHeaders });
-    }
-
-    // ─── BUILD INVOICE ───────────────────────────────────────────────
-    const invoiceId = crypto.randomUUID();
-    const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
-
-    const nameParts = name.trim().split(' ');
-    const firstName = nameParts.slice(0, -1).join(' ') || name.trim();
-    const lastName = nameParts.slice(-1)[0] || '-';
-
-    const invoice = {
-      invoice_id: invoiceId,
-      total: finalPrice,
-      currency: currency,
-      sale_web_hook_key: env.WEBHOOK_SECRET,
-      return_url: `${baseUrl}/odeme-basarili.html`,
-      cancel_url: `${baseUrl}/odeme-hatasi.html`,
-      items: [{
-        id: 'hydrozid-001',
-        name: 'Hydrozid Kriyocerrahi Cihazi',
-        price: finalPrice,
-        quantity: 1,
-      }],
-      // DÜZELTME: bill_* prefix'i (doküman section 2.0)
-      bill_address1: address.trim().substring(0, 100),
-      bill_city: city.trim(),
-      bill_state: city.trim(),
-      bill_country: 'TR',
-      bill_email: email.trim(),
-      bill_phone: phone.trim(),
-    };
-
-    log('Invoice prepared', { invoice_id: invoiceId, total: finalPrice, currency });
-
-    // ─── PURCHASE LINK ───────────────────────────────────────────────
-    let paymentLink;
-    try {
-      const formData = new URLSearchParams();
-      formData.append('merchant_key', env.MERCHANT_KEY);
-      formData.append('invoice', JSON.stringify(invoice));
-      formData.append('currency_code', currency);
-      formData.append('name', firstName);
-      formData.append('surname', lastName);
-
-      log('Calling Platformode purchase/link', {
-        url: `${PLATFORMODE_BASE}/purchase/link`,
-        bodyLength: formData.toString().length,
-      });
-
-      const resp = await fetch(`${PLATFORMODE_BASE}/purchase/link`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData.toString(),
-      });
-
-      const rawText = await resp.text();
-      log('Platformode raw response', { status: resp.status, body: rawText.substring(0, 500) });
-
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (e) {
-        return new Response(JSON.stringify({
-          error: 'Platformode JSON parse hatası',
-          raw: rawText.substring(0, 500),
-          http_status: resp.status,
-          log: debugLog,
-        }), { status: 502, headers: corsHeaders });
-      }
-
-      if (data.status !== 'True' || !data.link) {
-        return new Response(JSON.stringify({
-          error: 'Platformode link dönmedi',
-          platformode_response: data,
-          log: debugLog,
-        }), { status: 502, headers: corsHeaders });
-      }
-      paymentLink = data.link;
-      log('Link alındı', { link: paymentLink });
-    } catch (e) {
-      log('Purchase link exception', { message: e.message });
-      return new Response(JSON.stringify({
-        error: 'Purchase link exception',
-        debug_message: e.message,
-        log: debugLog,
-      }), { status: 502, headers: corsHeaders });
-    }
-
-    // ─── SAVE PENDING ORDER ──────────────────────────────────────────
-    const orderData = { invoiceId, name, email, phone, city, diploma: diploma.trim(), package: packageName, price_final: finalPrice, currency, createdAt: Date.now() };
-    await env.PAYMENT_KV.put(`order:${invoiceId}`, JSON.stringify(orderData), { expirationTtl: 3600 });
-
-    return new Response(JSON.stringify({ link: paymentLink }), { status: 200, headers: corsHeaders });
-
-  } catch (e) {
-    return new Response(JSON.stringify({
-      error: 'Üst seviye exception',
-      message: e.message,
-      stack: e.stack,
-      log: debugLog,
-    }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
-  }
+// ─── CORS ─────────────────────────────────────────────────────────────────────
+function isAllowedOrigin(request) {
+  const origin = request.headers.get('Origin');
+  if (!origin) return true; // in-app browser vs direct = izin ver
+  return origin.includes('hydrozidtr.com') || origin.includes('localhost') || origin.includes('192.168.');
 }
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
+function corsHeaders(request) {
+  const origin = request.headers.get('Origin') || 'https://www.hydrozidtr.com';
+  return {
+    'Access-Control-Allow-Origin':  origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin',
+  };
+}
+
+function jsonResp(request, data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Content-Type':  'application/json',
+      'Cache-Control': 'no-store',
+      ...corsHeaders(request),
     },
   });
 }
 
-function errDebug(message, headers, log, status = 400) {
-  return new Response(JSON.stringify({ error: message, log }), { status, headers });
+// ─── Rate limit: 10 req/min per IP ─────────────────────────────────────────────
+async function checkRateLimit(kv, ip) {
+  const key = `rl:hydrozid:start:${ip}`;
+  const raw = await kv.get(key);
+  const count = raw ? parseInt(raw, 10) : 0;
+  if (count >= 10) return false;
+  await kv.put(key, String(count + 1), { expirationTtl: 60 });
+  return true;
 }
 
-async function fetchEurTryRate() {
-  try {
-    const res = await fetch('https://hydrozidtr.com/api/currency');
-    const data = await res.json();
-    return data.eur_try || null;
-  } catch {
-    return null;
-  }
-}
-
-async function getTokenDebug(env, log) {
+// ─── HalkÖde token (110 dk KV cache) ──────────────────────────────────────────
+async function getToken(env) {
   const cached = await env.PAYMENT_KV.get(TOKEN_KV_KEY, { type: 'text' });
-  if (cached) {
-    log('Token from KV cache', { length: cached.length });
-    return cached;
-  }
-
-  log('Fetching new token from Platformode', { url: `${PLATFORMODE_BASE}/api/token`, app_id_preview: String(env.APP_ID).substring(0, 8) + '...' });
+  if (cached) return cached;
 
   const resp = await fetch(`${PLATFORMODE_BASE}/api/token`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      app_id: env.APP_ID,
-      app_secret: env.APP_SECRET,
-    }),
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ app_id: env.HALKODE_APP_ID, app_secret: env.HALKODE_APP_SECRET }),
   });
 
-  const rawText = await resp.text();
-  log('Token response raw', { status: resp.status, body: rawText.substring(0, 300) });
+  if (!resp.ok) throw new Error(`Token HTTP ${resp.status}`);
 
-  if (!resp.ok) {
-    throw new Error(`Token HTTP ${resp.status}: ${rawText.substring(0, 200)}`);
-  }
-
-  const data = JSON.parse(rawText);
-  const token = data.token || data.access_token || data.data?.token;
-
-  if (!token) {
-    throw new Error(`Token yok — status_code: ${data.status_code}, desc: ${data.status_description}, raw: ${rawText.substring(0, 200)}`);
-  }
+  const data = await resp.json();
+  const token = data?.data?.token;
+  if (!token) throw new Error(`Token yok: ${data?.status_description || 'bilinmiyor'}`);
 
   await env.PAYMENT_KV.put(TOKEN_KV_KEY, token, { expirationTtl: 110 * 60 });
   return token;
+}
+
+// ─── EUR/TRY kuru (TCMB, 1 saat KV cache) ──────────────────────────────────────
+async function getEurTryRate(env) {
+  const cached = await env.PAYMENT_KV.get('hydrozid:eur_try_rate', { type: 'text' });
+  if (cached) {
+    try {
+      const data = JSON.parse(cached);
+      if (data.rate) return data.rate;
+    } catch {}
+  }
+
+  const res = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HydrozidBot/1.0)' },
+  });
+  const xml = await res.text();
+  const match = xml.match(/CurrencyCode="EUR"[\s\S]*?<BanknoteSelling>([\d,]+)<\/BanknoteSelling>/);
+  if (!match) throw new Error('EUR kuru bulunamadı');
+
+  const rate = parseFloat(match[1].replace(',', '.'));
+  await env.PAYMENT_KV.put('hydrozid:eur_try_rate', JSON.stringify({ rate, ts: Date.now() }), { expirationTtl: 3600 });
+  return rate;
+}
+
+// ─── OPTIONS preflight ────────────────────────────────────────────────────────
+export async function onRequestOptions(context) {
+  return new Response(null, { status: 204, headers: corsHeaders(context.request) });
+}
+
+// ─── POST handler ─────────────────────────────────────────────────────────────
+export async function onRequestPost(context) {
+  const { request, env } = context;
+
+  if (!isAllowedOrigin(request)) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  // Config guard
+  if (!env.HALKODE_APP_ID || !env.HALKODE_APP_SECRET || !env.HALKODE_MERCHANT_KEY || !env.PAYMENT_KV) {
+    console.error('[payment/start] missing configuration');
+    return jsonResp(request, { error: 'Ödeme sistemi yapılandırılmamış.' }, 503);
+  }
+
+  // Rate limit
+  const clientIP = request.headers.get('CF-Connecting-IP') || '0.0.0.0';
+  if (!(await checkRateLimit(env.PAYMENT_KV, clientIP))) {
+    return jsonResp(request, { error: 'Çok fazla istek. Lütfen bir dakika bekleyin.' }, 429);
+  }
+
+  // Parse body
+  let input;
+  try { input = await request.json(); }
+  catch { return jsonResp(request, { error: 'Geçersiz istek formatı.' }, 400); }
+
+  const { name, email, phone, city, address, diploma, package: packageName, currency: reqCurrency } = input;
+
+  // Validation
+  if (!name?.trim() || name.trim().length < 3) return jsonResp(request, { error: 'Ad Soyad en az 3 karakter olmalıdır.' }, 400);
+  if (!email?.trim() || !/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email.trim())) {
+    return jsonResp(request, { error: 'Geçerli bir e-posta girin (Türkçe karakter olmamalı).' }, 400);
+  }
+  if (!phone?.trim() || !/^0[5][0-9]{9}$/.test(phone.trim())) {
+    return jsonResp(request, { error: 'Telefon 05XXXXXXXXX formatında olmalıdır.' }, 400);
+  }
+  if (!city?.trim() || city.trim().length < 2) return jsonResp(request, { error: 'Şehir seçiniz.' }, 400);
+  if (!address?.trim() || address.trim().length < 10) return jsonResp(request, { error: 'Adres en az 10 karakter olmalıdır.' }, 400);
+  if (!diploma?.trim() || diploma.trim().length < 5) return jsonResp(request, { error: 'Doktor diploma no giriniz.' }, 400);
+
+  // ─── SERVER-SIDE FİYAT HESAPLAMA ─────────────────────────────────────────
+  const eurBase = PACKAGE_PRICES_EUR[packageName];
+  const qty = PACKAGE_QTY[packageName];
+  if (!eurBase || !qty) return jsonResp(request, { error: 'Geçersiz paket seçimi.' }, 400);
+
+  const currency = reqCurrency === 'EUR' ? 'EUR' : 'TRY';
+  let finalPriceNumber;
+  let unitPriceNumber;
+
+  if (currency === 'EUR') {
+    finalPriceNumber = eurBase;
+    unitPriceNumber = Math.round((eurBase / qty) * 100) / 100;
+  } else {
+    let rate;
+    try { rate = await getEurTryRate(env); }
+    catch (e) {
+      console.error('[payment/start] EUR/TRY rate error:', e.message);
+      return jsonResp(request, { error: 'Döviz kuru alınamadı. Lütfen tekrar deneyin.' }, 502);
+    }
+    finalPriceNumber = Math.round(eurBase * rate);
+    unitPriceNumber = Math.round((eurBase / qty) * rate);
+  }
+
+  // Ad/Soyad ayır
+  const nameParts = name.trim().split(/\s+/);
+  const firstName = nameParts.slice(0, -1).join(' ') || name.trim();
+  const lastName = nameParts.slice(-1)[0] || '-';
+
+  // HalkÖde token
+  let token;
+  try { token = await getToken(env); }
+  catch (e) {
+    console.error('[payment/start] token error:', e.message);
+    return jsonResp(request, { error: 'Ödeme sistemi bağlantısı kurulamadı.' }, 502);
+  }
+
+  // ─── INVOICE PAYLOAD (TEST EDİLMİŞ FORMAT) ──────────────────────────────
+  const invoiceId = crypto.randomUUID();
+  const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
+
+  const invoice = {
+    invoice_id: invoiceId,
+    invoice_description: `Hydrozid ${packageName} - ${qty} adet`,
+    total: finalPriceNumber, // NUMBER, string değil!
+    return_url: `${baseUrl}/odeme-basarili.html`,
+    cancel_url: `${baseUrl}/odeme-hatasi.html`,
+    items: [{
+      name: `Hydrozid Kriyocerrahi Cihazi (${packageName})`,
+      price: unitPriceNumber,
+      quantity: qty,
+      description: `${packageName} - ${qty} adet paket`,
+    }],
+    bill_address1: address.trim().substring(0, 100),
+    bill_city: city.trim(),
+    bill_state: city.trim(),
+    bill_country: 'TURKEY', // 'TR' değil!
+    bill_phone: phone.trim(),
+    bill_email: email.trim().toLowerCase(),
+  };
+
+  if (env.WEBHOOK_SECRET) {
+    invoice.sale_web_hook_key = env.WEBHOOK_SECRET;
+  }
+
+  // ─── PURCHASE LINK ──────────────────────────────────────────────────────
+  const formData = new URLSearchParams();
+  formData.append('merchant_key', env.HALKODE_MERCHANT_KEY);
+  formData.append('invoice', JSON.stringify(invoice));
+  formData.append('currency_code', currency);
+  formData.append('name', firstName);
+  formData.append('surname', lastName);
+
+  let halkResp;
+  try {
+    const resp = await fetch(`${PLATFORMODE_BASE}/purchase/link`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+      },
+      body: formData.toString(),
+    });
+    halkResp = await resp.json();
+  } catch (e) {
+    console.error('[payment/start] fetch error:', e.message);
+    return jsonResp(request, { error: 'Ödeme sistemine bağlanılamadı.' }, 502);
+  }
+
+  if (halkResp.status !== true || !halkResp.link) {
+    console.error('[payment/start] HalkOde error:', JSON.stringify(halkResp));
+    return jsonResp(request, { error: 'Ödeme oturumu başlatılamadı.' }, 400);
+  }
+
+  // ─── Pending order'ı KV'ye kaydet (webhook'ta eşleşecek) ────────────────
+  await env.PAYMENT_KV.put(
+    `order:${invoiceId}`,
+    JSON.stringify({
+      invoiceId,
+      orderId: halkResp.order_id,
+      customerName: name.trim(),
+      customerEmail: email.trim().toLowerCase(),
+      customerPhone: phone.trim(),
+      customerCity: city.trim(),
+      customerAddress: address.trim(),
+      diploma: diploma.trim(),
+      package: packageName,
+      amount: finalPriceNumber,
+      currency,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+    }),
+    { expirationTtl: 1800 } // 30 dk
+  );
+
+  return jsonResp(request, { link: halkResp.link, order_id: halkResp.order_id });
 }
