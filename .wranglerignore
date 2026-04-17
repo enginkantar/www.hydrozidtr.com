@@ -1,0 +1,6 @@
+.gstack/
+.git/
+node_modules/
+seo-analiz/
+*.backup
+*.log
