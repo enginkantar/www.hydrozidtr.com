@@ -431,7 +431,7 @@ async function getEurTryRate(env) {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HydrozidBot/1.0)' },
   });
   const xml = await res.text();
-  const match = xml.match(/CurrencyCode="EUR"[\s\S]*?<BanknoteSelling>([\d,]+)<\/BanknoteSelling>/);
+  const match = xml.match(/CurrencyCode="EUR"[\s\S]*?<BanknoteSelling>([\d.,]+)<\/BanknoteSelling>/);
   if (!match) throw new Error('EUR kuru bulunamadı');
 
   const rate = parseFloat(match[1].replace(',', '.'));
