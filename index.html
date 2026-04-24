@@ -3099,8 +3099,7 @@
             </svg>
           </div>
           <div class="feature-title">Ekonomik</div>
-          <div class="feature-desc">Sermaye yatırımı gerekmez. Düşük birim maliyet, yüksek kâr marjı. Her uygulama için
-            ödeme yapın.</div>
+          <div class="feature-desc">Sermaye yatırımı gerekmez. Düşük birim maliyet, yüksek kâr marjı.</div>
           <span class="feature-tag">Maliyet Avantajı</span>
         </div>
 
@@ -4199,7 +4198,7 @@
   <!-- ─── ORDER MODAL HTML ─── -->
   <div class="order-overlay" id="orderOverlay" role="dialog" aria-modal="true" aria-labelledby="omTitle">
     <div class="order-modal">
-      <button class="order-modal-close" onclick="closeOrderModal()" aria-label="Kapat">×</button>
+      <button class="order-modal-close" onclick="closeOrderModal()" aria-label="Kapat" tabindex="-1">×</button>
       <h3 id="omTitle">Sipariş Bilgileri</h3>
       <div id="omPackageInfo"
         style="display:none; background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); border-radius:8px; padding:8px 14px; font-size:0.82rem; color:#00D4FF; font-weight:700; margin-bottom:16px; text-align:center;">
@@ -4310,6 +4309,10 @@
         el.offsetHeight;
         el.style.animation = '';
       });
+      setTimeout(() => {
+        const firstField = document.getElementById('omPackage');
+        if (firstField) firstField.focus();
+      }, 50);
     }
 
     function updatePriceDisplay() {
@@ -4333,7 +4336,16 @@
       if (e.target === this) closeOrderModal();
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeOrderModal();
+      if (e.key === 'Escape') {
+        const active = document.activeElement;
+        const overlay = document.getElementById('orderOverlay');
+        if (overlay && overlay.classList.contains('active') && overlay.contains(active) &&
+            (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+          active.blur();
+          return;
+        }
+        closeOrderModal();
+      }
     });
 
     // Populate city select

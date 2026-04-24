@@ -8,6 +8,7 @@ binding = "ASSETS"
 
 [vars]
 BASE_URL = "https://www.hydrozidtr.com"
+TELEGRAM_CHAT_ID = "6014598776"
 
 [[kv_namespaces]]
 binding = "PAYMENT_KV"
