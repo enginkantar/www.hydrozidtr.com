@@ -71,5 +71,5 @@ Online sipariş için [www.hydrozidtr.com](https://www.hydrozidtr.com) adresinde
 ## İletişim
 
 - **Web:** https://www.hydrozidtr.com
-- **E-posta:** info@hydrozidtr.com
+- **E-posta:** bilgi@hydrozidtr.com
 - **WhatsApp:** +90 553 475 9032
