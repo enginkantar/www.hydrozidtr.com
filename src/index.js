@@ -116,7 +116,7 @@ async function handlePaymentStart(request, env) {
   try { input = await request.json(); }
   catch { return jsonResp(request, { error: 'Geçersiz istek formatı.' }, 400); }
 
-  const { name, email, phone, city, address, diploma, package: packageName, currency: reqCurrency } = input;
+  const { name, email, phone, city, address, diploma, package: packageName } = input;
 
   if (!name?.trim() || name.trim().length < 3) return jsonResp(request, { error: 'Ad Soyad en az 3 karakter olmalıdır.' }, 400);
   if (!email?.trim() || !/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email.trim())) {
@@ -129,27 +129,27 @@ async function handlePaymentStart(request, env) {
   if (!address?.trim() || address.trim().length < 10) return jsonResp(request, { error: 'Adres en az 10 karakter olmalıdır.' }, 400);
   if (!diploma?.trim() || diploma.trim().length < 5) return jsonResp(request, { error: 'Doktor diploma no giriniz.' }, 400);
 
+  if (!Object.prototype.hasOwnProperty.call(PACKAGE_PRICES_EUR, packageName)) {
+    return jsonResp(request, { error: 'Geçersiz paket seçimi.' }, 400);
+  }
+  if (!Object.prototype.hasOwnProperty.call(PACKAGE_QTY, packageName)) {
+    return jsonResp(request, { error: 'Geçersiz paket seçimi.' }, 400);
+  }
+
   const eurBase = PACKAGE_PRICES_EUR[packageName];
   const qty = PACKAGE_QTY[packageName];
-  if (!eurBase || !qty) return jsonResp(request, { error: 'Geçersiz paket seçimi.' }, 400);
 
-  const currency = reqCurrency === 'EUR' ? 'EUR' : 'TRY';
-  let finalPriceNumber;
-  let unitPriceNumber;
-
-  if (currency === 'EUR') {
-    finalPriceNumber = eurBase;
-    unitPriceNumber = Math.round((eurBase / qty) * 100) / 100;
-  } else {
-    let rate;
-    try { rate = await getEurTryRate(env); }
-    catch (e) {
-      console.error('[start] EUR/TRY rate error:', e.message);
-      return jsonResp(request, { error: 'Döviz kuru alınamadı. Lütfen tekrar deneyin.' }, 502);
-    }
-    finalPriceNumber = Math.round(eurBase * rate);
-    unitPriceNumber = Math.round((eurBase / qty) * rate);
+  const currency = 'TRY';
+  let rate;
+  try {
+    rate = await getEurTryRate(env);
+  } catch (e) {
+    console.error('[start] EUR/TRY rate error:', e.message);
+    return jsonResp(request, { error: 'Döviz kuru alınamadı. Lütfen tekrar deneyin.' }, 502);
   }
+
+  const finalPriceNumber = Math.round(eurBase * rate);
+  const unitPriceNumber = Math.round((eurBase / qty) * rate);
 
   const nameParts = name.trim().split(/\s+/);
   const firstName = nameParts.slice(0, -1).join(' ') || name.trim();
@@ -230,8 +230,11 @@ async function handlePaymentStart(request, env) {
       customerAddress: address.trim(),
       diploma: diploma.trim(),
       package: packageName,
+      quantity: qty,
+      eurAmount: eurBase,
+      eurTryRate: rate,
       amount: finalPriceNumber,
-      currency,
+      currency: 'TRY',
       status: 'PENDING',
       createdAt: new Date().toISOString(),
     }),
