@@ -1,14 +1,3 @@
-/* ═══════════════════════════════════════════════════════════════════════════
- * ⚠️  TEST MODE AKTIF — SADECE TEMEL PAKET ⚠️
- * PACKAGE_PRICES_EUR['Temel Paket'] = 1 EUR (orijinal: 149)
- * Klinik ve Kurumsal Paket orijinal fiyatlarında — yanlışlıkla seçilirse
- * gerçek tutar çekilir, dikkat.
- *
- * Test bitince:
- *   1. 'Temel Paket': 1 → 'Temel Paket': 149 yap
- *   2. TEST MODE yorumlarını ve bu header'ı kaldır
- *   3. npx wrangler deploy
- * ═══════════════════════════════════════════════════════════════════════════ */
 // src/index.js
 // Hydrozid Worker (tek dosya) — HalkOde ödeme entegrasyonu
 // Cloudflare Worker (static assets + fetch handler) modunda çalışır.
@@ -35,10 +24,14 @@
 const PLATFORMODE_BASE = 'https://app.halkode.com.tr/ccpayment';
 const TOKEN_KV_KEY = 'token:halkode';
 
-const PACKAGE_PRICES_EUR = {
-  // ⚠️ TEST MODE — 'Temel Paket' 1 EUR'ya düşürüldü, orijinal: 149
-  // Test bitince 1 → 149 yap ve yorum satırlarını kaldır.
+const TEST_MODE = false;  // tek yerden kontrol
+
+const PACKAGE_PRICES_EUR = TEST_MODE ? {
   'Temel Paket':    1,
+  'Klinik Paketi':  2,
+  'Kurumsal Paket': 3,
+} : {
+  'Temel Paket':    149,
   'Klinik Paketi':  695,
   'Kurumsal Paket': 1290,
 };
