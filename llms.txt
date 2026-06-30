@@ -77,8 +77,54 @@ www.hydrozidtr.com üzerinden online sipariş veya WhatsApp (+90 553 475 9032) i
 
 ## Sayfa Dizini
 
+### Ana Sayfalar
 - [Ana Sayfa](https://www.hydrozidtr.com/): Ürün özellikleri, endikasyonlar, fiyatlandırma, sipariş formu
+- [Blog](https://www.hydrozidtr.com/blog.html): Tüm makalelere kategori bazlı erişim
 - [Sık Sorulan Sorular](https://www.hydrozidtr.com/sss.html): Hekim ve hasta soruları
-- [Blog](https://www.hydrozidtr.com/blog.html): Siğil ve lezyon tedavisi hakkında medikal içerik
+
+### Blog: Siğil (Verruca, HPV)
+- [Siğil Tedavisi Kapsamlı Rehber](https://www.hydrozidtr.com/blog/sigil-tedavisi-rehberi.html): Tüm tedavi yöntemleri (kriyoterapi, lazer, salisilik asit, elektrokoter)
+- [Siğil Tedavisi Yöntemleri](https://www.hydrozidtr.com/blog/sigil-tedavisi-yontemleri.html)
+- [Siğil Evde Nasıl Geçer?](https://www.hydrozidtr.com/blog/sigil-evde-nasil-gecer.html)
+- [Siğil Kaç Seansta Geçer?](https://www.hydrozidtr.com/blog/sigil-kac-seansta-gecer.html)
+- [Siğil Tekrar Çıkar mı?](https://www.hydrozidtr.com/blog/sigil-tekrar-cikar-mi.html)
+- [Siğil İlaçları Nelerdir?](https://www.hydrozidtr.com/blog/sigil-ilaclari-nelerdir.html)
+- [Siğil Kökü Nasıl Çıkarılır?](https://www.hydrozidtr.com/blog/sigil-koku-nasil-cikarilir.html)
+- [Bulaşıcı Siğil Nedir, Nasıl Geçer?](https://www.hydrozidtr.com/blog/bulasici-sigil-nedir-nasil-gecer.html)
+- [Kondilom-Siğil Farkı](https://www.hydrozidtr.com/blog/kondilom-sigil-farki.html)
+- [HPV Aşısı Siğili Önler mi?](https://www.hydrozidtr.com/blog/hpv-asisi-sigili-onler-mi.html)
+- [Yüz Siğili Tedavisi](https://www.hydrozidtr.com/blog/yuz-sigili-tedavisi.html)
+- [Çocuklarda Siğil Tedavisi](https://www.hydrozidtr.com/blog/cocuklarda-sigil-tedavisi.html)
+- [Ayak Tabanı Siğili Tedavisi](https://www.hydrozidtr.com/blog/ayak-tabani-sigili-tedavisi.html)
+- [Erkeklerde Genital Siğil](https://www.hydrozidtr.com/blog/erkeklerde-genital-sigil.html)
+- [Kadınlarda Genital Siğil](https://www.hydrozidtr.com/blog/kadinlarda-genital-sigil.html)
+- [Genital Siğil Evde Nasıl Geçer?](https://www.hydrozidtr.com/blog/genital-sigil-evde-nasil-gecer.html)
+
+### Blog: Et Beni (Acrochordon, Skin Tag)
+- [Et Beni Tedavisi Kapsamlı Rehber](https://www.hydrozidtr.com/blog/et-beni-tedavisi-rehberi.html)
+- [Et Beni Nedir, Neden Çıkar?](https://www.hydrozidtr.com/blog/et-beni-nedir-neden-cikar.html)
+- [Et Beni Nasıl Geçer?](https://www.hydrozidtr.com/blog/et-beni-nasil-gecer.html)
+- [Et Beni Dondurma (Kriyoterapi) Tedavisi](https://www.hydrozidtr.com/blog/et-beni-dondurma-tedavisi.html)
+- [Et Beni Elektrokoter Tedavisi](https://www.hydrozidtr.com/blog/et-beni-elektrokoter-tedavisi.html)
+- [Et Beni İlacı / Losyon](https://www.hydrozidtr.com/blog/et-beni-ilaci-losyon.html)
+- [Et Beni - İnsülin Direnci İlişkisi](https://www.hydrozidtr.com/blog/et-beni-insulin-direnci.html)
+- [Et Beni - Siğil Farkı](https://www.hydrozidtr.com/blog/et-beni-sigil-farki.html)
+- [Boyunda Et Beni Tedavisi](https://www.hydrozidtr.com/blog/boyunda-et-beni-tedavisi.html)
+- [Göz Kapağında Et Beni](https://www.hydrozidtr.com/blog/goz-kapaginda-et-beni.html)
+
+### Blog: Güneş Lekesi (Lentigo, Aktinik Keratoz)
+- [Güneş Lekesi Tedavisi Kapsamlı Rehber](https://www.hydrozidtr.com/blog/gunes-lekesi-tedavisi-rehberi.html)
+- [Güneş Lekesi Nedir, Neden Olur?](https://www.hydrozidtr.com/blog/gunes-lekesi-nedir-neden-olur.html)
+- [Güneş Lekesi Dondurma Tedavisi](https://www.hydrozidtr.com/blog/gunes-lekesi-dondurma-tedavisi.html)
+- [Güneş Lekesi Kremi](https://www.hydrozidtr.com/blog/gunes-lekesi-kremi.html)
+- [Yüzde Güneş Lekesi Nasıl Geçer?](https://www.hydrozidtr.com/blog/yuzde-gunes-lekesi-nasil-gecer.html)
+- [SPF ile Güneş Lekesi Korunma](https://www.hydrozidtr.com/blog/gunes-lekesi-spf-korunma.html)
+- [Lentigo - Yaşlılık Lekesi](https://www.hydrozidtr.com/blog/lentigo-nedir-yaslilik-lekesi.html)
+- [Melazma Nedir?](https://www.hydrozidtr.com/blog/melazma-nedir.html)
+
+### Karşılaştırma
+- [Hydrozid® vs Histofreezer® Bilimsel Karşılaştırma](https://www.hydrozidtr.com/histofreezer-karsilastirma.html): İki portatif kriyocerrahi cihazının aktif madde, güvenlik (non-flammable vs flammable), klinik kanıt (PubMed 2024 peer-reviewed çalışma), endikasyonlar (8 vs 9) ve fiyat politikası (şeffaf vs belirsiz) açısından objektif karşılaştırması. Hekimlere yönelik bilimsel analiz.
+
+### Yasal
 - [Gizlilik Politikası](https://www.hydrozidtr.com/gizlilik-politikasi.html)
 - [Mesafeli Satış Sözleşmesi](https://www.hydrozidtr.com/mesafeli-satis-sozlesmesi.html)
