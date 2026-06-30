@@ -3,12 +3,34 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17613782027"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17613782027');
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hydrozid® | Siğil, Et Beni ve Güneş Lekesi için FDA Onaylı Kriyoterapi Cihazı</title>
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/apple-icon-57x57.png" />
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/apple-icon-60x60.png" />
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/apple-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/apple-icon-76x76.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/apple-icon-120x120.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/apple-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-icon-180x180.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/android-icon-192x192.png" />
+  <meta name="msapplication-TileImage" content="/assets/ms-icon-144x144.png" />
+  <meta name="msapplication-TileColor" content="#070B14" />
+  <title>Siğil Dondurma Spreyi | FDA Onaylı Cryotherapy Çözümü | Hydrozid®</title>
   <meta name="description"
-    content="Kliniğinizde 30 saniyede siğil, et beni, seboreik keratoz ve güneş lekesi tedavisi. Sıvı nitrojen gerekmez. FDA onaylı norfluran teknolojisi. Adet başı 125 EUR'dan başlayan fiyatlarla." />
+    content="Hydrozid® cryotherapy spreyi ile siğil ve et beni uygulamalarında hızlı ve pratik çözüm. FDA onaylı teknoloji, sıvı nitrojen gerekmez. Kliniğinizde 30 saniyede uygulama. 125 EUR'dan başlayan fiyatlar." />
   <meta name="keywords"
-    content="siğil tedavisi, et beni tedavisi, güneş lekesi tedavisi, kriyoterapi cihazı, FDA onaylı kriyoterapi, seboreik keratoz, aktinik keratoz, plantar siğil, norfluran, Hydrozid" />
+    content="siğil tedavisi, et beni tedavisi, güneş lekesi tedavisi, kriyoterapi spreyi, FDA onaylı kriyoterapi, seboreik keratoz, aktinik keratoz, plantar siğil, norfluran, Hydrozid" />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Hydrozid Türkiye" />
   <link rel="canonical" href="https://www.hydrozidtr.com/" />
@@ -16,7 +38,7 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.hydrozidtr.com/" />
-  <meta property="og:title" content="Hydrozid® | Siğil, Et Beni ve Güneş Lekesi için FDA Onaylı Kriyoterapi Cihazı" />
+  <meta property="og:title" content="Hydrozid® | Siğil, Et Beni ve Güneş Lekesi için FDA Onaylı Kriyoterapi Spreyi" />
   <meta property="og:description"
     content="Kliniğinizde 30 saniyede siğil, et beni, seboreik keratoz ve güneş lekesi tedavisi. Sıvı nitrojen gerekmez. FDA onaylı norfluran teknolojisi." />
   <meta property="og:image" content="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" />
@@ -25,16 +47,21 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Hydrozid® | FDA Onaylı Kriyoterapi Cihazı" />
+  <meta name="twitter:title" content="Hydrozid® | FDA Onaylı Kriyoterapi Spreyi" />
   <meta name="twitter:description"
     content="30 saniyede siğil tedavisi. Sıvı nitrojen gerekmez. FDA onaylı norfluran teknolojisi." />
   <meta name="twitter:image" content="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
+  <!-- Non-blocking font load — eliminates 600ms render block -->
+  <link rel="preload"
     href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Nunito+Sans:wght@300;400;600;700&display=swap"
-    rel="stylesheet" />
+    as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Nunito+Sans:wght@300;400;600;700&display=swap" /></noscript>
+  <!-- Preload LCP image -->
+  <link rel="preload" as="image" href="/assets/hydrozid-product-nobg.png" fetchpriority="high" />
 
   <style>
     /* ─── Reset & Base ─── */
@@ -2807,6 +2834,157 @@
       }
     }
   </style>
+
+  <!-- GA_MEASUREMENT_ID placeholder kaldırıldı — aktif ise G-XXXXXXXXXX ile buraya ekle -->
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Hydrozid Türkiye",
+    "alternateName": "Batu Medikal",
+    "url": "https://www.hydrozidtr.com",
+    "logo": "https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+90-553-475-9032",
+      "contactType": "customer service",
+      "areaServed": "TR",
+      "availableLanguage": ["Turkish"]
+    },
+    "sameAs": [
+      "https://instagram.com/batu_medikal",
+      "https://www.tiktok.com/@batu_medikal",
+      "https://youtube.com/@Batu_Medikal",
+      "https://facebook.com/medikal.batu"
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Hydrozid Kriyoterapi Spreyi",
+    "image": "https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png",
+    "description": "FDA 510(k) onaylı, CE belgeli norfluran teknolojisi ile çalışan profesyonel kriyoterapi spreyi. Siğil, et beni, seboreik keratoz, aktinik keratoz tedavisi.",
+    "brand": { "@type": "Brand", "name": "Hydrozid" },
+    "category": "Medical Device / Cryotherapy",
+    "manufacturer": { "@type": "Organization", "name": "Hydrozid" },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Temel Paket",
+        "price": "149",
+        "priceCurrency": "EUR",
+        "description": "1 adet kriyoterapi spreyi",
+        "availability": "https://schema.org/InStock"
+      },
+      {
+        "@type": "Offer",
+        "name": "Klinik Paketi",
+        "price": "695",
+        "priceCurrency": "EUR",
+        "description": "5 adet · adet başı 139 EUR",
+        "availability": "https://schema.org/InStock"
+      },
+      {
+        "@type": "Offer",
+        "name": "Kurumsal Paket",
+        "price": "1290",
+        "priceCurrency": "EUR",
+        "description": "10 adet · adet başı 129 EUR",
+        "availability": "https://schema.org/InStock"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "reviewCount": "22"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Hydrozid kriyoterapi spreyi nedir?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FDA 510(k) onaylı, CE belgeli norfluran teknolojisiyle çalışan profesyonel bir kriyoterapi spreyidir. Siğil, et beni, seboreik keratoz ve güneş lekelerinin 30 saniyede tedavisi için kullanılır."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Sıvı nitrojen gerektirir mi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hayır. Hydrozid norfluran (1,1,1,2-tetrafluoroethane) teknolojisi kullanır. Sıvı nitrojen depolama veya özel ekipman gerektirmez. Klinikte oda sıcaklığında saklanır."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Kimler kullanabilir?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hydrozid sadece dermatoloji ve aile hekimliği uzmanları, klinikler ve hastaneler tarafından kullanılması için tasarlanmıştır. Sipariş için doktor diploma numarası gereklidir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Hangi rahatsızlıklarda etkilidir?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Vulgaris siğil, plantar siğil, düz siğil, et beni (acrochordon), seboreik keratoz, aktinik keratoz, molluscum contagiosum ve güneş lekesi tedavisinde etkilidir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Tedavi süresi ne kadardır?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tek lezyon için ortalama 30 saniyelik uygulama yeterlidir. Çoğu durumda tek seans yeterli olur, dirençli lezyonlarda 2-3 hafta arayla tekrar uygulanabilir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Türkiye'de nasıl sipariş verebilirim?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "www.hydrozidtr.com sitesinden online sipariş verebilirsiniz. WhatsApp +90 553 475 9032 üzerinden de doğrudan görüşebilirsiniz. 1-3 iş günü içinde kargolanır."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Hydrozid siğil tedavisinde etkili midir?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Evet. Hydrozid, plantar siğil ve verruca vulgaris dahil birçok siğil türünde FDA onaylı kriyoterapi uygular. Klinik çalışmalar yüksek etkinlik oranı göstermektedir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Et beni tedavisinde Hydrozid kullanılabilir mi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Evet. Fibroepitelyal polip (et beni) Hydrozid'in onaylı endikasyonları arasındadır. 10–30 saniyede uygulama tamamlanır."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Güneş lekesi ve yaşlılık lekesi tedavisinde kullanılır mı?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Evet. Aktinik keratoz ve yaşlılık/güneş lekeleri Hydrozid'in tedavi ettiği endikasyonlar arasındadır."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -2897,7 +3075,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span class="gl" data-text="Kapıda ödeme">Kapıda ödeme</span>
+              <span class="gl" data-text="Güvenli alışveriş">Güvenli alışveriş</span>
             </span>
             <span class="hz-trust-pill">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -2911,7 +3089,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span class="gl" data-text="30 gün iade">30 gün iade</span>
+              <span class="gl" data-text="%100 müşteri memnuniyeti">%100 müşteri memnuniyeti</span>
             </span>
           </div>
 
@@ -3178,7 +3356,7 @@
       <div class="how-video-wrap reveal">
         <iframe
           src="https://player.vimeo.com/video/889158223?h=79852c7756&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0&background=1&dnt=1"
-          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Hydrozid Uygulama Talimatı">
+          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" title="Hydrozid Uygulama Talimatı">
         </iframe>
       </div>
 
@@ -3561,8 +3739,7 @@
     });
   </script>
 
-  <!-- YouTube IFrame API — hero background video -->
-  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- YouTube IFrame API — lazy loaded after page is interactive to avoid 820KB JS block -->
   <script>
     var heroPlayer;
     function onYouTubeIframeAPIReady() {
@@ -3585,6 +3762,16 @@
           onReady: function (e) { e.target.playVideo(); }
         }
       });
+    }
+    function loadYouTubeAPI() {
+      var tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadYouTubeAPI, { timeout: 3000 });
+    } else {
+      window.addEventListener('load', function () { setTimeout(loadYouTubeAPI, 1500); });
     }
   </script>
 
@@ -3615,7 +3802,7 @@
   {
     "@context": "https://schema.org",
     "@type": "MedicalDevice",
-    "name": "Hydrozid® Kriyoterapi Cihazı",
+    "name": "Hydrozid® Kriyoterapi Spreyi",
     "description": "FDA onaylı, sıvı nitrojen gerektirmeyen norfluran bazlı kriyocerrahi cihazı. Siğil, et beni, seboreik keratoz ve güneş lekesi tedavisinde kullanılır.",
     "url": "https://www.hydrozidtr.com",
     "brand": {
@@ -3628,7 +3815,7 @@
         "name": "Tekli",
         "price": "149",
         "priceCurrency": "EUR",
-        "description": "1 adet Hydrozid kriyoterapi cihazı",
+        "description": "1 adet Hydrozid kriyoterapi spreyi",
         "availability": "https://schema.org/InStock"
       },
       {
@@ -3681,55 +3868,47 @@
         "text": "10–30 saniyede uygulama tamamlanır. Hasta hemen kliniği terk edebilir."
       }
     ]
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Hydrozid siğil tedavisinde etkili midir?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Evet. Hydrozid, plantar siğil ve verruca vulgaris dahil birçok siğil türünde FDA onaylı kriyoterapi uygular. Klinik çalışmalar yüksek etkinlik oranı göstermektedir."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Et beni tedavisinde Hydrozid kullanılabilir mi?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Evet. Fibroepitelyal polip (et beni) Hydrozid'in onaylı endikasyonları arasındadır. 10–30 saniyede uygulama tamamlanır."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Güneş lekesi ve yaşlılık lekesi tedavisinde kullanılır mı?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Evet. Aktinik keratoz ve yaşlılık/güneş lekeleri Hydrozid'in tedavi ettiği endikasyonlar arasındadır."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Sıvı nitrojen gerekiyor mu?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Hayır. Hydrozid, sıvı nitrojen yerine FDA onaylı norfluran gazı kullanır. Özel depolama veya güvenlik ekipmanı gerekmez."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Hydrozid Türkiye'de nereden satın alınır?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "bilgi@hydrozidtr.com adresine e-posta göndererek veya WhatsApp (+90 553 475 9032) üzerinden sipariş verebilirsiniz. Tekli fiyat 149 EUR'dan başlamaktadır."
-        }
-      }
-    ]
   }
 ]
 </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalDevice",
+    "name": "Hydrozid Kriyoterapi Cihazı",
+    "description": "FDA 510(k) onaylı, CE belgeli norfluran (HFA-134a) bazlı taşınabilir kriyocerrahi cihazı. Sıvı nitrojen alternatifi.",
+    "image": "https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png",
+    "manufacturer": {
+      "@type": "Organization",
+      "name": "Hydrozid"
+    },
+    "medicineSystem": "https://schema.org/WesternConventional",
+    "recognizingAuthority": [
+      { "@type": "Organization", "name": "FDA" },
+      { "@type": "Organization", "name": "CE" }
+    ],
+    "purpose": "Cilt lezyonlarının kriyoterapi ile tedavisi (siğil, et beni, güneş lekesi, seboreik keratoz, aktinik keratoz, molluscum contagiosum)"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalProcedure",
+    "name": "Hydrozid Kriyoterapi Uygulaması",
+    "description": "Norfluran bazlı kriyoterapi ile siğil, et beni ve diğer cilt lezyonlarının 10-30 saniyede dondurularak tedavisi.",
+    "procedureType": "https://schema.org/TherapeuticProcedure",
+    "howPerformed": "Tek kullanımlık uygulatör cihaza monte edilir, lezyonun 1-2 mm üzerine yerleştirilir, 10-30 saniye uygulanır. Lezyon donar, 2-4 hafta içinde dökülür.",
+    "preparation": "Lezyon bölgesi alkollü swab ile temizlenir.",
+    "followup": "Çözülme sonrası kızarıklık ve kabuk oluşumu normaldir. Gerekirse 2-3 hafta sonra tekrar uygulama yapılabilir.",
+    "bodyLocation": ["Cilt yüzeyi", "El", "Ayak", "Boyun", "Yüz", "Genital bölge"],
+    "medicalDevice": {
+      "@type": "MedicalDevice",
+      "name": "Hydrozid Kriyoterapi Cihazı"
+    }
+  }
+  </script>
 
   <!-- Pretext: pixel-accurate text layout on resize -->
   <!-- Vendor: ~/.claude/skills/gstack/design-html/vendor/pretext.js -->
@@ -4229,25 +4408,13 @@
           <label for="omPackage">Paket Seçimi <span style="color:#EF4444">*</span></label>
           <select id="omPackage" required>
             <option value="" data-price="">— Paket seçiniz —</option>
-            <option value="Temel Paket" data-price="149">Temel Paket — 149 EUR (1 adet)</option>
-            <option value="Klinik Paketi" data-price="695">Klinik Paketi — 139 EUR × 5 = 695 EUR</option>
-            <option value="Kurumsal Paket" data-price="1290">Kurumsal Paket — 129 EUR × 10 = 1.290 EUR</option>
+            <option value="Temel Paket" data-price="149" data-eur-unit="149" data-qty="1">Temel Paket — 1 adet × 149 EURO</option>
+            <option value="Klinik Paketi" data-price="695" data-eur-unit="139" data-qty="5">Klinik Paketi — 5 adet × 139 EURO</option>
+            <option value="Kurumsal Paket" data-price="1290" data-eur-unit="129" data-qty="10">Kurumsal Paket — 10 adet × 129 EURO</option>
           </select>
         </div>
         <div id="omPriceDisplay"
           style="display:none; font-size:1.1rem; font-weight:700; color:#00D4FF; margin: -4px 0 10px; text-align:center;">
-        </div>
-        <div class="om-field" style="margin-bottom:16px;">
-          <label style="display:block; margin-bottom:8px; font-weight:500; font-size:.93rem; color:#94A3B8;">Ödeme Para
-            Birimi</label>
-          <div style="display:flex; gap:16px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:.95rem;">
-              <input type="radio" name="currency" value="TRY" checked> <span>Türk Lirası (₺)</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:.95rem;">
-              <input type="radio" name="currency" value="EUR"> <span>Euro (€)</span>
-            </label>
-          </div>
         </div>
         <div class="om-field">
           <label for="omName">Ad Soyad <span style="color:#EF4444">*</span></label>
@@ -4277,8 +4444,32 @@
           <label for="omDiploma">Doktor Diploma No <span style="color:#EF4444">*</span></label>
           <input type="text" id="omDiploma" placeholder="Diploma numaranızı giriniz" required minlength="5">
         </div>
+        <div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.3);border-radius:10px;padding:16px 18px;margin-bottom:16px;font-size:0.82rem;color:#94A3B8;line-height:1.7">
+          <p style="margin:0 0 8px;font-weight:700;color:#00D4FF;font-size:0.88rem">🔒 Güvenli Ödeme Bilgilendirmesi</p>
+          <ul style="margin:0;padding-left:18px">
+            <li>İşlem tutarı, işlem yapıldığı günün TCMB döviz kuru üzerinden Türk Lirası olarak hesaplanır.</li>
+            <li style="margin-top:6px">Kart bilgileriniz ve ödeme işlemleriniz sitemizde tutulmaz veya saklanmaz. Ödeme doğrudan Halkbank güvenli ödeme altyapısı (HalkÖde, 3D Secure) üzerinden gerçekleştirilir.</li>
+            <li style="margin-top:6px">"Ödemeyi Tamamla" butonuna bastığınızda Halkbank güvenli ödeme sayfasına yönlendirilirsiniz. İşlem tamamlanınca otomatik olarak sitemize geri dönersiniz.</li>
+          </ul>
+        </div>
+        <div style="background:rgba(255,200,0,0.05);border:1px solid rgba(255,200,0,0.25);border-radius:10px;padding:16px 18px;margin-bottom:16px;font-size:0.85rem;color:#CBD5E1;line-height:1.7">
+          <p style="margin:0 0 12px;font-weight:700;color:#FCD34D;font-size:0.88rem">📋 Sözleşmeler ve Bilgilendirme</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.84rem">
+              <input type="checkbox" id="omTermsOnBilgi" style="margin-top:3px;cursor:pointer;width:16px;height:16px;flex-shrink:0" required>
+              <span><a href="on-bilgilendirme-formu" target="_blank" style="color:#00D4FF;text-decoration:underline">Ön Bilgilendirme Formu</a>'nu okudum, anladım ve kabul ediyorum.</span>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.84rem">
+              <input type="checkbox" id="omTermsMesafeli" style="margin-top:3px;cursor:pointer;width:16px;height:16px;flex-shrink:0" required>
+              <span><a href="mesafeli-satis-sozlesmesi.html" target="_blank" style="color:#00D4FF;text-decoration:underline">Mesafeli Satış Sözleşmesi</a>'ni okudum, anladım ve kabul ediyorum.</span>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.84rem">
+              <input type="checkbox" id="omTermsGizlilik" style="margin-top:3px;cursor:pointer;width:16px;height:16px;flex-shrink:0" required>
+              <span><a href="gizlilik-politikasi.html" target="_blank" style="color:#00D4FF;text-decoration:underline">Gizlilik Politikası</a>'nı okudum, anladım ve kabul ediyorum.</span>
+            </label>
+          </div>
+        </div>
         <button type="submit" class="om-submit" id="omSubmit">Güvenli Ödemeye Geç →</button>
-        <p class="om-note">🔒 Platformode güvenli ödeme sayfasına yönlendirileceksiniz</p>
       </form>
     </div>
   </div>
@@ -4320,11 +4511,15 @@
       const display = document.getElementById('omPriceDisplay');
       const opt = sel.options[sel.selectedIndex];
       if (!opt || !opt.dataset.price) { display.style.display = 'none'; return; }
-      const currencyRadio = document.querySelector('input[name="currency"]:checked');
-      const isTRY = currencyRadio && currencyRadio.value === 'TRY' && opt.dataset.tryPrice;
-      const displayPrice = isTRY ? parseInt(opt.dataset.tryPrice) : parseInt(opt.dataset.price);
-      const sym = isTRY ? '₺' : 'EUR';
-      display.textContent = 'Toplam: ' + displayPrice.toLocaleString('tr-TR') + ' ' + sym;
+      if (opt.dataset.tryPrice) {
+        const eurUnit = parseInt(opt.dataset.eurUnit || opt.dataset.price);
+        const qty = parseInt(opt.dataset.qty || 1);
+        const rate = window.eurTryRate ? window.eurTryRate.toFixed(2) : null;
+        const totalTry = parseInt(opt.dataset.tryPrice);
+        display.textContent = totalTry.toLocaleString('tr-TR') + ' ₺' + (rate ? ' (TCMB kuru ile)' : '');
+      } else {
+        display.textContent = 'Toplam: ' + parseInt(opt.dataset.price).toLocaleString('tr-TR') + ' EUR';
+      }
       display.style.display = 'block';
     }
     document.getElementById('omPackage').addEventListener('change', updatePriceDisplay);
@@ -4332,8 +4527,12 @@
       document.getElementById('orderOverlay').classList.remove('active');
       document.body.style.overflow = '';
     }
+    let _overlayMouseDownTarget = null;
+    document.getElementById('orderOverlay').addEventListener('mousedown', function (e) {
+      _overlayMouseDownTarget = e.target;
+    });
     document.getElementById('orderOverlay').addEventListener('click', function (e) {
-      if (e.target === this) closeOrderModal();
+      if (e.target === this && _overlayMouseDownTarget === this) closeOrderModal();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
@@ -4365,8 +4564,14 @@
       const diploma = document.getElementById('omDiploma').value.trim();
       const pkgSel = document.getElementById('omPackage');
       const selectedPackage = pkgSel.value;
-      const currency = (document.querySelector('input[name="currency"]:checked') || {}).value || 'TRY';
       if (!selectedPackage) { alert('Lütfen bir paket seçiniz.'); return; }
+      const termsOnBilgi = document.getElementById('omTermsOnBilgi').checked;
+      const termsMesafeli = document.getElementById('omTermsMesafeli').checked;
+      const termsGizlilik = document.getElementById('omTermsGizlilik').checked;
+      if (!termsOnBilgi || !termsMesafeli || !termsGizlilik) {
+        alert('Lütfen Ön Bilgilendirme Formu, Mesafeli Satış Sözleşmesi ve Gizlilik Politikası kutularını işaretleyiniz.');
+        return;
+      }
       if (!name || !email || !phone || !city || !address || !diploma) return;
       btn.disabled = true;
       btn.textContent = 'Yönlendiriliyor...';
@@ -4374,7 +4579,12 @@
         const resp = await fetch('/api/payment/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone, city, address, diploma, package: selectedPackage, currency })
+          body: JSON.stringify({
+            name, email, phone, city, address, diploma,
+            package: selectedPackage,
+            acceptedTerms: { onBilgi: true, mesafeli: true, gizlilik: true },
+            acceptedAt: new Date().toISOString()
+          })
         });
         const data = await resp.json();
         if (!resp.ok || !data.link) {
@@ -4424,14 +4634,6 @@
       });
     }
 
-    // Currency toggle → dropdown etiketleri + fiyat göstergesi güncelle
-    document.querySelectorAll('input[name="currency"]').forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        applyDropdownLabels(this.value === 'TRY');
-        updatePriceDisplay();
-      });
-    });
-
     (async function () {
       try {
         const res = await fetch('https://hydrozidtr.com/api/currency');
@@ -4447,17 +4649,21 @@
           el.innerHTML = tryPrice.toLocaleString('tr-TR') + ' <span class="pc-currency">₺</span>';
         });
 
-        // Dropdown'a data-try-price ekle (data-price EUR olarak kalır)
+        // Dropdown'a data-try-price ekle, TRY etiketleri güncelle
         const sel = document.getElementById('omPackage');
         PACKAGES.forEach(function (pkg) {
           const opt = Array.from(sel.options).find(function (o) { return o.value === pkg.value; });
           if (!opt) return;
-          opt.dataset.tryPrice = Math.round(pkg.eurUnit * rate) * pkg.qty;
+          const totalTry = Math.round(pkg.eurUnit * rate) * pkg.qty;
+          opt.dataset.tryPrice = totalTry;
+          const unitTry = Math.round(pkg.eurUnit * rate);
+          if (pkg.qty === 1) {
+            opt.textContent = pkg.value + ' — 1 adet × ' + unitTry.toLocaleString('tr-TR') + ' ₺';
+          } else {
+            opt.textContent = pkg.value + ' — ' + pkg.qty + ' adet × ' + unitTry.toLocaleString('tr-TR') + ' ₺ = ' + totalTry.toLocaleString('tr-TR') + ' ₺';
+          }
         });
 
-        // Seçili para birimine göre etiketleri güncelle
-        const isTRY = (document.querySelector('input[name="currency"]:checked') || {}).value !== 'EUR';
-        applyDropdownLabels(isTRY);
         updatePriceDisplay();
       } catch (e) {
         // API'ye ulaşılamazsa EUR gösterimi olduğu gibi kalır
