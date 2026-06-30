@@ -1,0 +1,6 @@
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.youtube.com https://s.ytimg.com https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com https://i.ytimg.com https://i.vimeocdn.com https://f.vimeocdn.com; connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com https://www.youtube.com https://vimeo.com https://esm.sh; frame-src https://app.halkode.com.tr https://www.youtube.com https://player.vimeo.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://app.halkode.com.tr;

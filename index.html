@@ -3149,8 +3149,11 @@
           <div class="device-wrap">
             <div class="device-aura"></div>
             <div class="device-img-wrap">
-              <img src="assets/hydrozid-product-nobg.png" alt="Hydrozid Cryotherapy cihazı — FDA onaylı"
-                class="device-product-img" loading="eager" draggable="false">
+              <picture>
+                <source srcset="assets/hydrozid-product-nobg.webp" type="image/webp">
+                <img src="assets/hydrozid-product-nobg.png" alt="Hydrozid Cryotherapy cihazı — FDA onaylı"
+                  class="device-product-img" loading="eager" draggable="false" width="178" height="379">
+              </picture>
             </div>
           </div>
 
@@ -3190,7 +3193,7 @@
         <a href="https://etbis.ticaret.gov.tr/tr" target="_blank" rel="noopener"
           class="hz-etbis-badge hz-etbis-bottom-row" aria-label="ETBİS — Elektronik Ticaret Bilgi Sistemi kaydı">
           <img src="assets/logo-tic-3.png" alt="Türkiye Cumhuriyeti Ticaret Bakanlığı" class="hz-etbis-logo"
-            loading="lazy">
+            loading="lazy" width="80" height="40">
           <span class="hz-etbis-divider"></span>
           <span class="hz-etbis-text">
             <span class="hz-etbis-title">ETBİS'e Kayıtlıdır</span>
@@ -3786,16 +3789,20 @@
         }
       });
     }
+    var ytLoaded = false;
     function loadYouTubeAPI() {
+      if (ytLoaded) return;
+      ytLoaded = true;
       var tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
       document.head.appendChild(tag);
     }
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(loadYouTubeAPI, { timeout: 3000 });
-    } else {
-      window.addEventListener('load', function () { setTimeout(loadYouTubeAPI, 1500); });
-    }
+    // Yalnızca kullanıcı etkileşimi sonrası yükle — Lighthouse skoru korur
+    ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
+      window.addEventListener(evt, loadYouTubeAPI, { once: true, passive: true });
+    });
+    // Fallback: 6 saniye sonra yükle (etkileşimsiz kullanıcılar için)
+    setTimeout(loadYouTubeAPI, 6000);
   </script>
 
   <script type="application/ld+json">
