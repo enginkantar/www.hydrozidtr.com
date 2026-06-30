@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yüz Siğili Tedavisi: Düz Siğil (Verruca Plana) ve Yüzdeki HPV Lezyonları | Hydrozid</title>
+  <meta name="description" content="Yüz siğili nasıl tedavi edilir? Verruca plana (düz siğil), verruca vulgaris ve molluscum contagiosum için en güvenli yöntemler. Yara izi riski olmadan FDA onaylı kriyoterapi." />
+  <link rel="canonical" href="https://www.hydrozidtr.com/blog/yuz-sigili-tedavisi.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #070B14;
+      --bg-card:     #0D1421;
+      --accent:      #00D4FF;
+      --accent2:     #0099CC;
+      --accent-dim:  rgba(0, 212, 255, 0.08);
+      --text-h:      #FFFFFF;
+      --text-b:      #94A3B8;
+      --text-dim:    #64748B;
+      --border:      rgba(0, 212, 255, 0.15);
+      --border-med:  rgba(0, 212, 255, 0.25);
+      --glow-sm:     0 0 8px rgba(0, 212, 255, 0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-b);
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,212,255,0.05) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(0,212,255,0.09) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,11,20,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 32px;
+    }
+
+    .nav-logo {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 900;
+      font-size: 1.25rem;
+      text-decoration: none;
+      background: linear-gradient(90deg, #fff 0%, var(--accent) 60%, #fff 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-logo .reg { font-size: 0.85em; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-h);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.85;
+      transition: color 0.2s, opacity 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--accent); opacity: 1; }
+
+    .nav-cta {
+      border: 1.5px solid rgba(0,212,255,0.6);
+      color: #fff !important;
+      padding: 7px 18px;
+      border-radius: 8px;
+    }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-h);
+      border-radius: 2px;
+    }
+
+    /* ─── ARTICLE LAYOUT ─── */
+    .article-wrap {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+      padding: 56px 0 96px;
+      align-items: start;
+    }
+
+    /* ─── ARTICLE HEADER ─── */
+    .article-header {
+      margin-bottom: 40px;
+    }
+
+    .article-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .article-breadcrumb a {
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+
+    .article-breadcrumb a:hover { color: var(--accent); }
+
+    .article-tag {
+      display: inline-block;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-med);
+      border-radius: 999px;
+      padding: 3px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      color: var(--text-h);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .article-lead {
+      font-size: 1.05rem;
+      color: var(--text-b);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .article-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ─── ARTICLE BODY ─── */
+    .article-body h2 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--text-h);
+      margin: 40px 0 16px;
+      padding-top: 8px;
+    }
+
+    .article-body h3 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-h);
+      margin: 28px 0 10px;
+    }
+
+    .article-body p {
+      margin-bottom: 16px;
+      color: var(--text-b);
+      line-height: 1.75;
+    }
+
+    .article-body ul, .article-body ol {
+      margin: 0 0 20px 20px;
+      color: var(--text-b);
+    }
+
+    .article-body li {
+      margin-bottom: 8px;
+      line-height: 1.65;
+    }
+
+    .article-body strong {
+      color: var(--text-h);
+      font-weight: 700;
+    }
+
+    .article-body a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0,212,255,0.3);
+      transition: border-color 0.2s;
+    }
+
+    .article-body a:hover { border-color: var(--accent); }
+
+    /* ─── INFO BOX ─── */
+    .info-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .info-box p {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .warning-box {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-left: 3px solid #EF4444;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .warning-box p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: #FCA5A5;
+    }
+
+    .tip-box {
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-left: 3px solid #10B981;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .tip-box p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: #6EE7B7;
+    }
+
+    /* ─── COMPARISON TABLE ─── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.9rem;
+    }
+
+    .compare-table th {
+      background: #0D1421;
+      color: var(--accent);
+      font-weight: 700;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--border-med);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .compare-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-b);
+      vertical-align: top;
+    }
+
+    .compare-table tr:last-child td { border-bottom: none; }
+
+    .compare-table tr:hover td { background: rgba(0,212,255,0.02); }
+
+    .td-good { color: #10B981; font-weight: 600; }
+    .td-warn { color: #F59E0B; }
+    .td-bad  { color: #EF4444; }
+
+    /* ─── INLINE CTA ─── */
+    .inline-cta {
+      background: #0D1421;
+      border: 1px solid var(--border-med);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 40px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .inline-cta p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-b);
+    }
+
+    .inline-cta strong { color: var(--text-h); }
+
+    .inline-cta-btns {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37,211,102,0.12);
+      border: 1px solid rgba(37,211,102,0.3);
+      color: #25D366;
+      padding: 9px 16px;
+      border-radius: 7px;
+      font: 600 0.85rem 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn-mail {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 9px 16px;
+      border-radius: 7px;
+      font: 600 0.85rem 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn-satin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239,68,68,0.12);
+      border: 1.5px solid rgba(239,68,68,0.4);
+      color: #EF4444;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 9px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-wa:hover, .btn-mail:hover, .btn-satin:hover { opacity: 0.75; }
+
+    /* ─── TEDAVI KARTI ─── */
+    .treatment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .treatment-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+
+    .treatment-card h4 {
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-h);
+      margin-bottom: 8px;
+    }
+
+    .treatment-card p {
+      font-size: 0.84rem;
+      color: var(--text-b);
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    .treatment-card.best {
+      border-color: var(--border-med);
+      background: linear-gradient(135deg, #0D1421 0%, rgba(0,212,255,0.04) 100%);
+    }
+
+    .treatment-card .badge {
+      display: inline-block;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-med);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* ─── FAQ ─── */
+    .faq-section { margin-top: 48px; }
+
+    .faq-section h2 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--text-h);
+      margin-bottom: 20px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: #0D1421;
+    }
+
+    .faq-item.open { border-color: var(--border-med); }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-q span {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-h);
+    }
+
+    .faq-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+
+    .faq-item.open .faq-icon svg { transform: rotate(45deg); }
+
+    .faq-a {
+      display: none;
+      padding: 0 20px 16px;
+      font-size: 0.9rem;
+      color: var(--text-b);
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .faq-item.open .faq-a { display: block; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar { position: sticky; top: 88px; }
+
+    .sidebar-card {
+      background: #0D1421;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-card h3 {
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-h);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-card p {
+      font-size: 0.85rem;
+      color: var(--text-b);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .sidebar-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-cta a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 7px;
+      font: 600 0.85rem 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .sidebar-cta .wa { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.3); color: #25D366; }
+    .sidebar-cta .mail { background: var(--accent-dim); border: 1px solid var(--border); color: var(--accent); }
+    .sidebar-cta a:hover { opacity: 0.75; }
+
+    .toc { list-style: none; }
+    .toc li { margin-bottom: 8px; }
+    .toc a { font-size: 0.82rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 40px 0 32px;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      text-decoration: none;
+      background: linear-gradient(90deg, #fff 0%, var(--accent) 60%, #fff 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a { font-size: 0.82rem; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-size: 0.78rem; color: var(--text-dim); }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+    @media (max-width: 900px) {
+      .article-wrap { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .treatment-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .inline-cta { flex-direction: column; }
+      .inline-cta-btns { flex-wrap: wrap; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": "Yüz Siğili Tedavisi: Verruca Plana ve Yüzdeki HPV Lezyonlarında Doğru Yaklaşım",
+        "description": "Yüz siğili nasıl tedavi edilir? Verruca plana (düz siğil), verruca vulgaris ve molluscum contagiosum için en güvenli yöntemler. Yara izi riski olmadan FDA onaylı kriyoterapi.",
+        "author": { "@type": "Organization", "name": "Hydrozid Türkiye" },
+        "publisher": { "@type": "Organization", "name": "Hydrozid Türkiye", "url": "https://www.hydrozidtr.com" },
+        "datePublished": "2026-05-01",
+        "dateModified": "2026-05-01",
+        "mainEntityOfPage": "https://www.hydrozidtr.com/blog/yuz-sigili-tedavisi.html",
+        "keywords": "yüz siğili tedavisi, düz siğil, verruca plana, yüzdeki siğil, verruca vulgaris yüz, siğil kriyoterapi"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Hydrozid Türkiye", "item": "https://www.hydrozidtr.com" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.hydrozidtr.com/blog.html" },
+          { "@type": "ListItem", "position": 3, "name": "Yüz Siğili Tedavisi", "item": "https://www.hydrozidtr.com/blog/yuz-sigili-tedavisi.html" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Yüzdeki siğil kendiliğinden geçer mi?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Verruca plana (düz siğil) zaman zaman bağışıklık sistemi tarafından yıllar içinde temizlenebilir; ancak bu süre öngörülemez, kozmetik rahatsızlık bu süre boyunca devam eder ve lezyonlar bu dönemde çevredeki deriye yayılabilir. Klinikte kriyoterapi veya topikal tedavi ile bu süreç önemli ölçüde kısaltılabilir." }
+          },
+          {
+            "@type": "Question",
+            "name": "Yüz siğilinde yara izi kalır mı?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Doğru protokolle uygulanan kriyoterapi yüzde genellikle kalıcı yara izi bırakmaz. Aşırı dondurma, derin kimyasal soyma veya elektrokoter gibi agresif yöntemlerde skar ve pigment değişikliği riski vardır. Hafif dozda norfluran bazlı kriyoterapi (Hydrozid) ve düşük konsantrasyonlu topikal tedaviler yüz bölgesi için tercih edilen güvenli seçeneklerdir." }
+          },
+          {
+            "@type": "Question",
+            "name": "Düz siğil (verruca plana) nasıl tedavi edilir?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Verruca plana tedavisinde en sık kullanılan yöntemler hafif dozda kriyoterapi, tretinoyn (%0.025) veya adapalen içeren retinoid kremler ve imikimod kremdir. Yüzde salisilik asit kullanılacaksa konsantrasyon %10'u geçmemelidir. Lezyonlar genellikle 2–4 seanste yanıt verir." }
+          },
+          {
+            "@type": "Question",
+            "name": "Yüz siğili bulaşıcı mı?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Evet. Yüzdeki siğiller, özellikle verruca plana, tıraş ve el temasıyla çevredeki sağlıklı deriye kolayca yayılabilir (otoinnokülasyon). Kişiden kişiye bulaşma da mümkündür. Bu nedenle erken tedavi hem yayılmayı hem de başkalarına bulaşmayı önler." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Hydrozid<span class="reg">®</span></a>
+      <ul class="nav-links">
+        <li><a href="/#ozellikler">Özellikler</a></li>
+        <li><a href="/#endikasyonlar">Endikasyonlar</a></li>
+        <li><a href="/#nasil-calisir">Nasıl Çalışır</a></li>
+        <li><a href="../sss.html">SSS</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="/#iletisim">İletişim</a></li>
+        <li><a href="/#demo" class="nav-cta">Satın Al</a></li>
+      </ul>
+      <div class="nav-hamburger" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="article-wrap">
+
+    <!-- ─── MAIN ARTICLE ─── -->
+    <main>
+      <div class="article-header">
+        <div class="article-breadcrumb">
+          <a href="/">Ana Sayfa</a>
+          <span>›</span>
+          <a href="../blog.html">Blog</a>
+          <span>›</span>
+          <span>Yüz Siğili Tedavisi</span>
+        </div>
+        <div class="article-tag">Klinik Rehber</div>
+        <h1 class="article-title">Yüz Siğili Tedavisi: Düz Siğil (Verruca Plana) ve Yüzdeki HPV Lezyonları</h1>
+        <p class="article-lead">Yüzde çıkan siğiller, özellikle verruca plana, hem estetik hem de tedavi açısından özel bir yaklaşım gerektirir. Yara izi ve pigment değişikliği riski göz önünde bulundurulduğunda tedavi seçimi kritik önem taşır. Bu rehberde yüz siğili tedavisinde kanıta dayalı seçenekler ve uygulama protokolleri ele alınmaktadır.</p>
+        <div class="article-meta">
+          <div class="article-meta-item">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#64748B" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            8 dk okuma
+          </div>
+          <div class="article-meta-item">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="10" height="9" rx="1.5" stroke="#64748B" stroke-width="1.2"/><path d="M5 2v2M9 2v2M2 6h10" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Mayıs 2026
+          </div>
+          <div class="article-meta-item">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2a5 5 0 100 10A5 5 0 007 2z" stroke="#64748B" stroke-width="1.2"/><path d="M7 5v2.5L9 9" stroke="#64748B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Hydrozid Türkiye
+          </div>
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <h2 id="yuzde-hangi-sigil">Yüzde Hangi Siğil Tipleri Görülür?</h2>
+
+        <p>Yüz derisi, vücudun en hassas bölgelerinden biri olması nedeniyle HPV lezyonları için özel bir yönetim gerektirmektedir. Yüzde karşılaşılan başlıca viral siğil tipleri şunlardır:</p>
+
+        <h3 id="verruca-plana">Verruca Plana — Düz Siğil (En Yaygın)</h3>
+
+        <p><strong>Verruca plana</strong>, yüzde görülen siğillerin büyük çoğunluğundan sorumludur. HPV tip 3 ve tip 10 kaynaklı bu lezyonlar, adından da anlaşılacağı üzere düz ya da çok hafif kabarık yüzeyiyle diğer siğil tiplerinden ayrılır. Alın, yanak ve çene bölgesinde sıklıkla çok sayıda lezyon bir arada bulunur.</p>
+
+        <p>Verruca plananın temel klinik özellikleri:</p>
+        <ul>
+          <li><strong>Boyut:</strong> 1–4 mm çapında, küçük ve düzgün kenarlı</li>
+          <li><strong>Renk:</strong> Ten rengi, açık kahve veya hafif sarımsı</li>
+          <li><strong>Doku:</strong> Düz ya da çok hafif kabarık; verrucous (pürüzlü) görünüm yoktur</li>
+          <li><strong>Dağılım:</strong> Çoğunlukla gruplar halinde, birden fazla lezyon bir arada</li>
+          <li><strong>Yayılım mekanizması:</strong> Tıraş ve kaşıma ile otoinnokülasyon (Köbner fenomeni) sıktır</li>
+        </ul>
+
+        <div class="info-box">
+          <p><strong>Klinisyen notu:</strong> Verruca plana, tıraş sırasında yayıldığı için erkeklerde çene, kadınlarda ise bacak ve yüz bölgesinde lineer dağılım gösterebilir. Hastanın tıraş alışkanlıkları sorgulanmalıdır.</p>
+        </div>
+
+        <h3 id="verruca-vulgaris-yuz">Verruca Vulgaris — Yaygın Siğil (Yüzde Nadir)</h3>
+
+        <p>Yüzde daha az sık görülen <strong>verruca vulgaris</strong>, çoğunlukla dudak çevresi, alın ya da saçlı deri sınırında ortaya çıkabilir. Yüzeyi pürüzlü, kabarık ve gri-kahverengi renktedir. HPV tip 2 ve tip 4'ten kaynaklanır; lezyonlar verruca planadan daha büyük ve daha az sayıdadır.</p>
+
+        <h3 id="molluscum">Molluscum Contagiosum — Diferansiyel Tanı</h3>
+
+        <p>Molluscum contagiosum, poxvirus kaynaklı olup HPV ile ilgili değildir; ancak yüzde özellikle çocuklarda karşılaşıldığında verruca plana ile karıştırılabilir. Göbek benzeri merkezi çöküntüsü (umblikasyon) ile verruca planadan ayrılır. Tedavi yaklaşımı benzerdir; kriyoterapi her iki durumda da etkin bir seçenektir. Hydrozid, molluscum contagiosum tedavisi için de FDA onaylıdır.</p>
+
+        <div class="info-box">
+          <p><strong>Diferansiyel tanı özeti:</strong> Verruca plana düz ve çok sayıda; verruca vulgaris pürüzlü ve kabarık; molluscum merkezi çöküntülü. Tedaviye başlamadan önce klinik tanı netleştirilmelidir.</p>
+        </div>
+
+        <h2 id="yuz-tedavisi-zorlugu">Yüz Tedavisinin Özel Zorluğu</h2>
+
+        <p>Yüz bölgesi, siğil tedavisinde diğer vücut bölgelerine kıyasla üç temel ek risk barındırır:</p>
+
+        <ol>
+          <li><strong>Yara izi riski:</strong> Yüz derisi estetik açıdan kritik olduğundan her türlü derin doku hasarı kabul edilemez sonuçlara yol açabilir. Agresif kriyoterapi, yüksek konsantrasyonlu asit uygulamaları veya elektrokoter kalıcı skar oluşturabilir.</li>
+          <li><strong>Pigment değişikliği riski:</strong> Dondurma veya kimyasal soyma sonrasında geçici (birkaç hafta) veya kalıcı hipopigmentasyon ya da hiperpigmentasyon gelişebilir. Esmer tenli bireylerde (Fitzpatrick tip III–VI) bu risk daha yüksektir.</li>
+          <li><strong>Göz çevresi hassasiyeti:</strong> Göz kapağı ve orbita çevresindeki lezyonlarda herhangi bir topikal madde veya kriyoterapi uygulaması ekstra dikkat gerektirmektedir; yanlış uygulama konjonktiva ya da kornea hasarına neden olabilir.</li>
+        </ol>
+
+        <div class="warning-box">
+          <p><strong>Uyarı:</strong> Göz kapağı üzerindeki veya göze 3 mm'den yakın konumdaki lezyonlar için kriyoterapi veya topikal tedavi uygulamadan önce oftalmoloji konsültasyonu alınmalı ya da tedavi oftalmoloğa devredilmelidir.</p>
+        </div>
+
+        <h2 id="tedavi-yontemleri">Yüz Siğili İçin Tedavi Yöntemleri</h2>
+
+        <p>Yüz siğilinde tedavi seçimi; lezyon tipine, sayısına, hastanın ten rengine, bağışıklık durumuna ve estetik beklentisine göre bireyselleştirilmelidir. Kanıta dayalı seçenekler şu şekilde sıralanabilir:</p>
+
+        <h3 id="kriyoterapi">1. Kriyoterapi — Hafif Protokol (En Güvenli Birinci Basamak Seçenek)</h3>
+
+        <p>Kriyoterapi, yüz siğillerinde birinci tercih olarak önerilmektedir; ancak vücut siğillerine kıyasla <strong>daha kısa donma süresi ve daha az döngü</strong> ile uygulanmalıdır. Aşırı dondurma hem pigment hasarı hem de skar riskini artırır.</p>
+
+        <p><strong>Yüz için önerilen Hydrozid protokolü:</strong></p>
+        <ul>
+          <li>Verruca plana (düz siğil): 3–5 saniye × 1–2 döngü; lezyonlar küçük ve yüzeysel olduğundan kısa uygulama yeterlidir</li>
+          <li>Verruca vulgaris (kabarık): 5–7 saniye × 2 döngü; biraz daha uzun uygulama gerekebilir</li>
+          <li>Molluscum contagiosum: 3–5 saniye × 1–2 döngü</li>
+          <li>Göz çevresine 5 mm'den fazla uzaklıkta uygulanabilir; daha yakındaki lezyonlar için devir önerilir</li>
+        </ul>
+
+        <p>Hydrozid®, FDA 510(k) onaylı norfluran (HFA 134a) gazını kullanır. –50°C ile –54°C arasında çalışan bu teknoloji, sıvı azot (–196°C) kadar aşırı soğuma olmadan klinik olarak yeterli dondurma derinliği sağlar. Bu özelliği sayesinde yüz bölgesinde pigment hasarı ve derin doku nekrozu riski önemli ölçüde azalır. Uygulayıcı, aplikatörün şekli ve boyutunu seçerek hedefleme hassasiyetini artırabilir.</p>
+
+        <div class="inline-cta">
+          <p><strong>Yüz lezyonları için hassas kriyoterapi mi arıyorsunuz?</strong><br>Hydrozid'in norfluran teknolojisi ile yüz bölgesine özel, kontrollü dondurma protokolü uygulayabilirsiniz.</p>
+          <div class="inline-cta-btns">
+            <a href="https://wa.me/905534759032?text=Hydrozid%20Yuz%20Sigili%20Tedavisi%20Hakkinda%20Bilgi%20Almak%20Istiyorum" class="btn-wa" target="_blank" rel="noopener">WhatsApp</a>
+            <a href="mailto:bilgi@hydrozidtr.com" class="btn-mail">E-posta</a>
+          </div>
+        </div>
+
+        <h3 id="retinoid">2. Retinoid Krem — Tretinoyn %0.025</h3>
+
+        <p>Verruca plana tedavisinde retinoidler, özellikle tretinoyn (%0.025) ve adapalen, iyi tolere edilen topikal seçeneklerdir. Etki mekanizması viral replikasyonu doğrudan hedeflemekten ziyade epidermal dönüşümü hızlandırmak ve viral konaklama ortamını bozmak yönündedir.</p>
+
+        <p>Uygulama önerileri:</p>
+        <ul>
+          <li>Gece, küçük miktarda ince tabaka halinde lezyonların üzerine uygulanır</li>
+          <li>İlk haftalarda geçici eritem ve soyulma normaldir</li>
+          <li>Güneş hassasiyeti arttığından sabah SPF 50+ güneş koruyucu zorunludur</li>
+          <li>Tedavi süresi genellikle 8–16 haftadır; kriyoterapiye ek olarak kullanıldığında etkinlik artar</li>
+          <li>Gebelikte kontrendikedir</li>
+        </ul>
+
+        <h3 id="imikimod">3. İmikimod Krem (%5 veya %3.75)</h3>
+
+        <p>İmikimod, toll-like reseptör 7/8 üzerinden interferon üretimini uyararak antiviral ve immün aktivasyon etkisi gösteren bir topikal bağışıklık stimülatörüdür. Verruca plana dahil çeşitli viral cilt lezyonlarında off-label olarak kullanılmaktadır.</p>
+
+        <p>Yüzde kullanım protokolü:</p>
+        <ul>
+          <li>Haftada 3 gece uygulanır (örn. pazartesi–çarşamba–cuma); yıkamadan 6–8 saat bekletilir</li>
+          <li>Eritem, kabuklanma ve hafif yanma beklenen lokal reaksiyonlardır</li>
+          <li>Şiddetli reaksiyonda uygulama sıklığı azaltılır</li>
+          <li>Tedavi süresi 12–16 haftaya kadar uzayabilir</li>
+          <li>Kriyoterapi ile kombine kullanıldığında yanıt oranları yükselir</li>
+        </ul>
+
+        <h3 id="salisilik-asit">4. Salisilik Asit — Düşük Konsantrasyon (%5–10)</h3>
+
+        <p>Salisilik asit yüz bölgesinde <strong>maksimum %10 konsantrasyonda</strong> kullanılmalıdır; gövde ve ayak tabanında kullanılan %15–26'lık formülasyonlar yüze uygun değildir. Keratoliz ve hafif viral inhibe edici etkiyle çalışır; diğer yöntemlere ek olarak destekleyici bir rol üstlenebilir.</p>
+
+        <p>Yüz için dikkat noktaları:</p>
+        <ul>
+          <li>Yalnızca lezyon üzerine, çevre sağlıklı deri korunarak uygulanır</li>
+          <li>Göz kenarı, burun kanadı ve dudak çizgisinde son derece dikkatli olunmalıdır</li>
+          <li>Günde 1 kez, ince tabaka; ertesi sabah yıkanır</li>
+          <li>Irritasyon gelişirse uygulama sıklığı azaltılır</li>
+        </ul>
+
+        <h3 id="elektrokoter">5. Elektrokoter — Son Tercih</h3>
+
+        <p>Elektrokoter ve küretaj, dirençli ve büyük lezyonlarda düşünülebilir; ancak yüzde yara izi ve pigmentasyon riski yüksek olduğundan <strong>son tercih</strong> olarak değerlendirilmelidir. Lokal anestezi gerektirir, iyileşme süresi uzar ve iz kalıcı olabilir. Verruca plana gibi çok sayıda küçük lezyon varlığında pratik bir seçenek değildir.</p>
+
+        <div class="treatment-grid">
+          <div class="treatment-card best">
+            <div class="badge">Birinci Tercih</div>
+            <h4>Kriyoterapi (Hafif Protokol)</h4>
+            <p>Yüz için en güvenli fiziksel tedavi. Kısa donma süresiyle pigment ve skar riski minimumdur. Hydrozid ile hassas uygulama mümkündür.</p>
+          </div>
+          <div class="treatment-card best">
+            <div class="badge">Destekleyici</div>
+            <h4>Retinoid Krem (Gece)</h4>
+            <p>Verruca plana tedavisinde iyi tolere edilen topikal ajan. Kriyoterapi ile kombine edildiğinde yanıt artar.</p>
+          </div>
+          <div class="treatment-card">
+            <div class="badge">Alternatif</div>
+            <h4>İmikimod Krem</h4>
+            <p>Bağışıklık sistemi aktivasyonu yoluyla etki. Uzun tedavi süresi gerektirir; lokal reaksiyonlar beklenir.</p>
+          </div>
+          <div class="treatment-card">
+            <div class="badge">Son Tercih</div>
+            <h4>Elektrokoter</h4>
+            <p>Yüzde yara izi ve pigment değişikliği riski yüksek. Dirençli tek lezyonlarda düşünülebilir; rutin kullanım önerilmez.</p>
+          </div>
+        </div>
+
+        <h2 id="kacinalacaklar">Yüz Siğilinde Kaçınılması Gerekenler</h2>
+
+        <p>Yüzde yanlış uygulamaların kalıcı estetik hasar bırakma riski yüksektir. Aşağıdaki durumlarda dikkatli olunmalı ya da uzman devri yapılmalıdır:</p>
+
+        <ul>
+          <li><strong>Yüksek konsantrasyonlu salisilik asit (%15 ve üzeri):</strong> Derin kimyasal yanık, hipopigmentasyon ve skar riski nedeniyle yüzde kullanılmamalıdır.</li>
+          <li><strong>Göz çevresinde agresif uygulama:</strong> Göz kapağı, iç kantus ve göz altı bölgesinde kriyoterapi veya asit uygulaması oküler komplikasyona yol açabilir.</li>
+          <li><strong>Aşırı uzun donma süresi:</strong> Yüzde gerekenden uzun kriyoterapi büllezyona, kabuğa ve sonrasında depigmentasyona neden olabilir.</li>
+          <li><strong>Podofillotoksin:</strong> Cinsel yol dışı lezyonlarda yüzde kullanımı önerilmez; irritan etkisi yüksektir.</li>
+          <li><strong>TCA (trikloroasetik asit) yüksek konsantrasyonu:</strong> Yüzde ancak uzman ellerde ve uygun konsantrasyonlarda kullanılabilir; deneyimsiz uygulamada derin skar riski vardır.</li>
+        </ul>
+
+        <h2 id="kac-seans">Yüzde Siğil Tedavisi Kaç Seansta Tamamlanır?</h2>
+
+        <p>Yüzde siğil tedavisinin tamamlanması için gereken seans sayısı; lezyon tipi, sayısı, boyutu ve hastanın bağışıklık durumuna göre değişmektedir. Genel klinisyen beklentisi şu şekilde özetlenebilir:</p>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Lezyon Tipi</th>
+              <th>Ortalama Seans</th>
+              <th>Seans Aralığı</th>
+              <th>Notlar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Verruca plana (düz siğil)</strong></td>
+              <td class="td-good">2–4 seans</td>
+              <td>2–3 hafta</td>
+              <td>Retinoid ile kombine edildiğinde daha hızlı yanıt</td>
+            </tr>
+            <tr>
+              <td><strong>Verruca vulgaris (yüzde)</strong></td>
+              <td>2–3 seans</td>
+              <td>2–3 hafta</td>
+              <td>Daha büyük lezyonlar biraz daha uzun sürer</td>
+            </tr>
+            <tr>
+              <td><strong>Molluscum contagiosum</strong></td>
+              <td class="td-good">1–3 seans</td>
+              <td>2–4 hafta</td>
+              <td>Tek seans çoğunlukla yeterlidir</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Bağışıklık sistemi baskılanmış hastalarda (kortikosteroid kullanımı, otoimmün hastalık, HIV vb.) yanıt genellikle daha yavaştır ve tedavi süreci uzayabilir. Bu hastalarda immün sistem desteği ve birincil hastalığın yönetimi paralel olarak planlanmalıdır.</p>
+
+        <div class="info-box">
+          <p><strong>İç link:</strong> Kriyoterapi seans aralıkları ve tedavi adımları hakkında detaylı bilgi için <a href="/blog/sigil-kac-seansta-gecer.html">Siğil Kaç Seansta Geçer?</a> makalemizi inceleyebilirsiniz.</p>
+        </div>
+
+        <h2 id="bagisiklik">Bağışıklık Sistemi ve Yüz Siğilinde Önemi</h2>
+
+        <p>Siğil tedavisinin etkinliği, klinisyen tarafından uygulanan tedavinin yanı sıra hastanın bağışıklık yanıtıyla doğrudan ilişkilidir. Özellikle yüzde yaygın verruca plana varlığında bağışıklık sistemi durumu değerlendirilmelidir.</p>
+
+        <p>Bağışıklık sistemini desteklemek için önerilen yaklaşımlar:</p>
+        <ul>
+          <li><strong>Çinko desteği:</strong> Çinko eksikliği ile yaygın siğil arasında ilişki gösterilmiştir. Oral çinko (günde 10 mg, çocuklarda daha az) veya çinko oksit bazlı topikal ajanlar yardımcı olabilir.</li>
+          <li><strong>D vitamini:</strong> Yeterli D vitamini düzeyi viral immünite için önemlidir; eksiklik varsa takviye edilmelidir.</li>
+          <li><strong>Sağlıklı yaşam alışkanlıkları:</strong> Yeterli uyku, dengeli beslenme ve kronik stresin yönetimi bağışıklık fonksiyonunu destekler.</li>
+          <li><strong>Topikal immünomodülatörler:</strong> İmikimod gibi ajanlar yerel bağışıklık aktivasyonu sağlayarak tedaviye katkıda bulunur.</li>
+        </ul>
+
+        <h2 id="gunes-koruyucu">Tedavi Sonrası Güneş Koruyucu Zorunluluğu</h2>
+
+        <p>Yüz bölgesinde uygulanan kriyoterapi, retinoid krem veya kimyasal tedavinin ardından güneş koruyucu kullanımı <strong>vazgeçilmezdir</strong>. Bu önem iki temel nedene dayanır:</p>
+
+        <ol>
+          <li><strong>Post-inflamatuvar hiperpigmentasyon (PIH) önlenmesi:</strong> Tedavi sonrası dermisin yenilenme sürecindeyken UV ışını maruziyeti koyu leke oluşumunu tetikleyebilir; bu durum özellikle esmer tenli bireylerde belirgindir.</li>
+          <li><strong>Retinoid fotosensitivitesi:</strong> Tretinoyn ve diğer retinoidler UV hasarına karşı deri hassasiyetini artırır. Bu dönemde güneş koruyucu kullanmayan hastalarda yanık ve leke riski önemli ölçüde yükselir.</li>
+        </ol>
+
+        <div class="tip-box">
+          <p><strong>Öneri:</strong> Tedavi süresince ve sonrasında en az 4–6 hafta boyunca her sabah SPF 50+ geniş spektrumlu mineral veya kimyasal güneş koruyucu kullanılmalıdır. Doğrudan ve uzun süreli güneş maruziyetinden kaçınılmalıdır.</p>
+        </div>
+
+        <h2 id="ilgili">İlgili Makaleler</h2>
+
+        <p>Siğil tedavisine ilişkin daha kapsamlı bilgi için aşağıdaki klinik rehberlerimizi inceleyebilirsiniz:</p>
+
+        <ul>
+          <li><a href="/blog/sigil-tedavisi-yontemleri.html">Siğil Tedavisi Yöntemleri: İlaçlar, Kriyoterapi ve Klinik Seçenekler</a></li>
+          <li><a href="/blog/sigil-kac-seansta-gecer.html">Siğil Kaç Seansta Geçer? Seans Sayısını Belirleyen Faktörler</a></li>
+        </ul>
+
+        <!-- ─── INLINE CTA ─── -->
+        <div class="inline-cta">
+          <p><strong>Kliniğinizde yüz siğili tedavisi sunmak ister misiniz?</strong><br>Hydrozid'in hassas norfluran teknolojisi ile yüz bölgesinde güvenli, seans başına 30 saniye kriyoterapi imkânı. Türkiye yetkili distribütörümüzden aynı gün kargo.</p>
+          <div class="inline-cta-btns">
+            <a href="https://wa.me/905534759032?text=Hydrozid%20Yuz%20Sigili%20Tedavisi%20Hakkinda%20Bilgi%20Almak%20Istiyorum" class="btn-wa" target="_blank" rel="noopener">WhatsApp</a>
+            <a href="mailto:bilgi@hydrozidtr.com" class="btn-mail">E-posta</a>
+          </div>
+        </div>
+
+        <!-- ─── FAQ ─── -->
+        <div class="faq-section">
+          <h2>Sıkça Sorulan Sorular</h2>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Yüzdeki siğil kendiliğinden geçer mi?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Verruca plana (düz siğil) zaman zaman bağışıklık sistemi tarafından yıllar içinde temizlenebilir; ancak bu süre öngörülemez ve bu sırada lezyonlar çevreye yayılmaya devam edebilir. Kozmetik rahatsızlık süre boyunca devam ettiğinden klinikte kriyoterapi veya topikal tedavi ile süreç önemli ölçüde kısaltılabilir.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Yüz siğilinde yara izi kalır mı?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Doğru protokolle uygulanan kriyoterapi yüzde genellikle kalıcı yara izi bırakmaz. Aşırı dondurma, yüksek konsantrasyonlu asit uygulamaları veya elektrokoter gibi agresif yöntemlerde skar ve pigment değişikliği riski artar. Hafif dozda norfluran bazlı kriyoterapi (Hydrozid) ve düşük konsantrasyonlu topikal tedaviler yüz bölgesi için tercih edilen güvenli seçeneklerdir. Tedavi sonrası güneş koruyucu kullanımı hiperpigmentasyon riskini azaltır.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Düz siğil (verruca plana) nasıl tedavi edilir?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Verruca plana tedavisinde en sık kullanılan yöntemler hafif dozda kriyoterapi, tretinoyn (%0.025) veya adapalen içeren retinoid kremler ve imikimod kremdir. Yüzde salisilik asit kullanılacaksa konsantrasyon %10'u geçmemelidir. Lezyonlar genellikle 2–4 seanste yanıt verir. Bağışıklık sistemi zayıf hastalarda tedavi süreci uzayabilir; bu durumda immün sistem destekleyici önlemler (çinko, D vitamini) eklenebilir.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+              <span>Yüz siğili bulaşıcı mı?</span>
+              <div class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1v10M1 6h10" stroke="#00D4FF" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div class="faq-a">Evet, yüzdeki siğiller bulaşıcıdır. Verruca plana özellikle tıraş ve kaşıma yoluyla otoinnokülasyon (kendine bulaş) ile çevre deriye hızla yayılabilir; bu nedenle Köbner fenomeni olarak adlandırılan lineer dizilim tipiktir. Kişiden kişiye doğrudan temas yoluyla bulaşma da mümkündür. Erken tedavi hem lezyonların yayılmasını hem de başkalarına bulaşmayı önler.</div>
+          </div>
+
+        </div><!-- /faq-section -->
+
+      </div><!-- /article-body -->
+    </main>
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Hydrozid'i Kliniğinize Alın</h3>
+        <p>FDA 510(k) onaylı, CE belgeli. Yüz lezyonları dahil tüm endikasyonlarda hassas kriyoterapi. Türkiye yetkili distribütörümüzden aynı gün kargo.</p>
+        <div class="sidebar-cta">
+          <a href="https://wa.me/905534759032?text=Hydrozid%20Yuz%20Sigili%20Tedavisi%20Hakkinda%20Bilgi%20Almak%20Istiyorum" class="wa" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+          <a href="mailto:bilgi@hydrozidtr.com" class="mail">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 4l6 4 6-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            bilgi@hydrozidtr.com
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Bu Makalede</h3>
+        <ul class="toc">
+          <li><a href="#yuzde-hangi-sigil">Yüzde hangi siğil görülür?</a></li>
+          <li><a href="#verruca-plana">— Verruca plana (düz siğil)</a></li>
+          <li><a href="#verruca-vulgaris-yuz">— Verruca vulgaris</a></li>
+          <li><a href="#molluscum">— Molluscum contagiosum</a></li>
+          <li><a href="#yuz-tedavisi-zorlugu">Yüz tedavisinin zorluğu</a></li>
+          <li><a href="#tedavi-yontemleri">Tedavi yöntemleri</a></li>
+          <li><a href="#kriyoterapi">— Kriyoterapi</a></li>
+          <li><a href="#retinoid">— Retinoid krem</a></li>
+          <li><a href="#imikimod">— İmikimod</a></li>
+          <li><a href="#salisilik-asit">— Salisilik asit</a></li>
+          <li><a href="#kacinalacaklar">Kaçınılması gerekenler</a></li>
+          <li><a href="#kac-seans">Kaç seansta tamamlanır?</a></li>
+          <li><a href="#bagisiklik">Bağışıklık sistemi</a></li>
+          <li><a href="#gunes-koruyucu">Güneş koruyucu</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>İlgili Makaleler</h3>
+        <ul class="toc">
+          <li><a href="/blog/sigil-tedavisi-yontemleri.html">Siğil Tedavisi Yöntemleri</a></li>
+          <li><a href="/blog/sigil-kac-seansta-gecer.html">Siğil Kaç Seansta Geçer?</a></li>
+          <li><a href="/blog/ayak-tabani-sigili-tedavisi.html">Ayak Tabanı Siğili Tedavisi</a></li>
+          <li><a href="/blog/bulasici-sigil-nedir-nasil-gecer.html">Bulaşıcı Siğil: Nasıl Geçer?</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">Hydrozid<span style="font-size:0.85em;">®</span></a>
+      <ul class="footer-links">
+        <li><a href="#">Gizlilik Politikası</a></li>
+        <li><a href="../sss.html">SSS</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 Hydrozid. FDA 510(k) onaylı. CE belgeli.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── FAQ Accordion ───
+  document.querySelectorAll('.faq-q').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = this.closest('.faq-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(el) {
+        el.classList.remove('open');
+        el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        this.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // ─── Mobile Nav ───
+  var hamburger = document.querySelector('.nav-hamburger');
+  var navLinks = document.querySelector('.nav-links');
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', function() {
+      var isVisible = navLinks.style.display === 'flex';
+      navLinks.style.display = isVisible ? 'none' : 'flex';
+      navLinks.style.flexDirection = 'column';
+      navLinks.style.position = 'absolute';
+      navLinks.style.top = '68px';
+      navLinks.style.left = '0';
+      navLinks.style.right = '0';
+      navLinks.style.background = 'rgba(7,11,20,0.97)';
+      navLinks.style.padding = '16px 24px 24px';
+      navLinks.style.borderBottom = '1px solid rgba(0,212,255,0.15)';
+      navLinks.style.zIndex = '99';
+    });
+  }
+</script>
+
+</body>
+</html>
