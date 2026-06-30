@@ -3353,12 +3353,35 @@
         </div>
       </div>
 
-      <div class="how-video-wrap reveal">
-        <iframe
-          src="https://player.vimeo.com/video/889158223?h=79852c7756&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0&background=1&dnt=1"
-          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" title="Hydrozid Uygulama Talimatı">
+      <div class="how-video-wrap reveal" id="vimeoWrap">
+        <!-- Poster — video gelene kadar gösterilir, tıklanınca Vimeo yüklenir -->
+        <div id="vimeoPoster" style="position:absolute;inset:0;background:#0d1a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:inherit;" onclick="loadVimeo()">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.9">
+            <circle cx="36" cy="36" r="36" fill="rgba(0,212,255,0.15)"/>
+            <circle cx="36" cy="36" r="28" fill="rgba(0,212,255,0.25)" stroke="#00D4FF" stroke-width="1.5"/>
+            <polygon points="30,24 54,36 30,48" fill="#00D4FF"/>
+          </svg>
+        </div>
+        <iframe id="vimeoIframe" src="" data-src="https://player.vimeo.com/video/889158223?h=79852c7756&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0&background=1&dnt=1"
+          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Hydrozid Uygulama Talimatı" style="display:none">
         </iframe>
       </div>
+      <script>
+        function loadVimeo() {
+          var iframe = document.getElementById('vimeoIframe');
+          var poster = document.getElementById('vimeoPoster');
+          iframe.src = iframe.dataset.src;
+          iframe.style.display = '';
+          poster.style.display = 'none';
+        }
+        // Masaüstünde IntersectionObserver ile otomatik yükle
+        if (!('ontouchstart' in window) && 'IntersectionObserver' in window) {
+          var vimeoObs = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) { loadVimeo(); vimeoObs.disconnect(); }
+          }, { threshold: 0.3 });
+          vimeoObs.observe(document.getElementById('vimeoWrap'));
+        }
+      </script>
 
       <div class="ifu-download reveal">
         <div class="ifu-download-icon">
