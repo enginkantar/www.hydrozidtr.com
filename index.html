@@ -3006,7 +3006,7 @@
           <li><a href="#iletisim">İletişim</a></li>
           <li><a href="javascript:void(0)" class="nav-cta" onclick="openOrderModal()">Satın Al</a></li>
         </ul>
-        <div class="nav-hamburger" aria-label="Menü">
+        <div class="nav-hamburger" role="button" aria-label="Menü" tabindex="0">
           <span></span><span></span><span></span>
         </div>
       </div>
@@ -3940,43 +3940,7 @@
   }
   </script>
 
-  <!-- Pretext: pixel-accurate text layout on resize -->
-  <!-- Vendor: ~/.claude/skills/gstack/design-html/vendor/pretext.js -->
-  <script type="module">
-    import { prepare, layout } from 'https://esm.sh/@chenglou/pretext@0.1.1';
-
-    const textEls = document.querySelectorAll('.hero-sub, .feature-desc');
-    const prepared = new Map();
-
-    async function initPretext() {
-      await document.fonts.ready;
-      for (const el of textEls) {
-        const font = getComputedStyle(el).font;
-        prepared.set(el, prepare(el.textContent, font));
-      }
-      relayout();
-    }
-
-    function relayout() {
-      for (const [el, handle] of prepared) {
-        const lh = parseFloat(getComputedStyle(el).lineHeight) || 24;
-        const { height } = layout(handle, el.clientWidth, lh);
-        el.style.minHeight = `${height}px`;
-      }
-    }
-
-    // Re-layout on viewport resize
-    const ro = new ResizeObserver(() => relayout());
-    ro.observe(document.body);
-
-    // Respect prefers-reduced-motion: skip smooth init if motion is reduced
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      initPretext();
-    } else {
-      initPretext();
-    }
-  </script>
+  <!-- pretext.js kaldırıldı — esm.sh 404 veriyordu, görsel etkisi yok -->
 
   <!-- ─── ORDER MODAL CSS ─── -->
   <style>
