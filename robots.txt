@@ -31,3 +31,6 @@ Allow: /
 
 # Sitemap
 Sitemap: https://www.hydrozidtr.com/sitemap.xml
+
+# IndexNow (Bing, Yandex, Seznam, Naver, Yep)
+IndexNow-Key: https://www.hydrozidtr.com/dd6897a3dd6213540fa1b5d9a99652c2.txt
