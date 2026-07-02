@@ -65,5 +65,31 @@
       info.innerHTML = 'Fatura No: <span>' + invoiceId + '</span>';
     }
   </script>
+  <script>
+    if (typeof gtag === 'function') {
+      const params = new URLSearchParams(window.location.search);
+      const orderNo = params.get('order_no') || params.get('order_id');
+      gtag('event', 'purchase', {
+        transaction_id: orderNo,
+        currency: 'TRY'
+      });
+    }
+  </script>
+  <script>
+    (async function notifySuccess() {
+      const p = new URLSearchParams(window.location.search);
+      const orderId = p.get('order_no') || p.get('order_id') || p.get('orderNo');
+      if (!orderId) { console.log('[notify] no order_id in URL'); return; }
+      try {
+        const res = await fetch('/api/payment/notify-success', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_id: orderId }),
+        });
+        const data = await res.json();
+        console.log('[notify]', data);
+      } catch (e) { console.error('[notify] failed:', e); }
+    })();
+  </script>
 </body>
 </html>

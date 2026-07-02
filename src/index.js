@@ -57,6 +57,12 @@ export default {
       return new Response('Method not allowed', { status: 405 });
     }
 
+    if (path === '/api/payment/notify-success') {
+      if (request.method === 'OPTIONS') return handleOptions(request);
+      if (request.method === 'POST') return handleNotifySuccess(request, env);
+      return new Response('Method not allowed', { status: 405 });
+    }
+
     if (path === '/api/payment/webhook') {
       if (request.method === 'POST') return handleWebhook(request, env);
       return new Response('Method not allowed', { status: 405 });
@@ -67,9 +73,14 @@ export default {
       return new Response('Method not allowed', { status: 405 });
     }
 
+    if (path === '/api/telegram/webhook' && request.method === 'POST') {
+      return handleTelegramWebhook(request, env);
+    }
+
     // Diğer her şey static asset
     if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
+      const response = await env.ASSETS.fetch(request);
+      return addSecurityHeaders(response);
     }
 
     return new Response('Not found', { status: 404 });
@@ -80,17 +91,6 @@ export default {
 // /api/payment/start
 // ══════════════════════════════════════════════════════════════════════════════
 async function handlePaymentStart(request, env) {
-  // ⚠️ BAKIM MODU — test sonrası gece uykuda iken ödeme alınmasın diye
-  // Sabah kaldırılacak. Kaldırmak için: bu blok sil + deploy.
-  if (env.PAYMENT_KV) {
-    const maintenanceMode = false; // ← true = kapalı, false = açık
-    if (maintenanceMode) {
-      return jsonResp(request, {
-        error: 'Ödeme sistemi şu an bakımda. Lütfen WhatsApp\'tan iletişime geçin: +90 553 475 9032'
-      }, 503);
-    }
-  }
-
   if (!isAllowedOrigin(request)) {
     return new Response('Forbidden', { status: 403 });
   }
@@ -109,7 +109,14 @@ async function handlePaymentStart(request, env) {
   try { input = await request.json(); }
   catch { return jsonResp(request, { error: 'Geçersiz istek formatı.' }, 400); }
 
-  const { name, email, phone, city, address, diploma, package: packageName } = input;
+  const { name, email, phone, city, address, diploma, package: packageName, acceptedTerms, acceptedAt } = input;
+
+  if (!acceptedTerms?.onBilgi || !acceptedTerms?.mesafeli || !acceptedTerms?.gizlilik) {
+    return jsonResp(request, { error: 'Sözleşmeleri kabul etmeniz gerekir.' }, 400);
+  }
+  if (!acceptedAt) {
+    return jsonResp(request, { error: 'Sözleşme kabul zamanı geçersiz.' }, 400);
+  }
 
   if (!name?.trim() || name.trim().length < 3) return jsonResp(request, { error: 'Ad Soyad en az 3 karakter olmalıdır.' }, 400);
   if (!email?.trim() || !/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email.trim())) {
@@ -230,9 +237,16 @@ async function handlePaymentStart(request, env) {
       currency: 'TRY',
       status: 'PENDING',
       createdAt: new Date().toISOString(),
+      acceptedAt,
+      termsVersion: '1.0',
     }),
-    { expirationTtl: 7200 }
+    { expirationTtl: 604800 }
   );
+
+  // KV alias: halkode:ORDER_ID → invoiceId (notify-success endpoint için)
+  if (halkResp.order_id) {
+    await env.PAYMENT_KV.put(`halkode:${halkResp.order_id}`, invoiceId, { expirationTtl: 604800 });
+  }
 
   return jsonResp(request, { link: halkResp.link, order_id: halkResp.order_id });
 }
@@ -405,18 +419,267 @@ async function handleCurrency(request, env) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// /api/payment/notify-success
+// ══════════════════════════════════════════════════════════════════════════════
+async function handleNotifySuccess(request, env) {
+  try {
+    let body;
+    try { body = await request.json(); }
+    catch { return jsonResp(request, { error: 'Invalid JSON' }, 400); }
+
+    const { order_id } = body;
+    if (!order_id) return jsonResp(request, { error: 'order_id required' }, 400);
+
+    if (!env.PAYMENT_KV) return jsonResp(request, { error: 'KV not configured' }, 503);
+
+    // KV alias → invoiceId
+    const invoiceId = await env.PAYMENT_KV.get(`halkode:${order_id}`, { type: 'text' });
+    if (!invoiceId) {
+      console.warn('[notify] alias not found for order_id:', order_id);
+      return jsonResp(request, { ok: false, note: 'order alias not found' });
+    }
+
+    const orderRaw = await env.PAYMENT_KV.get(`order:${invoiceId}`, { type: 'text' });
+    if (!orderRaw) {
+      console.warn('[notify] order not found:', invoiceId);
+      return jsonResp(request, { ok: false, note: 'order not found' });
+    }
+
+    let order;
+    try { order = JSON.parse(orderRaw); }
+    catch { return jsonResp(request, { error: 'Invalid order data' }, 500); }
+
+    // notify-success çağrılması = ödeme başarılı (HalkOde return_url tetikledi)
+    // Webhook'tan PAID gelmediyse burada işaretle
+    if (order.status === 'PENDING') {
+      order.status = 'PAID';
+      order.paidAt = new Date().toISOString();
+      order.paidVia = 'browser_return';
+    }
+
+    // Order başka bir state'deyse (FAILED vs) bildirme
+    if (order.status !== 'PAID') {
+      return jsonResp(request, { ok: false, note: `order status is ${order.status}` });
+    }
+
+    // Idempotency — zaten bildirilmişse tekrar gönderme
+    if (order.notifiedAt) {
+      return jsonResp(request, { ok: true, idempotent: true, notifiedAt: order.notifiedAt });
+    }
+
+    const notifiedAt = new Date().toISOString();
+    const trDate = new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' });
+
+    // Telegram bildirimi
+    if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+      const msg = `📧 BİLDİRİM GÖNDERİLDİ — ${order.customerName}
+📦 ${order.package} (${order.quantity} adet)
+💰 ${order.amount} ${order.currency}
+📧 ${order.customerEmail}
+⏰ ${trDate}`;
+      try {
+        await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text: msg }),
+        });
+      } catch (e) { console.error('[notify] telegram error:', e.message); }
+    }
+
+    // Admin e-postaları
+    if (env.RESEND_API_KEY) {
+      const adminHtml = `
+<div style="text-align: center; padding: 0 0 16px;">
+  <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 8px;"><br>
+  <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid" style="height: 60px; width: auto;">
+</div>
+<h2>Yeni Sipariş — Hydrozid</h2>
+<table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
+  <tr><td style="padding:6px 12px;color:#666">Müşteri</td><td style="padding:6px 12px"><strong>${order.customerName}</strong></td></tr>
+  <tr><td style="padding:6px 12px;color:#666">E-posta</td><td style="padding:6px 12px">${order.customerEmail}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Telefon</td><td style="padding:6px 12px">${order.customerPhone}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Şehir</td><td style="padding:6px 12px">${order.customerCity}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Adres</td><td style="padding:6px 12px">${order.customerAddress}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Diploma No</td><td style="padding:6px 12px">${order.diploma}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Paket</td><td style="padding:6px 12px">${order.package} (${order.quantity} adet)</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Tutar</td><td style="padding:6px 12px"><strong>${order.amount} ${order.currency}</strong> (${order.eurAmount} EUR × ${order.eurTryRate?.toFixed(2)})</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Sipariş No</td><td style="padding:6px 12px">${order.orderNo || order_id}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Tarih</td><td style="padding:6px 12px">${trDate}</td></tr>
+</table>`;
+
+      await Promise.allSettled([
+        sendEmail(env, {
+          to: 'enginkantar@gmail.com',
+          subject: `[Hydrozid] Yeni Sipariş — ${order.customerName} / ${order.package}`,
+          html: adminHtml,
+        }),
+        sendEmail(env, {
+          to: 'medikalbatu@gmail.com',
+          subject: `[Hydrozid] Yeni Sipariş — ${order.customerName} / ${order.package}`,
+          html: adminHtml,
+        }),
+      ]);
+
+      // Müşteri onay e-postası
+      const customerHtml = `
+<div style="font-family:'Nunito Sans',sans-serif;background:#070B14;color:#CBD5E1;padding:40px 24px;max-width:560px;margin:0 auto;border-radius:16px">
+  <div style="text-align: center; padding: 32px 0 24px; border-bottom: 1px solid #1e293b; margin-bottom: 24px;">
+    <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 12px;"><br>
+    <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid® Sprey" style="height: 100px; width: auto; display: inline-block;">
+  </div>
+  <h1 style="font-family:Rubik,sans-serif;color:#00D4FF;font-size:1.4rem;margin-bottom:8px">Siparişiniz Alındı!</h1>
+  <p style="color:#94A3B8;margin-bottom:24px">Sayın <strong style="color:#fff">${order.customerName}</strong>, ödemeniz başarıyla tamamlandı.</p>
+  <table style="font-size:14px;border-collapse:collapse;width:100%">
+    <tr><td style="padding:8px 0;color:#64748B;width:140px">Sipariş No</td><td style="padding:8px 0;color:#fff;font-weight:700">${order.orderNo || order_id}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748B">Ürün</td><td style="padding:8px 0;color:#fff">Hydrozid® ${order.package} — ${order.quantity} adet</td></tr>
+    <tr><td style="padding:8px 0;color:#64748B">Tutar</td><td style="padding:8px 0;color:#22C55E;font-weight:700">${order.amount} ${order.currency}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748B">Teslimat Adresi</td><td style="padding:8px 0;color:#CBD5E1">${order.customerCity} — ${order.customerAddress}</td></tr>
+  </table>
+  <p style="margin-top:24px;color:#94A3B8;font-size:0.9rem">Siparişiniz en kısa sürede kargoya verilecek ve kargo takip bilgileri ayrıca iletilecektir.</p>
+  <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Sorularınız için: <a href="mailto:bilgi@hydrozidtr.com" style="color:#00D4FF">bilgi@hydrozidtr.com</a> veya WhatsApp <a href="https://wa.me/905534759032" style="color:#00D4FF">+90 553 475 9032</a></p>
+
+  <!-- DOKTOR ÖNER BÖLÜMÜ -->
+  <div style="margin: 32px 0 24px; padding: 24px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; text-align: center;">
+    <p style="color: #0c4a6e; font-size: 16px; font-weight: 700; margin: 0 0 8px;">
+      🎯 Hydrozid'den memnun kaldıysanız
+    </p>
+    <p style="color: #0369a1; font-size: 14px; margin: 0 0 20px;">
+      Doktor meslektaşlarınıza önerin, onlar da güvenilir kriyoterapi spreyine ulaşsın.
+    </p>
+    <a href="https://wa.me/?text=Hydrozid%20kriyoterapi%20cihaz%C4%B1n%C4%B1%20kullan%C4%B1yorum%2C%20doktor%20arkada%C5%9Flar%C4%B1ma%20da%20%C3%B6neriyorum%3A%20https%3A%2F%2Fhydrozidtr.com"
+       style="display: inline-block; background: #25D366; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 8px; margin: 4px; font-weight: 700; font-size: 13px;">
+      📱 WhatsApp ile Paylaş
+    </a>
+    <a href="mailto:?subject=Hydrozid%20%C3%96nerisi&body=Sevgili%20meslekta%C5%9F%C4%B1m%2C%0A%0AHydrozid%20kriyoterapi%20cihaz%C4%B1n%C4%B1%20kullanmaya%20ba%C5%9Flad%C4%B1m%20ve%20performans%C4%B1ndan%20%C3%A7ok%20memnunum.%20FDA%20510(k)%20onayl%C4%B1%2C%20CE%20belgeli.%20Size%20de%20%C3%B6neririm.%0A%0A%C3%9Cr%C3%BCn%20bilgisi%3A%20https%3A%2F%2Fhydrozidtr.com"
+       style="display: inline-block; background: #6366F1; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 8px; margin: 4px; font-weight: 700; font-size: 13px;">
+      ✉️ E-posta ile Paylaş
+    </a>
+  </div>
+
+  <!-- SOSYAL MEDYA BANDI -->
+  <div style="text-align: center; padding: 24px 0; border-top: 1px solid #e5e7eb; margin-top: 24px;">
+    <p style="color: #6b7280; font-size: 13px; margin: 0 0 16px; font-weight: 600;">
+      Bizi takip edin
+    </p>
+    <a href="https://wa.me/905534759032" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/whatsapp.png" alt="WhatsApp" style="width: 32px; height: 32px;">
+    </a>
+    <a href="https://instagram.com/batu_medikal" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/instagram-new.png" alt="Instagram" style="width: 32px; height: 32px;">
+    </a>
+    <a href="https://www.tiktok.com/@batu_medikal" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/tiktok--v1.png" alt="TikTok" style="width: 32px; height: 32px;">
+    </a>
+    <a href="https://youtube.com/@Batu_Medikal" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/youtube-play.png" alt="YouTube" style="width: 32px; height: 32px;">
+    </a>
+    <a href="https://facebook.com/medikal.batu" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/facebook-new.png" alt="Facebook" style="width: 32px; height: 32px;">
+    </a>
+  </div>
+
+  <!-- ŞİRKET BİLGİLERİ -->
+  <div style="text-align: center; padding: 16px 0 8px; font-size: 12px; color: #6b7280; line-height: 1.8;">
+    <p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Hydrozid® Türkiye</p>
+    <p style="margin: 4px 0;">Batu Medikal — Çorum, Türkiye</p>
+    <p style="margin: 4px 0;">MERSİS NO: 4016506204800017</p>
+    <p style="margin: 4px 0;">
+      <a href="https://wa.me/905534759032" style="color: #25D366; text-decoration: none; font-weight: 600;">WhatsApp: +90 553 475 9032</a> &nbsp;|&nbsp;
+      <a href="mailto:bilgi@hydrozidtr.com" style="color: #0369a1; text-decoration: none;">bilgi@hydrozidtr.com</a>
+    </p>
+    <p style="margin: 4px 0;">
+      <a href="https://www.hydrozidtr.com" style="color: #0369a1; text-decoration: none;">www.hydrozidtr.com</a> &nbsp;|&nbsp;
+      <a href="https://www.batumedikal.com" style="color: #6b7280; text-decoration: none;">batumedikal.com</a>
+    </p>
+    <p style="margin: 12px 0 0; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 11px;">
+      © 2026 Hydrozid® Türkiye — FDA 510(k) onaylı, CE belgeli
+    </p>
+  </div>
+</div>`;
+
+      await sendEmail(env, {
+        to: order.customerEmail,
+        subject: 'Hydrozid® Siparişiniz Alındı',
+        html: customerHtml,
+        replyTo: 'bilgi@hydrozidtr.com',
+      });
+    }
+
+    // notifiedAt kaydet
+    await env.PAYMENT_KV.put(
+      `order:${invoiceId}`,
+      JSON.stringify({ ...order, notifiedAt }),
+      { expirationTtl: 86400 * 30 }
+    );
+
+    return jsonResp(request, { ok: true, notifiedAt });
+
+  } catch (err) {
+    console.error('[notify] exception:', err.message);
+    return jsonResp(request, { error: err.message }, 500);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// sendEmail (Resend HTTP API)
+// ══════════════════════════════════════════════════════════════════════════════
+async function sendEmail(env, { to, subject, html, replyTo }) {
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Hydrozid Sipariş <siparis@hydrozidtr.com>',
+        to: [to],
+        subject,
+        html,
+        reply_to: replyTo || 'bilgi@hydrozidtr.com',
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('[resend] failed:', res.status, err);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('[resend] exception:', e.message);
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
 function isAllowedOrigin(request) {
   const origin = request.headers.get('Origin');
   if (!origin) return true;
-  return origin.includes('hydrozidtr.com') || origin.includes('localhost') || origin.includes('192.168.');
+
+  let host;
+  try {
+    const url = new URL(origin);
+    host = url.hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+
+  const allowed = ['hydrozidtr.com', 'www.hydrozidtr.com', 'localhost', '127.0.0.1'];
+  if (allowed.includes(host)) return true;
+  if (host.startsWith('192.168.')) return true;
+  return false;
 }
 
 function corsHeaders(request) {
-  const origin = request.headers.get('Origin') || 'https://www.hydrozidtr.com';
+  const origin = request.headers.get('Origin');
+  // SADECE whitelist'teki origin'leri echo et
+  const safeOrigin = (origin && isAllowedOrigin(request))
+    ? origin
+    : 'https://www.hydrozidtr.com';
   return {
-    'Access-Control-Allow-Origin':  origin,
+    'Access-Control-Allow-Origin':  safeOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Vary': 'Origin',
@@ -424,7 +687,7 @@ function corsHeaders(request) {
 }
 
 function jsonResp(request, data, status = 200) {
-  return new Response(JSON.stringify(data), {
+  const resp = new Response(JSON.stringify(data), {
     status,
     headers: {
       'Content-Type':  'application/json',
@@ -432,9 +695,13 @@ function jsonResp(request, data, status = 200) {
       ...corsHeaders(request),
     },
   });
+  return addSecurityHeaders(resp);
 }
 
 function handleOptions(request) {
+  if (!isAllowedOrigin(request)) {
+    return new Response(null, { status: 403 });
+  }
   return new Response(null, { status: 204, headers: corsHeaders(request) });
 }
 
@@ -513,15 +780,25 @@ async function validateHash(hashKey, expStatus, expOrderId, expInvoiceId, appSec
     const text = new TextDecoder().decode(decrypted);
     const [decStatus, decOrderId, decInvoiceId] = text.split('|');
 
-    if (decStatus !== expStatus) return null;
-    if (decOrderId !== String(expOrderId)) return null;
-    if (decInvoiceId !== expInvoiceId) return null;
+    if (!timingSafeEqual(decStatus, expStatus)) return null;
+    if (!timingSafeEqual(decOrderId, String(expOrderId))) return null;
+    if (!timingSafeEqual(decInvoiceId, expInvoiceId)) return null;
 
     return text;
   } catch (e) {
     console.error('[webhook] hash decrypt error:', e.message);
     return null;
   }
+}
+
+function timingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 async function sha1(input) {
@@ -560,5 +837,238 @@ function ack(data) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// /api/telegram/webhook
+// ══════════════════════════════════════════════════════════════════════════════
+async function handleTelegramWebhook(request, env) {
+  const headerSecret = request.headers.get('X-Telegram-Bot-Api-Secret-Token');
+  if (!env.TELEGRAM_WEBHOOK_SECRET || headerSecret !== env.TELEGRAM_WEBHOOK_SECRET) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  let update;
+  try { update = await request.json(); }
+  catch { return new Response('Bad request', { status: 400 }); }
+
+  const msg = update?.message;
+  if (!msg?.text) return new Response('OK', { status: 200 });
+
+  const chatId = msg.chat.id;
+  const text = msg.text.trim();
+
+  if (String(chatId) !== String(env.TELEGRAM_CHAT_ID)) {
+    return new Response('OK', { status: 200 });
+  }
+
+  let reply;
+  try {
+    if (text === '/start' || text === '/help') {
+      reply = '🤖 *Hydrozid Bot Komutları*\n\n' +
+              '/today - Bugünkü işlemler\n' +
+              '/last - Son 10 işlem\n' +
+              '/find <email> - Email ile ara\n' +
+              '/order <invoice_id> - Order detayı\n' +
+              '/health - Sistem durumu';
+    }
+    else if (text === '/today')      reply = await cmdToday(env);
+    else if (text === '/last' || text.startsWith('/last ')) {
+      const n = parseInt(text.split(' ')[1] || '10', 10);
+      reply = await cmdLast(env, Math.min(Math.max(n, 1), 20));
+    }
+    else if (text.startsWith('/find ')) {
+      const email = text.substring(6).trim().toLowerCase();
+      reply = await cmdFind(env, email);
+    }
+    else if (text.startsWith('/order ')) {
+      const id = text.substring(7).trim();
+      reply = await cmdOrder(env, id);
+    }
+    else if (text === '/health')     reply = await cmdHealth(env);
+    else reply = 'Bilinmeyen komut. /help yazabilirsin.';
+  } catch (e) {
+    reply = '⚠️ Hata: ' + (e.message || 'bilinmiyor');
+  }
+
+  try {
+    await fetch('https://api.telegram.org/bot' + env.TELEGRAM_BOT_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: reply,
+        parse_mode: 'Markdown',
+      }),
+    });
+  } catch (e) {
+    console.error('[telegram] sendMessage error:', e.message);
+  }
+
+  return new Response('OK', { status: 200 });
+}
+
+async function cmdToday(env) {
+  const list = await env.PAYMENT_KV.list({ prefix: 'order:', limit: 200 });
+  const today = new Date().toISOString().split('T')[0];
+
+  let paid = 0, pending = 0, failed = 0, revenue = 0;
+  let currency = '';
+
+  for (const k of list.keys) {
+    const raw = await env.PAYMENT_KV.get(k.name);
+    if (!raw) continue;
+    try {
+      const o = JSON.parse(raw);
+      if (!o.createdAt || !o.createdAt.startsWith(today)) continue;
+      if (o.status === 'PAID') { paid++; revenue += Number(o.amount || 0); currency = o.currency || ''; }
+      else if (o.status === 'FAILED') failed++;
+      else pending++;
+    } catch {}
+  }
+
+  return '📊 *Bugün (' + today + ')*\n\n' +
+         '✅ PAID: ' + paid + '\n' +
+         '⏳ PENDING: ' + pending + '\n' +
+         '❌ FAILED: ' + failed + '\n\n' +
+         '💰 Ciro: ' + revenue.toFixed(2) + ' ' + currency;
+}
+
+async function cmdLast(env, n) {
+  const list = await env.PAYMENT_KV.list({ prefix: 'order:', limit: 200 });
+  const orders = [];
+
+  for (const k of list.keys) {
+    const raw = await env.PAYMENT_KV.get(k.name);
+    if (!raw) continue;
+    try { orders.push(JSON.parse(raw)); } catch {}
+  }
+
+  orders.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  const top = orders.slice(0, n);
+
+  if (top.length === 0) return 'Hiç order bulunamadı.';
+
+  return '📋 *Son ' + top.length + ' işlem:*\n\n' +
+    top.map(o => {
+      const icon = o.status === 'PAID' ? '✅' : o.status === 'FAILED' ? '❌' : '⏳';
+      const time = (o.createdAt || '').substring(11, 16);
+      const day = (o.createdAt || '').substring(5, 10);
+      return icon + ' ' + day + ' ' + time + ' | ' + (o.package || '-') + ' | ' + (o.amount || 0) + ' ' + (o.currency || '');
+    }).join('\n');
+}
+
+async function cmdFind(env, email) {
+  const list = await env.PAYMENT_KV.list({ prefix: 'order:', limit: 500 });
+  const matches = [];
+
+  for (const k of list.keys) {
+    const raw = await env.PAYMENT_KV.get(k.name);
+    if (!raw) continue;
+    try {
+      const o = JSON.parse(raw);
+      if ((o.customerEmail || '').toLowerCase().includes(email)) matches.push(o);
+    } catch {}
+  }
+
+  if (matches.length === 0) return '🔍 ' + email + ' için sonuç yok.';
+
+  matches.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  const top = matches.slice(0, 10);
+
+  return '🔍 *' + email + ' için ' + matches.length + ' sonuç:*\n\n' +
+    top.map(o => {
+      const icon = o.status === 'PAID' ? '✅' : o.status === 'FAILED' ? '❌' : '⏳';
+      const date = (o.createdAt || '').substring(0, 10);
+      const idShort = (o.invoiceId || '').substring(0, 8);
+      return icon + ' ' + date + ' | ' + (o.amount || 0) + ' ' + (o.currency || '') + ' | ' + idShort;
+    }).join('\n');
+}
+
+async function cmdOrder(env, invoiceId) {
+  const raw = await env.PAYMENT_KV.get('order:' + invoiceId);
+  if (!raw) return '❌ Order bulunamadı: ' + invoiceId;
+
+  try {
+    const o = JSON.parse(raw);
+    let reply = '📦 *Order Detayı*\n\n' +
+                'ID: ' + invoiceId.substring(0, 16) + '...\n' +
+                'Status: ' + o.status + '\n' +
+                'Paket: ' + o.package + '\n' +
+                'Tutar: ' + o.amount + ' ' + o.currency + '\n\n' +
+                '👤 ' + o.customerName + '\n' +
+                '📧 ' + o.customerEmail + '\n' +
+                '📱 ' + o.customerPhone + '\n' +
+                '📍 ' + o.customerCity + '\n' +
+                '🏥 Diploma: ' + o.diploma + '\n\n' +
+                '⏰ ' + o.createdAt;
+    if (o.paidAt) reply += '\n💚 Ödendi: ' + o.paidAt;
+    if (o.failedAt) reply += '\n💔 Başarısız: ' + o.failedAt + '\n   ' + (o.failureReason || '-');
+    return reply;
+  } catch {
+    return '⚠️ Order verisi bozuk.';
+  }
+}
+
+async function cmdHealth(env) {
+  let kvStatus = '❌';
+  let tokenStatus = '❌';
+  let halkStatus = '❌';
+
+  try {
+    await env.PAYMENT_KV.list({ limit: 1 });
+    kvStatus = '✅';
+  } catch (e) {
+    kvStatus = '❌ ' + e.message.substring(0, 30);
+  }
+
+  try {
+    const cached = await env.PAYMENT_KV.get('token:halkode');
+    tokenStatus = cached ? '✅ cached' : '⚠️ yok';
+  } catch {}
+
+  try {
+    const r = await fetch('https://app.halkode.com.tr/ccpayment/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_id: env.HALKODE_APP_ID, app_secret: env.HALKODE_APP_SECRET }),
+    });
+    halkStatus = r.ok ? '✅ ' + r.status : '❌ ' + r.status;
+  } catch (e) {
+    halkStatus = '❌ ' + e.message.substring(0, 30);
+  }
+
+  return '🏥 *Sistem Sağlık Durumu*\n\n' +
+         'Worker: ✅ (çalışıyor)\n' +
+         'KV: ' + kvStatus + '\n' +
+         'Token: ' + tokenStatus + '\n' +
+         'HalkÖde API: ' + halkStatus + '\n\n' +
+         '⏰ ' + new Date().toISOString();
+}
+
+function addSecurityHeaders(response) {
+  const newHeaders = new Headers(response.headers);
+  newHeaders.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  newHeaders.set('X-Content-Type-Options', 'nosniff');
+  newHeaders.set('X-Frame-Options', 'DENY');
+  newHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  newHeaders.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  newHeaders.set('Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com data:; " +
+    "img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com; " +
+    "connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com; " +
+    "frame-src https://app.halkode.com.tr; " +
+    "frame-ancestors 'none'; " +
+    "base-uri 'self'; " +
+    "form-action 'self' https://app.halkode.com.tr;"
+  );
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders,
   });
 }

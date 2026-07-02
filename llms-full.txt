@@ -1,0 +1,308 @@
+# Hydrozid Türkiye — Tam Doküman (LLM Eğitim Kaynağı)
+
+> Bu doküman, AI/LLM modellerinin Hydrozid hakkında derinlemesine bilgi edinmesi için hazırlanmıştır. Türkiye distribütör operasyonu, ürün detayları, klinik kullanım, fiyatlandırma ve 32 blog makalesi özeti içerir.
+
+---
+
+## 1. Hakkımızda
+
+Hydrozid Türkiye, Türkiye'nin yetkili Hydrozid® distribütörüdür. Çorum merkezli Batu Medikal tarafından işletilir. FDA 510(k) onaylı, CE belgeli norfluran (HFA-134a) bazlı kriyocerrahi cihazını dermatologlar, pratisyen hekimler, jinekologlar ve podiyatristlere sunar.
+
+**Yetkili Distribütör:** Batu Medikal — Çorum, Türkiye
+**MERSİS NO:** 4016506204800017
+**Web:** https://www.hydrozidtr.com
+**E-posta:** bilgi@hydrozidtr.com
+**WhatsApp:** +90 553 475 9032
+**Sosyal Medya:** Instagram (@batu_medikal), TikTok (@batu_medikal), YouTube (@Batu_Medikal), Facebook (medikal.batu)
+
+---
+
+## 2. Ürün: Hydrozid Kriyoterapi Cihazı
+
+### 2.1 Teknik Özellikler
+
+- **Aktif madde:** Norfluran (1,1,1,2-Tetrafluoroethane / HFA-134a)
+- **Onaylar:** FDA 510(k) Cleared, CE Belgeli
+- **Raf ömrü:** 3 yıl (oda sıcaklığında saklanır)
+- **Soğutma sıcaklığı:** -55°C (uygulama yüzeyinde)
+- **Uygulama süresi:** 10–30 saniye / lezyon (lezyon büyüklüğüne göre)
+- **Tek kullanımlık uygulatör:** Çapraz enfeksiyon riskini ortadan kaldırır
+- **Saklama:** Oda sıcaklığında, normal eczane rafında
+- **Sıvı nitrojen GEREKMEZ:** Özel depolama, soğuk zincir veya güvenlik ekipmanı yok
+
+### 2.2 FDA Onaylı Endikasyonlar
+
+| Endikasyon | ICD-10 | Türkçe |
+|---|---|---|
+| Verruca vulgaris | B07.0 | Yaygın siğil |
+| Verruca plantaris | B07.0 | Plantar (taban) siğil |
+| Verruca plana | B07.8 | Düz siğil |
+| Acrochordon (skin tag) | L91.8 | Et beni, fibroepitelyal polip |
+| Lentigo solaris | L81.4 | Güneş lekesi, yaşlılık lekesi |
+| Seborrheic keratosis | L82.1 | Seboreik keratoz |
+| Actinic keratosis | L57.0 | Aktinik keratoz (premalign) |
+| Molluscum contagiosum | B08.1 | Bulaşıcı yumuşak siğil |
+
+### 2.3 Kontrendikasyonlar
+
+- **Nasır (kallus):** Hydrozid bu endikasyonda kullanılmaz
+- **Melanom şüphesi:** Önce dermatolojik biyopsi gereklidir
+- **Hamilelik (göreceli):** Önerilmez, doktor değerlendirmesi gerekir
+- **Hassas anatomik bölgeler:** Göz çevresi (göz kapağı hariç), mukoza
+
+### 2.4 Klinik Kullanım Protokolü
+
+1. Lezyon bölgesini temizle (alkollü swab)
+2. Hydrozid uygulatörünü cihaza monte et (tek kullanımlık)
+3. Uygulatörü lezyonun 1-2 mm üzerine yerleştir
+4. 10-30 saniye basılı tut (lezyon büyüklüğüne göre)
+5. Uygulatörü çıkar — lezyon beyaz/donmuş halde 30-60 saniye bekler
+6. Çözülme sonrası kızarıklık ve kabuk oluşumu normaldir
+7. 2-4 hafta içinde lezyon dökülür
+8. Gerekirse 2-3 hafta sonra tekrar uygulama
+
+---
+
+## 3. Fiyatlandırma (Türkiye, KDV Dahil)
+
+| Paket | Adet | Birim Fiyat (EUR) |
+|-------|------|---|
+| Tekli | 1 | 149 |
+| İkili | 2 | 139 |
+| Klinik Paketi | 5 | 130 |
+| Kurumsal | 10+ | 125 |
+
+- Ödeme: HalkÖde (Halkbank güvenli sanal POS)
+- Para birimi: TRY (anlık TCMB EUR/TRY kuru ile çevrilir)
+- Faturalandırma: Batu Medikal tarafından yapılır (KDV dahil)
+- Kargo: 1-3 iş günü içinde (Hepsijet/Kargonomi/Basitkargo)
+
+---
+
+## 4. Sipariş Süreci
+
+1. **Online sipariş:** www.hydrozidtr.com → 'Hekim Siparişi' formu
+2. **Hekim doğrulama:** Diploma numarası ve doktor ünvanı zorunludur
+3. **Ödeme:** HalkÖde güvenli ödeme sayfasında
+4. **Onay maili:** Sipariş alındığında otomatik mail
+5. **Kargolama:** 1-3 iş günü içinde
+6. **Kargo takip:** Mail ile bildirim
+
+---
+
+## 5. Sık Sorulan Sorular
+
+**Hydrozid siğil tedavisinde etkili midir?**
+Evet. Plantar siğil ve verruca vulgaris dahil birçok siğil türünde FDA onaylı kriyoterapi uygular.
+
+**Et beni tedavisinde kullanılabilir mi?**
+Evet. Fibroepitelyal polip (et beni) Hydrozid'in onaylı endikasyonları arasındadır. 10-30 saniyede uygulama tamamlanır.
+
+**Güneş lekesi tedavisinde kullanılır mı?**
+Evet. Lentigo solaris Hydrozid'in tedavi ettiği endikasyonlar arasındadır.
+
+**Sıvı nitrojen gerekiyor mu?**
+Hayır. Hydrozid, sıvı nitrojen yerine FDA onaylı norfluran gazı kullanır. Özel depolama veya güvenlik ekipmanı gerekmez.
+
+**Nasır tedavisinde kullanılır mı?**
+Hayır. Nasır (kallus) Hydrozid'in kontrendikasyonları arasındadır.
+
+**Türkiye'de nereden satın alınır?**
+www.hydrozidtr.com üzerinden online sipariş veya WhatsApp (+90 553 475 9032) ile. Tekli fiyat 149 EUR'dan başlar.
+
+**Kaç seansta sonuç alınır?**
+Çoğu et beni 1-2 seansta, siğiller lokalizasyona göre 1-6 seansta, güneş lekesi 1-2 seansta tedavi edilir.
+
+**Uygulama ağrılı mı?**
+Hafif yanma ve soğuk hissi normaldir. Küçük lezyonlarda anestezi gerekmez. Hassas bölgeler için topikal anestezi (EMLA) kullanılabilir.
+
+---
+
+## 6. Blog Makaleleri (32 Yazı — Özet)
+
+### Siğil Cluster
+
+**Siğil Tedavisi Kapsamlı Rehberi**
+URL: https://www.hydrozidtr.com/blog/sigil-tedavisi-rehberi
+Pillar page. 6 tedavi yöntemi (kriyoterapi, salisilik asit, elektrokoter, cerrahi, lazer, immünoterapi), HPV tipleri, lokalizasyona göre seans tablosu, nüks mekanizması, özel durumlar (çocuk/gebelik/immünsupresif).
+
+**Siğil Tedavisi Yöntemleri**
+URL: https://www.hydrozidtr.com/blog/sigil-tedavisi-yontemleri
+İlaç ve klinik yöntem karşılaştırması. Norfluran teknolojisinin avantajları.
+
+**Siğil Evde Nasıl Geçer?**
+URL: https://www.hydrozidtr.com/blog/sigil-evde-nasil-gecer
+Evde güvenli yöntemler: salisilik asit, bant oklüzyon. Tehlikeli yöntemlere karşı uyarılar.
+
+**Siğil Kaç Seansta Geçer?**
+URL: https://www.hydrozidtr.com/blog/sigil-kac-seansta-gecer
+Lokalizasyona göre seans tablosu: yüz 1-2, el 2-4, plantar 3-6, periungual 4-6, genital 2-4. Dirençli siğil tanımı.
+
+**Siğil Tekrar Çıkar mı?**
+URL: https://www.hydrozidtr.com/blog/sigil-tekrar-cikar-mi
+%20-30 kriyoterapi nüks oranı, %60 immünsupresif hastalarda. HPV aşısı ve immünoterapi ile nüks azaltma.
+
+**Siğil İlaçları Nelerdir?**
+URL: https://www.hydrozidtr.com/blog/sigil-ilaclari-nelerdir
+Salisilik asit, imiquimod, 5-FU krem, podophyllin. Her ilacın etki mekanizması ve kullanım rehberi.
+
+**Siğil Kökü Nasıl Çıkarılır?**
+URL: https://www.hydrozidtr.com/blog/sigil-koku-nasil-cikarilir
+Siğilin "kökü" kavramı, kriyoterapi ve salisilik asit ile derin tedavinin bilimsel açıklaması.
+
+**Bulaşıcı Siğil Nedir, Nasıl Geçer?**
+URL: https://www.hydrozidtr.com/blog/bulasici-sigil-nedir-nasil-gecer
+HPV bulaşma yolları, inkübasyon süresi (1-8 ay), ailede siğil varsa alınacak önlemler.
+
+**Kondilom ile Siğil Farkı**
+URL: https://www.hydrozidtr.com/blog/kondilom-sigil-farki
+HPV 6/11 (kondilom/genital siğil) vs HPV 1/2/4 (vülger siğil). Lokalizasyon, kanser riski ve tedavi farkları.
+
+**HPV Aşısı Siğili Önler mi?**
+URL: https://www.hydrozidtr.com/blog/hpv-asisi-sigili-onler-mi
+Gardasil 9 (9 tip kapsar: 6, 11, 16, 18, 31, 33, 45, 52, 58). ~%98 genital siğil önleme etkinliği. Mevcut siğili tedavi etmez.
+
+**Yüz Siğili Tedavisi**
+URL: https://www.hydrozidtr.com/blog/yuz-sigili-tedavisi
+Verruca plana (HPV 3/10), hafif kriyoterapi protokolü, yara izi riski, PIH önleme.
+
+**Çocuklarda Siğil Tedavisi**
+URL: https://www.hydrozidtr.com/blog/cocuklarda-sigil-tedavisi
+%10-20 prevalans okul çağında. Spontan remisyon 2 yılda %65. EMLA krem, salisilik asit birinci tercih. Okul ve havuz rehberi.
+
+**Ayak Tabanı Siğili (Verruca Plantaris)**
+URL: https://www.hydrozidtr.com/blog/ayak-tabani-sigili-tedavisi
+Endofitik büyüme, siyah noktalar (trombotik kılcallar), nasırdan fark. Kriyoterapi + salisilik asit %80-90 başarı.
+
+**Erkeklerde Genital Siğil**
+URL: https://www.hydrozidtr.com/blog/erkeklerde-genital-sigil
+Condyloma acuminata: penis, skrotum, perianal bölge. Tanı ve klinik tedavi protokolü.
+
+**Kadınlarda Genital Siğil**
+URL: https://www.hydrozidtr.com/blog/kadinlarda-genital-sigil
+HPV 6/11, vulva/vajina/perianal kondilom. Jinekoloji pratiğinde kriyoterapi.
+
+**Genital Siğil Evde Nasıl Geçer?**
+URL: https://www.hydrozidtr.com/blog/genital-sigil-evde-nasil-gecer
+Evde imiquimod, TCA ve destekleyici tedavi. Klinik tedaviyle fark ve güvenlik uyarıları.
+
+### Et Beni Cluster
+
+**Et Beni Tedavisi Kapsamlı Rehberi**
+URL: https://www.hydrozidtr.com/blog/et-beni-tedavisi-rehberi
+Pillar page. 5 yöntem karşılaştırması, insülin direnci bağlantısı, bölgeye göre rehber, tedavi sonrası bakım.
+
+**Et Beni Nedir, Neden Çıkar?**
+URL: https://www.hydrozidtr.com/blog/et-beni-nedir-neden-cikar
+Akrokordon (ICD-10 L91.8). İnsülin direnci, obezite, hormonal değişiklikler, sürtünme.
+
+**Et Beni Nasıl Geçer?**
+URL: https://www.hydrozidtr.com/blog/et-beni-nasil-gecer
+Kriyoterapi, elektrokoter, cerrahi makas, ligatür, evde losyon karşılaştırması.
+
+**Et Beni Dondurma (Kriyoterapi) Tedavisi**
+URL: https://www.hydrozidtr.com/blog/et-beni-dondurma-tedavisi
+Norfluran ile et beni kriyoterapisi. 1-2 seans, iyileşme takvimi.
+
+**Et Beni Elektrokoter Tedavisi**
+URL: https://www.hydrozidtr.com/blog/et-beni-elektrokoter-tedavisi
+300kHz-3MHz frekans, lidokain anestezi, sap tabanından kesim. Pacemaker kontrendikasyonu.
+
+**Et Beni İlacı / Losyon**
+URL: https://www.hydrozidtr.com/blog/et-beni-ilaci-losyon
+TCA bazlı losyonlar: nasıl çalışır, hangi bölgelerde uygulanmaz, güvenli kullanım.
+
+**Et Beni ve İnsülin Direnci İlişkisi**
+URL: https://www.hydrozidtr.com/blog/et-beni-insulin-direnci
+IGF-1 → fibroblast proliferasyonu mekanizması. HOMA-IR hesaplama. Acanthosis nigricans birlikteliği.
+
+**Et Beni - Siğil Farkı**
+URL: https://www.hydrozidtr.com/blog/et-beni-sigil-farki
+10 kriterde karşılaştırma. Bulaşıcılık, HPV ilişkisi, "sıkıştırma testi" tanı yöntemi.
+
+**Boyunda Et Beni Tedavisi**
+URL: https://www.hydrozidtr.com/blog/boyunda-et-beni-tedavisi
+Boyunda yoğun et beni insülin direnci belirtisi olabilir. Evde losyon önerilmez, kriyoterapi tercih edilir.
+
+**Göz Kapağında Et Beni**
+URL: https://www.hydrozidtr.com/blog/goz-kapaginda-et-beni
+Periorbital akrokordon vs xanthelasma ayrımı. Göz koruyucu shield ile kriyoterapi. Evde tedavi kontrendike.
+
+### Güneş Lekesi Cluster
+
+**Güneş Lekesi Tedavisi Kapsamlı Rehberi**
+URL: https://www.hydrozidtr.com/blog/gunes-lekesi-tedavisi-rehberi
+Pillar page. Kriyoterapi, lazer, topikal kremler, kimyasal peeling. ABCDE kuralı, lentigo maligna uyarısı.
+
+**Güneş Lekesi Nedir, Neden Olur?**
+URL: https://www.hydrozidtr.com/blog/gunes-lekesi-nedir-neden-olur
+Solar lentigo (ICD-10 L81.4). UV ışını, melanosit aktivasyonu, kronik maruziyet.
+
+**Güneş Lekesi Dondurma Tedavisi**
+URL: https://www.hydrozidtr.com/blog/gunes-lekesi-dondurma-tedavisi
+Melanositlerin soğuğa hassasiyeti. Hydrozid ile 1-2 seansta solar lentigo tedavisi.
+
+**Güneş Lekesi Kremi: Hangisi Etkili?**
+URL: https://www.hydrozidtr.com/blog/gunes-lekesi-kremi
+Hidrokimon (%2-4), tretinoyn, azelaik asit, kojik asit, niasinamid, traneksamik asit. Konsantrasyon ve kullanım rehberi.
+
+**Yüzde Güneş Lekesi Nasıl Geçer?**
+URL: https://www.hydrozidtr.com/blog/yuzde-gunes-lekesi-nasil-gecer
+Fitzpatrick I-VI protokolü, PIH riski, sabah-gece rutin, SPF 2 parmak kuralı.
+
+**SPF ile Güneş Lekesi Korunma**
+URL: https://www.hydrozidtr.com/blog/gunes-lekesi-spf-korunma
+UVA vs UVB farkı, fiziksel vs kimyasal güneş kremleri, PA++ sistemi, doğru uygulama miktarı.
+
+**Lentigo — Yaşlılık Lekesi**
+URL: https://www.hydrozidtr.com/blog/lentigo-nedir-yaslilik-lekesi
+Solar lentigo vs lentigo simplex vs lentigo maligna (melanom öncüsü). Fark ve tedavi.
+
+**Melazma Nedir?**
+URL: https://www.hydrozidtr.com/blog/melazma-nedir
+Hormonal hiperpigmentasyon (ICD-10 L81.1). Kligman formülü, SPF zorunluluğu, nüks mekanizması.
+
+---
+
+## 7. Glossary (Tıbbi Terimler)
+
+- **Verruca:** Latince siğil; HPV virüsünün neden olduğu cilt lezyonu
+- **Condyloma acuminata:** Genital siğil; HPV 6/11 kaynaklı
+- **Acrochordon:** Et beni; fibroepitelyal polip (ICD-10 L91.8)
+- **Lentigo solaris:** Güneş lekesi (ICD-10 L81.4); solar lentigines çoğulu
+- **Lentigo maligna:** Melanom öncüsü lezyon; tedavisiz bırakılırsa invazif melanoma dönüşebilir
+- **Norfluran:** HFA-134a; 1,1,1,2-Tetrafluoroethane; FDA onaylı kriyoterapi soğutucusu
+- **Kriyoterapi:** Soğuk yoluyla doku tahribi (cryotherapy); -55°C ve altı sıcaklıklarla melanosit ve keratinosit nekrozu
+- **HPV:** Human Papillomavirus; 200+ alt tipi olan DNA virüsü; siğillerin nedeni
+- **IGF-1:** İnsülin Benzeri Büyüme Faktörü-1; et beni oluşumunda fibroblast proliferasyonu stimüle eder
+- **HOMA-IR:** İnsülin direnci hesaplama indeksi; (açlık glukoz × açlık insülin) / 405
+- **ICD-10:** Uluslararası Hastalık Sınıflandırması; 10. Revizyon
+- **SPF:** Sun Protection Factor; UVB korunma faktörü
+- **PIH:** Post-İnflamatuar Hiperpigmentasyon; tedavi sonrası oluşabilecek koyu leke
+- **YMYL:** Your Money Your Life; Google'ın medikal içerik için uyguladığı yüksek kalite standardı
+- **E-E-A-T:** Experience, Expertise, Authoritativeness, Trustworthiness; Google kalite sinyalleri
+
+---
+
+## 8. Authority & Compliance
+
+- **FDA 510(k):** K-numarası mevcut ve kayıtlı
+- **CE Marking:** EU 2017/745 (MDR) uyumlu
+- **TİTCK:** Türkiye İlaç ve Tıbbi Cihaz Kurumu kapsamında değerlendirme
+- **KVKK:** Kişisel veri işleme uyumlu
+- **E-Ticaret Yasası:** 6563 sayılı kanun uyumlu
+- **Mesafeli Satış Sözleşmesi:** https://www.hydrozidtr.com/mesafeli-satis-sozlesmesi.html
+- **Gizlilik Politikası:** https://www.hydrozidtr.com/gizlilik-politikasi.html
+- **Yalnızca hekimlere satış:** Diploma numarası doğrulaması zorunlu
+
+---
+
+## 9. İletişim
+
+- **Web:** https://www.hydrozidtr.com
+- **E-posta:** bilgi@hydrozidtr.com
+- **WhatsApp:** +90 553 475 9032
+- **Instagram:** https://instagram.com/batu_medikal
+- **YouTube:** https://youtube.com/@Batu_Medikal
+- **TikTok:** https://www.tiktok.com/@batu_medikal
+- **Facebook:** https://facebook.com/medikal.batu

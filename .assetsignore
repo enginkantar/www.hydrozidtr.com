@@ -25,7 +25,8 @@ package-lock.json
 *~
 CLAUDE.md
 DESIGN.md
-YARIN_*.md
+YARIN_SKILL_BRIEF.md
+YARIN_YAPILACAKLAR.md
 TODO.md
 NOTES.md
 *.md.bak
@@ -40,5 +41,6 @@ functions/**
 src/
 src/**
 
+# Backup dosyaları asla deploy edilmesin
 *.backup-*
 *.backup
