@@ -2403,6 +2403,13 @@
       font-weight: 500;
       color: #64748B;
     }
+    .pc-try {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #475569;
+      margin-top: 4px;
+    }
 
     .pc-sub {
       font-size: 0.78rem;
@@ -4639,10 +4646,11 @@
 
         window.eurTryRate = rate;
 
-        // Fiyat kartlarını EUR → TRY'ye çevir
+        // Fiyat kartlarını EUR + TRY eşdeğeri göster
         document.querySelectorAll('.pc-price[data-eur]').forEach(function (el) {
-          const tryPrice = Math.round(parseFloat(el.dataset.eur) * rate);
-          el.innerHTML = tryPrice.toLocaleString('tr-TR') + ' <span class="pc-currency">₺</span>';
+          const eurAmt = parseFloat(el.dataset.eur);
+          const tryPrice = Math.round(eurAmt * rate);
+          el.innerHTML = eurAmt + ' <span class="pc-currency">EUR</span><span class="pc-try">(~' + tryPrice.toLocaleString('tr-TR') + ' ₺)</span>';
         });
 
         // Dropdown'a data-try-price ekle, TRY etiketleri güncelle
