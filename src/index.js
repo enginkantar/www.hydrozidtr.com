@@ -612,7 +612,7 @@ async function handleNotifySuccess(request, env) {
       { expirationTtl: 86400 * 30 }
     );
 
-    return jsonResp(request, { ok: true, notifiedAt });
+    return jsonResp(request, { ok: true, notifiedAt, amount: order.amount, currency: order.currency, orderNo: order.orderNo || order_id });
 
   } catch (err) {
     console.error('[notify] exception:', err.message);
