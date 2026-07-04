@@ -4514,14 +4514,14 @@
       const display = document.getElementById('omPriceDisplay');
       const opt = sel.options[sel.selectedIndex];
       if (!opt || !opt.dataset.price) { display.style.display = 'none'; return; }
+      const eurUnit = parseInt(opt.dataset.eurUnit || opt.dataset.price);
+      const qty = parseInt(opt.dataset.qty || 1);
+      const totalEur = eurUnit * qty;
       if (opt.dataset.tryPrice) {
-        const eurUnit = parseInt(opt.dataset.eurUnit || opt.dataset.price);
-        const qty = parseInt(opt.dataset.qty || 1);
-        const rate = window.eurTryRate ? window.eurTryRate.toFixed(2) : null;
         const totalTry = parseInt(opt.dataset.tryPrice);
-        display.textContent = totalTry.toLocaleString('tr-TR') + ' ₺' + (rate ? ' (TCMB kuru ile)' : '');
+        display.textContent = 'Toplam: ' + totalEur + ' EUR (~' + totalTry.toLocaleString('tr-TR') + ' ₺)';
       } else {
-        display.textContent = 'Toplam: ' + parseInt(opt.dataset.price).toLocaleString('tr-TR') + ' EUR';
+        display.textContent = 'Toplam: ' + totalEur + ' EUR';
       }
       display.style.display = 'block';
     }
@@ -4658,13 +4658,14 @@
         PACKAGES.forEach(function (pkg) {
           const opt = Array.from(sel.options).find(function (o) { return o.value === pkg.value; });
           if (!opt) return;
-          const totalTry = Math.round(pkg.eurUnit * rate) * pkg.qty;
-          opt.dataset.tryPrice = totalTry;
           const unitTry = Math.round(pkg.eurUnit * rate);
+          const totalTry = unitTry * pkg.qty;
+          opt.dataset.tryPrice = totalTry;
+          const totalEur = pkg.eurUnit * pkg.qty;
           if (pkg.qty === 1) {
-            opt.textContent = pkg.value + ' — 1 adet × ' + unitTry.toLocaleString('tr-TR') + ' ₺';
+            opt.textContent = pkg.value + ' — ' + pkg.eurUnit + ' EUR (~' + unitTry.toLocaleString('tr-TR') + ' ₺) · 1 adet';
           } else {
-            opt.textContent = pkg.value + ' — ' + pkg.qty + ' adet × ' + unitTry.toLocaleString('tr-TR') + ' ₺ = ' + totalTry.toLocaleString('tr-TR') + ' ₺';
+            opt.textContent = pkg.value + ' — ' + pkg.eurUnit + ' EUR × ' + pkg.qty + ' = ' + totalEur + ' EUR (~' + totalTry.toLocaleString('tr-TR') + ' ₺)';
           }
         });
 
