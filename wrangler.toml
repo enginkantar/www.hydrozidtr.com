@@ -11,6 +11,9 @@ BASE_URL = "https://www.hydrozidtr.com"
 TELEGRAM_CHAT_ID = "6014598776"
 HYDROZID_API_URL = "https://hydrozid-pazarlama.onrender.com"
 KARGO_SAGLAYICI = "kargonomi"
+MOCK_PAYMENT = "0"
+QNB_MOCK = "0"
+KARGO_MOCK = "0"
 # ORDER_ALERT_EMAILS ve RESEND_FROM_EMAIL Cloudflare Dashboard'da secret/var olarak verilebilir.
 
 # Her gün 05:00 UTC = 08:00 Türkiye — otomatik kampanya tetikleyici
