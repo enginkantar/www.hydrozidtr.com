@@ -60,6 +60,7 @@
     }
     .btn-fail:hover { color: #ef4444; border-color: #7f1d1d; }
     .secure { text-align: center; font-size: 11px; color: #475569; margin-top: 18px; }
+    .secure strong { color: #94A3B8; }
     /* Güven rozetleri (footer ile aynı) */
     .trust { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; }
     .trust-chip { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 10px; padding: 7px 12px; }
@@ -67,15 +68,17 @@
     .trust-chip span { font-size: 0.72rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
     .trust-batu img { height: 26px; }
     .trust-etbis span { color: #7a5c1e; }
+    .hidden { display: none !important; }
+    .notice { margin-top: 14px; font-size: 12px; color: #94A3B8; line-height: 1.5; text-align: center; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="test-banner">⚠️ TEST ORTAMI — Gerçek çekim yapılmaz. Test kartı: 9999 9999 9999 9999</div>
+    <div class="test-banner" id="modeBanner">⚠️ TEST ORTAMI — Gerçek çekim yapılmaz. Test kartı: 9999 9999 9999 9999</div>
     <div class="head">
       <div class="lock">🔒</div>
-      <h1>Güvenli Ödeme (Simülasyon)</h1>
-      <p>Kart bilgileri kaydedilmez — bu bir test ekranıdır</p>
+      <h1 id="pageTitle">Güvenli Ödeme (Simülasyon)</h1>
+      <p id="pageDesc">Kart bilgileri kaydedilmez — bu bir test ekranıdır</p>
     </div>
     <div class="amount">
       <div class="pkg" id="pkgLabel">Paket</div>
@@ -84,6 +87,25 @@
 
     <div id="banner"></div>
     <form id="payForm" novalidate>
+      <div id="wlFields" class="hidden">
+        <div class="field">
+          <label>Ad Soyad</label>
+          <input type="text" id="customerName" autocomplete="name" readonly>
+        </div>
+        <div class="field">
+          <label>E-posta</label>
+          <input type="email" id="customerEmail" autocomplete="email" readonly>
+        </div>
+        <div class="field">
+          <label>Telefon</label>
+          <input type="text" id="customerPhone" autocomplete="tel" readonly>
+        </div>
+        <div class="field">
+          <label>Fatura / Teslimat Adresi</label>
+          <input type="text" id="customerAddress" autocomplete="street-address" readonly>
+        </div>
+        <div class="notice" id="wlNotice">White-label modda form doğrudan ödeme sağlayıcısına gönderilir.</div>
+      </div>
       <div class="field" id="f-name">
         <label>Kart Üzerindeki İsim</label>
         <input type="text" id="cardName" value="9999 9999" autocomplete="off">
@@ -109,7 +131,7 @@
       <button type="submit" class="btn btn-pay" id="payBtn">Ödemeyi Tamamla</button>
       <button type="button" class="btn btn-fail" id="failBtn">Başarısız Ödeme Simüle Et</button>
     </form>
-    <div class="secure">🛡️ Bu ekran ödeme sağlayıcısını taklit eder — canlıda HalkÖde 3D Secure kullanılır.</div>
+    <div class="secure" id="secureNote">🛡️ Bu ekran ödeme sağlayıcısını taklit eder — canlıda HalkÖde 3D Secure kullanılır.</div>
     <div class="trust">
       <div class="trust-chip trust-batu">
         <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
@@ -130,27 +152,28 @@
     const oid = p.get('oid') || '';
     const amt = p.get('amt') || '';
     const pkg = p.get('pkg') || 'Paket';
-    document.getElementById('pkgLabel').textContent = 'Hydrozid® ' + pkg;
-    document.getElementById('amtLabel').textContent = amt ? Number(amt).toLocaleString('tr-TR') + ' ₺' : '—';
-
-    // ─── Girdi formatlama ───
+    const wl = p.get('wl') === '1';
+    const mock = p.get('mock') === '1';
     const noEl = document.getElementById('cardNo');
     const expEl = document.getElementById('cardExp');
     const cvvEl = document.getElementById('cardCvv');
-    noEl.addEventListener('input', () => {
-      let d = noEl.value.replace(/\D/g, '').slice(0, 16);
-      noEl.value = d.replace(/(.{4})/g, '$1 ').trim();
-      clearErr('f-no');
-    });
-    expEl.addEventListener('input', () => {
-      let d = expEl.value.replace(/\D/g, '').slice(0, 4);
-      expEl.value = d.length >= 3 ? d.slice(0, 2) + '/' + d.slice(2) : d;
-      clearErr('f-exp');
-    });
-    cvvEl.addEventListener('input', () => { cvvEl.value = cvvEl.value.replace(/\D/g, '').slice(0, 4); clearErr('f-cvv'); });
-    document.getElementById('cardName').addEventListener('input', () => clearErr('f-name'));
+    const payForm = document.getElementById('payForm');
+    const payBtn = document.getElementById('payBtn');
+    const failBtn = document.getElementById('failBtn');
+    const modeBanner = document.getElementById('modeBanner');
+    const secureNote = document.getElementById('secureNote');
+    const pageTitle = document.getElementById('pageTitle');
+    const pageDesc = document.getElementById('pageDesc');
+    const wlFields = document.getElementById('wlFields');
 
-    // ─── Validasyon ───
+    document.getElementById('pkgLabel').textContent = 'Hydrozid® ' + pkg;
+    document.getElementById('amtLabel').textContent = amt ? Number(amt).toLocaleString('tr-TR') + ' ₺' : '—';
+
+    const state = {
+      init: null,
+      actionUrl: '',
+    };
+
     function setErr(fid, msg) {
       const f = document.getElementById(fid);
       f.classList.add('invalid');
@@ -184,21 +207,158 @@
       return null;
     }
 
-    document.getElementById('payForm').addEventListener('submit', function (e) {
+    noEl.addEventListener('input', () => {
+      let d = noEl.value.replace(/\D/g, '').slice(0, 16);
+      noEl.value = d.replace(/(.{4})/g, '$1 ').trim();
+      clearErr('f-no');
+    });
+    expEl.addEventListener('input', () => {
+      let d = expEl.value.replace(/\D/g, '').slice(0, 4);
+      expEl.value = d.length >= 3 ? d.slice(0, 2) + '/' + d.slice(2) : d;
+      clearErr('f-exp');
+    });
+    cvvEl.addEventListener('input', () => { cvvEl.value = cvvEl.value.replace(/\D/g, '').slice(0, 4); clearErr('f-cvv'); });
+    document.getElementById('cardName').addEventListener('input', () => clearErr('f-name'));
+
+    async function initWhiteLabel() {
+      const invoiceId = p.get('invoice_id');
+      if (!invoiceId) {
+        modeBanner.textContent = '⚠️ White-label mod için invoice_id gerekiyor.';
+        return;
+      }
+      const res = await fetch('/api/payment/whitelabel-init?invoice_id=' + encodeURIComponent(invoiceId));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data && data.error ? data.error : 'White-label init failed');
+      state.init = data;
+      state.actionUrl = data.action_url;
+      modeBanner.textContent = '⚠️ CANLI WHITE-LABEL ÖDEME — Kart verisi doğrudan sağlayıcıya gönderilir.';
+      pageTitle.textContent = 'Güvenli Ödeme';
+      pageDesc.textContent = 'White-label 3D Secure ödeme ekranı';
+      secureNote.innerHTML = '🛡️ Bu ekran doğrudan ödeme sağlayıcısının akışını kullanır.';
+      wlFields.classList.remove('hidden');
+      document.getElementById('cardName').value = '';
+      document.getElementById('cardNo').value = '';
+      document.getElementById('cardExp').value = '';
+      document.getElementById('cardCvv').value = '';
+      document.getElementById('customerName').value = data.name + ' ' + data.surname;
+      document.getElementById('customerEmail').value = data.bill_email || '';
+      document.getElementById('customerPhone').value = data.bill_phone || '';
+      document.getElementById('customerAddress').value = data.bill_address1 || '';
+      payBtn.textContent = 'Ödemeyi Tamamla';
+      failBtn.textContent = 'İptal Et';
+      failBtn.onclick = function () {
+        location.href = (data.cancel_url || '/odeme-hatasi.html') + '?invoice_id=' + encodeURIComponent(data.invoice_id) + '&mock=0';
+      };
+      payForm.addEventListener('submit', handleWhiteLabelSubmit);
+      return data;
+    }
+
+    function addHidden(form, name, value) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value == null ? '' : String(value);
+      form.appendChild(input);
+    }
+
+    function handleWhiteLabelSubmit(e) {
       e.preventDefault();
       clearAll();
+      if (!state.init || !state.actionUrl) {
+        document.getElementById('banner').textContent = 'White-label ödeme bilgileri yüklenemedi.';
+        document.getElementById('banner').classList.add('show');
+        return;
+      }
+
       const err = validate();
       if (err) { setErr(err.fid, err.msg); return; }
-      const btn = document.getElementById('payBtn');
-      btn.disabled = true; btn.textContent = 'İşleniyor...';
-      setTimeout(function () {
-        location.href = '/odeme-basarili.html?order_no=' + encodeURIComponent(oid) + '&mock=1';
-      }, 1200);
-    });
 
-    document.getElementById('failBtn').addEventListener('click', function () {
-      location.href = '/odeme-hatasi.html?order_no=' + encodeURIComponent(oid) + '&mock=1';
-    });
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sağlayıcıya gönderiliyor...';
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = state.actionUrl;
+      form.style.display = 'none';
+      addHidden(form, 'merchant_key', state.init.merchant_key);
+      addHidden(form, 'invoice_id', state.init.invoice_id);
+      addHidden(form, 'invoice_description', state.init.invoice_description);
+      addHidden(form, 'total', state.init.total);
+      addHidden(form, 'currency_id', state.init.currency_id || 1);
+      addHidden(form, 'currency_code', state.init.currency_code);
+      addHidden(form, 'items', JSON.stringify(state.init.items || []));
+      addHidden(form, 'return_url', state.init.return_url);
+      addHidden(form, 'cancel_url', state.init.cancel_url);
+      addHidden(form, 'response_method', state.init.response_method || 'GET');
+      addHidden(form, 'name', state.init.name);
+      addHidden(form, 'surname', state.init.surname);
+      addHidden(form, 'bill_address1', state.init.bill_address1);
+      addHidden(form, 'bill_address2', state.init.bill_address2 || '');
+      addHidden(form, 'bill_city', state.init.bill_city);
+      addHidden(form, 'bill_state', state.init.bill_state);
+      addHidden(form, 'bill_postcode', state.init.bill_postcode || '');
+      addHidden(form, 'bill_country', state.init.bill_country);
+      addHidden(form, 'bill_email', state.init.bill_email);
+      addHidden(form, 'bill_phone', state.init.bill_phone);
+      addHidden(form, 'sale_web_hook_key', state.init.sale_web_hook_key);
+      addHidden(form, 'ip', state.init.ip);
+      addHidden(form, 'saved_card', state.init.saved_card || 0);
+      addHidden(form, 'maturity_period', state.init.maturity_period || 0);
+      addHidden(form, 'payment_frequency', state.init.payment_frequency || 0);
+      addHidden(form, 'installments_number', String(state.init.installments_number || 1));
+      addHidden(form, 'transaction_type', state.init.transaction_type || 'Auth');
+      addHidden(form, 'hash_key', state.init.hash_key);
+      addHidden(form, 'order_id', state.init.order_id || '');
+      addHidden(form, 'cc_holder_name', document.getElementById('cardName').value.trim());
+      addHidden(form, 'cc_no', noEl.value.replace(/\s/g, ''));
+      addHidden(form, 'expiry_month', expEl.value.split('/')[0] || '');
+      addHidden(form, 'expiry_year', expEl.value.split('/')[1] || '');
+      addHidden(form, 'cvv', cvvEl.value.trim());
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    if (wl) {
+      modeBanner.textContent = '⚠️ White-label ödeme modu yükleniyor...';
+      pageTitle.textContent = 'Güvenli Ödeme';
+      pageDesc.textContent = 'White-label 3D Secure ödeme ekranı';
+      secureNote.innerHTML = '🛡️ Bu ekran doğrudan ödeme sağlayıcısının akışını kullanır.';
+      failBtn.textContent = 'İptal Et';
+      wlFields.classList.remove('hidden');
+      initWhiteLabel().catch(err => {
+        modeBanner.textContent = '⚠️ White-label init hata verdi: ' + err.message;
+        document.getElementById('banner').textContent = err.message;
+        document.getElementById('banner').classList.add('show');
+      });
+    } else if (mock) {
+      failBtn.textContent = 'Başarısız Ödeme Simüle Et';
+      payForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearAll();
+        const err = validate();
+        if (err) { setErr(err.fid, err.msg); return; }
+        const btn = document.getElementById('payBtn');
+        btn.disabled = true; btn.textContent = 'İşleniyor...';
+        setTimeout(function () {
+          location.href = '/odeme-basarili.html?order_no=' + encodeURIComponent(oid) + '&mock=1';
+        }, 1200);
+      });
+      failBtn.addEventListener('click', function () {
+        location.href = '/odeme-hatasi.html?order_no=' + encodeURIComponent(oid) + '&mock=1';
+      });
+    } else {
+      payForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearAll();
+        const err = validate();
+        if (err) { setErr(err.fid, err.msg); return; }
+        location.href = '/odeme-basarili.html?order_no=' + encodeURIComponent(oid || '') + '&mock=1';
+      });
+      failBtn.addEventListener('click', function () {
+        location.href = '/odeme-hatasi.html?order_no=' + encodeURIComponent(oid || '') + '&mock=1';
+      });
+    }
   </script>
 </body>
 </html>

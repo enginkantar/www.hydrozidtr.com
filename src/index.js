@@ -27,7 +27,7 @@ import { buildBarcodeSvg, buildInvoicePdf, buildShippingCostPdf } from './docume
 //   PAYMENT_KV             (KV namespace)
 //   ASSETS                 (static asset binding, otomatik)
 
-const PLATFORMODE_BASE = 'https://app.halkode.com.tr/ccpayment';
+const PLATFORMODE_DEFAULT_BASE = 'https://app.platformode.com.tr/ccpayment';
 const TOKEN_KV_KEY = 'token:halkode';
 
 const TEST_MODE = false;  // tek yerden kontrol
@@ -48,6 +48,11 @@ const PACKAGE_QTY = {
   'Kurumsal Paket': 10,
 };
 
+function getPlatformodeBase(env) {
+  return (env.PLATFORMODE_ACCESS_URL || env.PLATFORMODE_BASE_URL || env.HALKODE_BASE_URL || PLATFORMODE_DEFAULT_BASE)
+    .replace(/\/+$/, '');
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // MAIN HANDLER
 // ══════════════════════════════════════════════════════════════════════════════
@@ -60,6 +65,11 @@ export default {
     if (path === '/api/payment/start') {
       if (request.method === 'OPTIONS') return handleOptions(request);
       if (request.method === 'POST') return handlePaymentStart(request, env);
+      return new Response('Method not allowed', { status: 405 });
+    }
+
+    if (path === '/api/payment/whitelabel-init') {
+      if (request.method === 'GET') return handleWhiteLabelInit(request, env);
       return new Response('Method not allowed', { status: 405 });
     }
 
@@ -266,25 +276,20 @@ async function handlePaymentStart(request, env) {
     return jsonResp(request, { link, order_id: orderId, mock: true });
   }
 
-  let token;
-  try { token = await getToken(env); }
-  catch (e) {
-    console.error('[start] token error:', e.message);
-    return jsonResp(request, { error: 'Ödeme sistemi bağlantısı kurulamadı.' }, 502);
-  }
-
   const invoiceId = crypto.randomUUID();
+  const platformodeBase = getPlatformodeBase(env);
   const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
 
   const invoice = {
     invoice_id: invoiceId,
     invoice_description: `Hydrozid ${packageName} - ${qty} adet`,
-    total: finalPriceNumber,
+    total: Number(finalPriceNumber).toFixed(2),
     return_url: `${baseUrl}/odeme-basarili.html`,
     cancel_url: `${baseUrl}/odeme-hatasi.html`,
+    response_method: 'GET',
     items: [{
       name: `Hydrozid Kriyocerrahi Cihazi (${packageName})`,
-      price: unitPriceNumber,
+      price: Number(unitPriceNumber).toFixed(2),
       quantity: qty,
       description: `${packageName} - ${qty} adet paket`,
     }],
@@ -300,40 +305,11 @@ async function handlePaymentStart(request, env) {
     invoice.sale_web_hook_key = env.WEBHOOK_SECRET;
   }
 
-  const formData = new URLSearchParams();
-  formData.append('merchant_key', env.HALKODE_MERCHANT_KEY);
-  formData.append('invoice', JSON.stringify(invoice));
-  formData.append('currency_code', currency);
-  formData.append('name', firstName);
-  formData.append('surname', lastName);
-
-  let halkResp;
-  try {
-    const resp = await fetch(`${PLATFORMODE_BASE}/purchase/link`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
-      },
-      body: formData.toString(),
-    });
-    halkResp = await resp.json();
-  } catch (e) {
-    console.error('[start] fetch error:', e.message);
-    return jsonResp(request, { error: 'Ödeme sistemine bağlanılamadı.' }, 502);
-  }
-
-  if (halkResp.status !== true || !halkResp.link) {
-    console.error('[start] HalkOde error:', JSON.stringify(halkResp));
-    return jsonResp(request, { error: 'Ödeme oturumu başlatılamadı.' }, 400);
-  }
-
   await env.PAYMENT_KV.put(
     `order:${invoiceId}`,
     JSON.stringify({
       invoiceId,
-      orderId: halkResp.order_id,
+      orderId: '',
       customerName: name.trim(),
       customerEmail: email.trim().toLowerCase(),
       customerPhone: phone.trim(),
@@ -355,12 +331,105 @@ async function handlePaymentStart(request, env) {
     { expirationTtl: 604800 }
   );
 
-  // KV alias: halkode:ORDER_ID → invoiceId (notify-success endpoint için)
-  if (halkResp.order_id) {
-    await env.PAYMENT_KV.put(`halkode:${halkResp.order_id}`, invoiceId, { expirationTtl: 604800 });
-  }
+  const link = `/odeme-test.html?invoice_id=${encodeURIComponent(invoiceId)}&wl=1` +
+    `&amt=${finalPriceNumber}&pkg=${encodeURIComponent(packageName)}`;
+  await env.PAYMENT_KV.put(`checkout:${invoiceId}`, JSON.stringify({
+    invoiceId,
+    orderId: '',
+    paymentLink: '',
+    platformodeBase,
+    currency,
+    total: Number(finalPriceNumber).toFixed(2),
+    installment: 1,
+    name: firstName,
+    surname: lastName,
+    customerCity: city.trim(),
+    customerAddress: address.trim(),
+  }), { expirationTtl: 604800 });
 
-  return jsonResp(request, { link: halkResp.link, order_id: halkResp.order_id });
+  return jsonResp(request, { link, order_id: invoiceId, invoice_id: invoiceId, white_label: true });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// /api/payment/whitelabel-init
+// Client-side white-label 3D form için hazır alanlar
+// ══════════════════════════════════════════════════════════════════════════════
+async function handleWhiteLabelInit(request, env) {
+  try {
+    const url = new URL(request.url);
+    const invoiceId = (url.searchParams.get('invoice_id') || '').trim();
+    if (!invoiceId) return jsonResp(request, { error: 'invoice_id required' }, 400);
+    if (!env.PAYMENT_KV) return jsonResp(request, { error: 'KV not configured' }, 503);
+    if (!env.HALKODE_APP_ID || !env.HALKODE_APP_SECRET || !env.HALKODE_MERCHANT_KEY) {
+      return jsonResp(request, { error: 'Ödeme sistemi yapılandırılmamış.' }, 503);
+    }
+
+    const raw = await env.PAYMENT_KV.get(`order:${invoiceId}`, { type: 'text' });
+    if (!raw) return jsonResp(request, { error: 'Order not found' }, 404);
+
+    const order = JSON.parse(raw);
+    const total = Number(order.amount || 0).toFixed(2);
+    const qty = Number(order.quantity || 1);
+    const unitPrice = qty > 0 ? (Number(order.amount || 0) / qty).toFixed(2) : total;
+    const nameParts = String(order.customerName || '').trim().split(/\s+/);
+    const firstName = nameParts.slice(0, -1).join(' ') || String(order.customerName || '').trim();
+    const lastName = nameParts.slice(-1)[0] || '-';
+    const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
+    const platformodeBase = getPlatformodeBase(env);
+    const actionUrl = `${platformodeBase}/api/paySmart3D`;
+    const items = [{
+      name: `Hydrozid Kriyocerrahi Cihazi (${order.package || '-'})`,
+      price: total,
+      quantity: 1,
+      description: `${order.package || '-'} - ${qty} adet paket`,
+    }];
+
+    const hashKey = await generatePaySmart3dHashKey(
+      total,
+      1,
+      'TRY',
+      env.HALKODE_MERCHANT_KEY,
+      invoiceId,
+      env.HALKODE_APP_SECRET
+    );
+
+    return jsonResp(request, {
+      action_url: actionUrl,
+      invoice_id: invoiceId,
+      invoice_description: `Hydrozid ${order.package || '-'} - ${qty} adet`,
+      total,
+      merchant_key: env.HALKODE_MERCHANT_KEY,
+      currency_id: 1,
+      currency_code: 'TRY',
+      items,
+      return_url: `${baseUrl}/odeme-basarili.html`,
+      cancel_url: `${baseUrl}/odeme-hatasi.html`,
+      response_method: 'GET',
+      name: firstName,
+      surname: lastName,
+      bill_address1: String(order.customerAddress || '').trim().substring(0, 100),
+      bill_city: String(order.customerCity || '').trim(),
+      bill_state: String(order.customerCity || '').trim(),
+      bill_country: 'TURKEY',
+      bill_postcode: '',
+      bill_email: String(order.customerEmail || '').trim().toLowerCase(),
+      bill_phone: String(order.customerPhone || '').trim(),
+      sale_web_hook_key: env.WEBHOOK_SECRET || '',
+      ip: request.headers.get('CF-Connecting-IP') || '',
+      saved_card: 0,
+      maturity_period: 0,
+      payment_frequency: 0,
+      installments_number: 1,
+      transaction_type: 'Auth',
+      hash_key: hashKey,
+      order_id: order.orderId || '',
+      platformode_base: platformodeBase,
+      unit_price: unitPrice,
+    });
+  } catch (e) {
+    console.error('[whitelabel-init] error:', e.message);
+    return jsonResp(request, { error: e.message }, 500);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -633,16 +702,21 @@ async function handleNotifySuccess(request, env) {
     try { body = await request.json(); }
     catch { return jsonResp(request, { error: 'Invalid JSON' }, 400); }
 
-    const { order_id } = body;
-    if (!order_id) return jsonResp(request, { error: 'order_id required' }, 400);
+    const { order_id, order_no, invoice_id, payment_status, status, hash_key } = body;
+    const incomingInvoiceId = (invoice_id || '').trim();
+    const incomingOrderId = (order_id || order_no || '').trim();
+    const incomingStatus = status ?? (String(payment_status) === '1' ? 'Completed' : '');
+    const incomingPaymentStatus = String(payment_status ?? '');
 
     if (!env.PAYMENT_KV) return jsonResp(request, { error: 'KV not configured' }, 503);
 
-    // KV alias → invoiceId
-    const invoiceId = await env.PAYMENT_KV.get(`halkode:${order_id}`, { type: 'text' });
+    let invoiceId = incomingInvoiceId;
+    if (!invoiceId && incomingOrderId) {
+      invoiceId = await env.PAYMENT_KV.get(`halkode:${incomingOrderId}`, { type: 'text' }) || '';
+    }
     if (!invoiceId) {
-      console.warn('[notify] alias not found for order_id:', order_id);
-      return jsonResp(request, { ok: false, note: 'order alias not found' });
+      console.warn('[notify] invoiceId not found:', { incomingInvoiceId, incomingOrderId });
+      return jsonResp(request, { ok: false, note: 'invoice not found' });
     }
 
     const orderRaw = await env.PAYMENT_KV.get(`order:${invoiceId}`, { type: 'text' });
@@ -655,13 +729,31 @@ async function handleNotifySuccess(request, env) {
     try { order = JSON.parse(orderRaw); }
     catch { return jsonResp(request, { error: 'Invalid order data' }, 500); }
 
-    // Yalnız yerel mock ödeme tarayıcı dönüşüyle tamamlanır.
-    // Canlı siparişin PAID durumu doğrulanmış HalkOde webhook'undan gelmelidir.
+    const isSuccessHint = incomingPaymentStatus === '1' || incomingStatus === 'Completed';
+
     if (order.status === 'PENDING') {
       if (order.mock && env.MOCK_PAYMENT === '1') {
         order.status = 'PAID';
         order.paidAt = new Date().toISOString();
         order.paidVia = 'mock_browser_return';
+      } else if (isSuccessHint) {
+        if (hash_key && env.HALKODE_APP_SECRET) {
+          const validated = await validateHash(hash_key, incomingStatus || 'Completed', incomingOrderId || order.orderId || '', invoiceId, env.HALKODE_APP_SECRET);
+          if (!validated) {
+            return jsonResp(request, { ok: false, note: 'hash validation failed' }, 400);
+          }
+        }
+
+        const statusCheck = await checkPlatformodeOrderStatus(env, invoiceId);
+        if (!statusCheck.ok) {
+          return jsonResp(request, { ok: false, note: statusCheck.error || 'payment confirmation pending' }, 409);
+        }
+
+        order.status = 'PAID';
+        order.paidAt = new Date().toISOString();
+        order.paidVia = 'whitelabel_return';
+        order.orderId = incomingOrderId || statusCheck.orderId || order.orderId || '';
+        order.orderNo = order.orderId;
       } else {
         return jsonResp(request, { ok: false, note: 'payment confirmation pending' }, 409);
       }
@@ -674,11 +766,11 @@ async function handleNotifySuccess(request, env) {
 
     // Idempotency — zaten bildirilmişse tekrar gönderme
     if (order.notifiedAt) {
-      return jsonResp(request, { ok: true, idempotent: true, notifiedAt: order.notifiedAt, siparis: siparisOzeti(order, order_id) });
+      return jsonResp(request, { ok: true, idempotent: true, notifiedAt: order.notifiedAt, siparis: siparisOzeti(order, invoiceId) });
     }
 
-    const fulfillment = await fulfillPaidOrder(env, order, invoiceId, order_id, 'browser');
-    return jsonResp(request, { ok: true, notifiedAt: fulfillment.notifiedAt, amount: order.amount, currency: order.currency, orderNo: order.orderNo || order_id, siparis: fulfillment.siparis });
+    const fulfillment = await fulfillPaidOrder(env, order, invoiceId, order.orderId || incomingOrderId || invoiceId, 'browser');
+    return jsonResp(request, { ok: true, notifiedAt: fulfillment.notifiedAt, amount: order.amount, currency: order.currency, orderNo: order.orderNo || order.orderId || incomingOrderId || invoiceId, siparis: fulfillment.siparis });
 
   } catch (err) {
     console.error('[notify] exception:', err.message);
@@ -1148,11 +1240,11 @@ async function checkRateLimit(kv, ip) {
   return true;
 }
 
-async function getToken(env) {
+async function getToken(env, platformodeBase = PLATFORMODE_DEFAULT_BASE) {
   const cached = await env.PAYMENT_KV.get(TOKEN_KV_KEY, { type: 'text' });
   if (cached) return cached;
 
-  const resp = await fetch(`${PLATFORMODE_BASE}/api/token`, {
+  const resp = await fetch(`${platformodeBase}/api/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({ app_id: env.HALKODE_APP_ID, app_secret: env.HALKODE_APP_SECRET }),
@@ -1191,7 +1283,7 @@ async function getEurTryRate(env) {
 
 async function validateHash(hashKey, expStatus, expOrderId, expInvoiceId, appSecret) {
   try {
-    const processed = hashKey.replace(/__/g, '/');
+    const processed = String(hashKey || '').replace(/__/g, '/');
     const parts = processed.split(':');
     if (parts.length !== 3) return null;
 
@@ -1201,18 +1293,21 @@ async function validateHash(hashKey, expStatus, expOrderId, expInvoiceId, appSec
     const keyHex = await sha256(secretSha1 + saltHex);
 
     const key = await crypto.subtle.importKey(
-      'raw', hexToBytes(keyHex),
+      'raw', new TextEncoder().encode(keyHex.slice(0, 32)),
       { name: 'AES-CBC' }, false, ['decrypt']
     );
 
     const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-CBC', iv: hexToBytes(ivHex) },
+      { name: 'AES-CBC', iv: new TextEncoder().encode(ivHex.slice(0, 16)) },
       key,
       base64ToBytes(encBase64)
     );
 
     const text = new TextDecoder().decode(decrypted);
-    const [decStatus, decOrderId, decInvoiceId] = text.split('|');
+    const decryptedParts = text.split('|');
+    const decStatus = decryptedParts[0] || '';
+    const decInvoiceId = decryptedParts[2] || '';
+    const decOrderId = decryptedParts[3] || decryptedParts[2] || '';
 
     if (!timingSafeEqual(decStatus, expStatus)) return null;
     if (!timingSafeEqual(decOrderId, String(expOrderId))) return null;
@@ -1222,6 +1317,76 @@ async function validateHash(hashKey, expStatus, expOrderId, expInvoiceId, appSec
   } catch (e) {
     console.error('[webhook] hash decrypt error:', e.message);
     return null;
+  }
+}
+
+async function generatePlatformodeHashKey(dataParts, appSecret) {
+  const iv = randomHex(16);
+  const salt = randomHex(4);
+  const password = await sha1(appSecret);
+  const saltWithPassword = await sha256(password + salt);
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(saltWithPassword.slice(0, 32)),
+    { name: 'AES-CBC' },
+    false,
+    ['encrypt']
+  );
+
+  const plaintext = new TextEncoder().encode(dataParts.join('|'));
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-CBC', iv: new TextEncoder().encode(iv.slice(0, 16)) },
+    key,
+    plaintext
+  );
+
+  const bundle = `${iv}:${salt}:${bytesToBase64(new Uint8Array(encrypted))}`;
+  return bundle.replace(/\//g, '__');
+}
+
+async function generateCheckStatusHashKey(invoiceId, merchantKey, appSecret) {
+  return generatePlatformodeHashKey([String(invoiceId), String(merchantKey)], appSecret);
+}
+
+async function generatePaySmart3dHashKey(total, installment, currencyCode, merchantKey, invoiceId, appSecret) {
+  return generatePlatformodeHashKey([
+    String(Number(total).toFixed(2)),
+    String(installment),
+    String(currencyCode),
+    String(merchantKey),
+    String(invoiceId),
+  ], appSecret);
+}
+
+async function checkPlatformodeOrderStatus(env, invoiceId) {
+  try {
+    const platformodeBase = getPlatformodeBase(env);
+    const token = await getToken(env, platformodeBase);
+    const hash_key = await generateCheckStatusHashKey(invoiceId, env.HALKODE_MERCHANT_KEY, env.HALKODE_APP_SECRET);
+    const res = await fetch(`${platformodeBase}/api/checkstatus`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        invoice_id: invoiceId,
+        merchant_key: env.HALKODE_MERCHANT_KEY,
+        hash_key,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: `HTTP ${res.status}`, raw: data };
+    const statusCode = Number(data?.status_code || 0);
+    const transactionStatus = String(data?.transaction_status || '');
+    if (statusCode === 100 || transactionStatus.toLowerCase() === 'completed') {
+      return { ok: true, orderId: data?.order_id || '', raw: data };
+    }
+    return { ok: false, error: data?.status_description || data?.message || 'order status not completed', raw: data };
+  } catch (e) {
+    return { ok: false, error: e.message };
   }
 }
 
@@ -1253,6 +1418,21 @@ function hexToBytes(hex) {
 
 function bytesToHex(bytes) {
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function bytesToBase64(bytes) {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+function randomHex(length) {
+  const bytes = new Uint8Array(Math.ceil(length / 2));
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, length);
 }
 
 function base64ToBytes(b64) {
@@ -1606,10 +1786,10 @@ function addSecurityHeaders(response) {
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com; " +
     "connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com; " +
-    "frame-src https://app.halkode.com.tr; " +
+    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
-    "form-action 'self' https://app.halkode.com.tr;"
+    "form-action 'self' https://app.halkode.com.tr https://app.platformode.com.tr;"
   );
   return new Response(response.body, {
     status: response.status,

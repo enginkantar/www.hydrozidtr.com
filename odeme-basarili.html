@@ -144,13 +144,25 @@
 
     (async function notifySuccess() {
       const p = new URLSearchParams(window.location.search);
-      const orderId = p.get('order_no') || p.get('order_id') || p.get('orderNo');
+      const orderNo = p.get('order_no') || '';
+      const orderId = orderNo || p.get('order_id') || p.get('orderNo') || '';
+      const invoiceId = p.get('invoice_id') || '';
+      const paymentStatus = p.get('payment_status') || '';
+      const status = p.get('status') || '';
+      const hashKey = p.get('hash_key') || '';
       const detay = document.getElementById('detay');
       if (!orderId) { detay.innerHTML = ''; return; }
       try {
         const res = await fetch('/api/payment/notify-success', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_id: orderId }),
+          body: JSON.stringify({
+            order_id: orderId,
+            order_no: orderNo,
+            invoice_id: invoiceId,
+            payment_status: paymentStatus,
+            status,
+            hash_key: hashKey,
+          }),
         });
         const data = await res.json();
         if (data && data.siparis) {
