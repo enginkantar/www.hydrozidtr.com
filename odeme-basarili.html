@@ -13,83 +13,163 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #070B14; color: #CBD5E1; font-family: 'Nunito Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     .card {
-      background: #0D1421;
-      border: 1px solid rgba(34,197,94,0.3);
-      border-radius: 20px;
-      padding: 48px 36px;
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
+      background: #0D1421; border: 1px solid rgba(34,197,94,0.3); border-radius: 20px;
+      padding: 40px 32px; max-width: 560px; width: 100%; text-align: center;
       box-shadow: 0 0 60px rgba(34,197,94,0.08);
     }
     .icon {
-      width: 72px; height: 72px;
-      background: rgba(34,197,94,0.12);
-      border: 2px solid rgba(34,197,94,0.4);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 24px;
+      width: 72px; height: 72px; background: rgba(34,197,94,0.12); border: 2px solid rgba(34,197,94,0.4);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
     }
     .icon svg { color: #22C55E; }
-    h1 { font-family: 'Rubik', sans-serif; font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
-    p { font-size: 0.95rem; color: #94A3B8; line-height: 1.6; margin-bottom: 8px; }
-    .order-no { font-size: 0.85rem; color: #64748B; margin-top: 16px; }
-    .order-no span { color: #00D4FF; font-weight: 700; }
-    .btn { display: inline-block; margin-top: 32px; background: #22C55E; color: #fff; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 0.95rem; padding: 14px 32px; border-radius: 10px; text-decoration: none; transition: opacity 0.2s; }
-    .btn:hover { opacity: 0.88; }
-    .brand { margin-top: 40px; font-size: 0.75rem; color: #334155; }
+    h1 { font-family: 'Rubik', sans-serif; font-size: 1.6rem; font-weight: 700; color: #4ADE80; margin-bottom: 10px; }
+    .lead { font-size: 0.95rem; color: #4ADE80; line-height: 1.6; margin-bottom: 6px; }
+    /* Başarı ikonu videosu (yeşil tick yerine) */
+    .icon-video { width: 96px; height: 96px; margin: 0 auto 20px; display: block; border-radius: 50%; object-fit: cover; background: transparent; }
+    /* Tutar vurgusu — yüksek kontrast */
+    .amount-box { margin: 24px 0 8px; padding: 18px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.35); border-radius: 14px; }
+    .amount-box .lbl { font-size: 0.8rem; color: #86EFAC; letter-spacing: .3px; }
+    .amount-box .val { font-family: 'Rubik', sans-serif; font-size: 2rem; font-weight: 900; color: #4ADE80; margin-top: 2px; }
+    /* Detay bölümleri */
+    .section { text-align: left; margin-top: 22px; background: #0B1220; border: 1px solid #1E293B; border-radius: 14px; overflow: hidden; }
+    .section h2 { font-family: 'Rubik', sans-serif; font-size: 0.82rem; letter-spacing: .5px; text-transform: uppercase; color: #00D4FF; padding: 14px 18px; border-bottom: 1px solid #1E293B; background: rgba(0,212,255,0.04); }
+    .row { display: flex; justify-content: space-between; gap: 16px; padding: 11px 18px; border-bottom: 1px solid #131C2B; font-size: 0.9rem; }
+    .row:last-child { border-bottom: none; }
+    .row .k { color: #64748B; flex-shrink: 0; }
+    .row .v { color: #E2E8F0; font-weight: 600; text-align: right; word-break: break-word; }
+    .row .v.hi { color: #00D4FF; }          /* önemli: sipariş no, fatura */
+    .row .v.mono { font-family: 'Rubik', monospace; letter-spacing: .3px; }
+    .badge { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+    .badge.ok { background: rgba(34,197,94,0.15); color: #4ADE80; }
+    .badge.wait { background: rgba(251,191,36,0.15); color: #FCD34D; }
+    /* Yeşil yerler senkronize yanıp sönsün (aynı süre) */
+    @keyframes greenPulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+    @keyframes redBlink   { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+    /* "Ödeme Başarılı" + alt yazı + tutar: hepsi senkronize yeşil yanıp sönme */
+    h1, .lead, .amount-box .val, .note { animation: greenPulse 1.4s ease-in-out infinite; }
+    /* Kargo "Hazırlanıyor" sadece kırmızı yanıp sönsün */
+    .badge.kargo { background: rgba(239,68,68,0.18); color: #F87171; animation: redBlink 1s ease-in-out infinite; }
+    .note { margin-top: 20px; font-size: 0.88rem; color: #4ADE80; line-height: 1.6; }
+    .note b { color: #86EFAC; }
+    .note .email-orange { color: #FB923C; font-weight: 700; }
+    .btn { display: inline-block; margin-top: 26px; background: #22C55E; color: #fff; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 0.95rem; padding: 14px 32px; border-radius: 10px; text-decoration: none; transition: opacity .2s; }
+    .btn:hover { opacity: .88; }
+    .trust { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
+    .trust-chip { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 10px; padding: 7px 12px; }
+    .trust-chip img { display: block; height: 22px; width: auto; }
+    .trust-chip span { font-size: 0.72rem; font-weight: 700; color: #1E293B; white-space: nowrap; }
+    .trust-batu img { height: 26px; }
+    .trust-etbis span { color: #7A5C1E; }
+    .loading { color: #64748B; font-size: 0.85rem; margin-top: 20px; }
+    .brand { margin-top: 32px; font-size: 0.75rem; color: #334155; text-align: center; }
     .brand a { color: #475569; text-decoration: none; }
+    .infrastructure { margin-top: 14px; font-size: 0.75rem; color: #94A3B8; line-height: 1.5; text-align: center; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="icon">
-      <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-    </div>
+    <video class="icon-video" autoplay muted loop playsinline preload="auto" poster="/assets/icon-poster.jpg" aria-hidden="true">
+      <source src="/assets/icon-video-sm.mp4" type="video/mp4">
+    </video>
     <h1>Ödeme Başarılı!</h1>
-    <p>Siparişiniz alındı. En kısa sürede kargoya verilecektir.</p>
-    <p>Onay ve kargo bilgileri e-posta adresinize gönderilecektir.</p>
-    <div class="order-no" id="orderInfo"></div>
+    <p class="lead">Siparişiniz alındı ve hazırlanıyor.</p>
+
+    <div id="detay">
+      <div class="loading">Sipariş bilgileri yükleniyor…</div>
+    </div>
+
+    <div class="note" id="note"></div>
     <a href="/" class="btn">Ana Sayfaya Dön</a>
+    <div class="trust">
+      <div class="trust-chip trust-batu">
+        <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
+        <span>güvencesi ile</span>
+      </div>
+      <div class="trust-chip">
+        <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
+      </div>
+      <div class="trust-chip trust-etbis">
+        <img src="/assets/logo-tic-3.png" alt="T.C. Ticaret Bakanlığı" loading="lazy">
+        <span>ETBİS'E KAYITLIDIR</span>
+      </div>
+    </div>
+    <div class="infrastructure">Batu Teknoloji E-Commerce M Power altyapısı ile işlemler sağlanmıştır.</div>
   </div>
   <div class="brand">
     <a href="https://www.hydrozidtr.com">Hydrozid® Türkiye</a> — FDA 510(k) onaylı, CE belgeli
   </div>
+
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const orderNo = params.get('order_no');
-    const invoiceId = params.get('invoice_id');
-    const info = document.getElementById('orderInfo');
-    if (orderNo) {
-      info.innerHTML = 'Sipariş No: <span>' + orderNo + '</span>';
-    } else if (invoiceId) {
-      info.innerHTML = 'Fatura No: <span>' + invoiceId + '</span>';
+    // Ödeme başarılı → kayıtlı form verisini temizle (yeni sipariş temiz başlasın)
+    try { sessionStorage.removeItem('omFormData'); } catch (_) {}
+
+    // Başarı ikonu videosu — bazı tarayıcılarda autoplay gecikirse elle tetikle (113KB, hafif)
+    (function () {
+      const v = document.querySelector('.icon-video');
+      if (v) v.play().catch(() => {});
+    })();
+    function esc(s) { const d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+    function row(k, v, cls) { return v ? `<div class="row"><span class="k">${k}</span><span class="v ${cls || ''}">${v}</span></div>` : ''; }
+
+    function render(s) {
+      const detay = document.getElementById('detay');
+      const tutar = s.tutar ? Number(s.tutar).toLocaleString('tr-TR') + ' ' + (s.paraBirimi || 'TRY') : '';
+      const kargoBadge = `<span class="badge kargo">Hazırlanıyor</span>`;
+      detay.innerHTML =
+        (tutar ? `<div class="amount-box"><div class="lbl">Ödenen Tutar</div><div class="val">${esc(tutar)}</div></div>` : '') +
+        `<div class="section"><h2>Sipariş Özeti</h2>` +
+          row('Sipariş No', esc(s.orderNo), 'hi mono') +
+          row('Paket', esc(s.paket) + (s.adet ? ` <span style="color:#64748B">(${esc(s.adet)} adet)</span>` : '')) +
+          row('Kargo Durumu', kargoBadge) +
+          row('Kargo Takip', esc(s.kargoBarkod), 'mono') +
+          row('Fatura No', esc(s.faturaNo), 'hi mono') +
+        `</div>` +
+        `<div class="section"><h2>Teslimat Bilgileri</h2>` +
+          row('Ad Soyad', esc(s.ad)) +
+          row('Telefon', esc(s.telefon)) +
+          row('E-posta', esc(s.email)) +
+          row('Şehir / İlçe', esc([s.sehir, s.ilce].filter(Boolean).join(' / '))) +
+          row('Adres', esc(s.adres)) +
+          row('Diploma No', esc(s.diploma)) +
+        `</div>`;
+
+      const note = document.getElementById('note');
+      note.innerHTML = s.email
+        ? `İşlem onayı, fatura ve kargo takip bilgileriniz <b class="email-orange">${esc(s.email)}</b> adresine gönderildi. ` +
+          `Her türlü sorunuz için WhatsApp: <b>+90 553 475 9032</b> üzerinden iletişime geçebilirsiniz. ` +
+          `Yoğunluk durumuna göre mutlaka cevap verilecektir.`
+        : `Her türlü sorunuz için WhatsApp: <b>+90 553 475 9032</b> üzerinden iletişime geçebilirsiniz. ` +
+          `Yoğunluk durumuna göre mutlaka cevap verilecektir.`;
     }
-  </script>
-  <script>
+
     (async function notifySuccess() {
       const p = new URLSearchParams(window.location.search);
       const orderId = p.get('order_no') || p.get('order_id') || p.get('orderNo');
-      if (!orderId) { console.log('[notify] no order_id in URL'); return; }
+      const detay = document.getElementById('detay');
+      if (!orderId) { detay.innerHTML = ''; return; }
       try {
         const res = await fetch('/api/payment/notify-success', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ order_id: orderId }),
         });
         const data = await res.json();
-        console.log('[notify]', data);
+        if (data && data.siparis) {
+          render(data.siparis);
+        } else {
+          detay.innerHTML = `<div class="section"><h2>Sipariş</h2><div class="row"><span class="k">Sipariş No</span><span class="v hi mono">${esc(orderId)}</span></div></div>`;
+        }
         if (data.ok && typeof gtag === 'function') {
           gtag('event', 'conversion', {
             send_to: 'AW-17613782027/rEnrCLTOlMocEIv4885B',
-            value: data.amount || 0,
+            value: data.amount || (data.siparis && data.siparis.tutar) || 0,
             currency: data.currency || 'TRY',
-            transaction_id: data.orderNo || orderId,
+            transaction_id: (data.siparis && data.siparis.orderNo) || orderId,
           });
         }
-      } catch (e) { console.error('[notify] failed:', e); }
+      } catch (e) {
+        console.error('[notify] failed:', e);
+        detay.innerHTML = `<div class="section"><h2>Sipariş</h2><div class="row"><span class="k">Sipariş No</span><span class="v hi mono">${esc(orderId)}</span></div></div>`;
+      }
     })();
   </script>
 </body>

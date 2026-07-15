@@ -2606,11 +2606,22 @@
 
     .footer-inner {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
     }
+    /* Marka bloğu (logo + e-commerce power + Batu Teknoloji) — ortalı */
+    .footer-brand { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .footer-brand .ec-power { font-size: 0.72rem; color: #64748B; letter-spacing: 2px; text-transform: uppercase; }
+    /* Batu Teknoloji reveal videosu (4:3, ~4x logo boyutu) */
+    .footer-brand .bt-video {
+      display: block; width: auto; max-width: 100%;
+      height: 460px; margin-top: 4px; border-radius: 12px;
+    }
+    @media (max-width: 767px) { .footer-brand .bt-video { height: 280px; } }
+    @media (prefers-reduced-motion: reduce) { .footer-brand .bt-video { /* animasyon başlamaz, poster kalır */ } }
 
     .footer-logo {
       font-family: 'Rubik', sans-serif;
@@ -2634,7 +2645,9 @@
 
     .footer-links {
       display: flex;
-      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px 24px;
       list-style: none;
     }
 
@@ -2652,6 +2665,28 @@
     .footer-copy {
       font-size: 0.78rem;
       color: var(--text-dim);
+    }
+
+    /* ─── Güven rozetleri (footer) ─── */
+    .footer-trust {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 14px; margin: 22px 0 18px;
+    }
+    .trust-chip {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border-radius: 10px; padding: 8px 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    .trust-chip img { display: block; height: 26px; width: auto; }
+    .trust-chip span { font-size: 0.74rem; font-weight: 700; color: #1e293b; letter-spacing: .3px; white-space: nowrap; }
+    .trust-batu img { height: 34px; }
+    .trust-etbis img { height: 30px; }
+    .trust-etbis span { color: #7a5c1e; }
+    @media (max-width: 560px) {
+      .footer-trust { gap: 10px; }
+      .trust-chip { padding: 7px 10px; }
+      .trust-chip img { height: 22px; }
+      .trust-batu img { height: 28px; }
     }
 
     /* ─── Animations ─── */
@@ -3720,7 +3755,15 @@
   <footer id="iletisim">
     <div class="container">
       <div class="footer-inner">
-        <a href="#" class="footer-logo">Hydrozid<span class="reg">®</span></a>
+        <div class="footer-brand">
+          <a href="#" class="footer-logo">Hydrozid<span class="reg">®</span></a>
+          <div class="ec-power">E-Commerce M Power</div>
+          <video class="bt-video" playsinline muted loop preload="none"
+                 poster="/assets/batutech-poster.jpg" aria-label="Batu Teknoloji">
+            <source data-src="/assets/batutech.webm" type="video/webm">
+            <source data-src="/assets/batutech.mp4" type="video/mp4">
+          </video>
+        </div>
         <ul class="footer-links">
           <li><a href="gizlilik-politikasi.html">Gizlilik Politikası</a></li>
           <li><a href="mesafeli-satis-sozlesmesi.html">Mesafeli Satış Sözleşmesi</a></li>
@@ -3728,7 +3771,23 @@
           <li><a href="https://wa.me/905534759032?text=Hydrozid%20Teknik%20Destek" target="_blank" rel="noopener">Teknik
               Destek</a></li>
         </ul>
-        <div class="footer-copy">© 2024 Hydrozid. FDA 510(k) onaylı. CE belgeli.</div>
+
+        <!-- ─── Güven rozetleri: Batu Medikal + ödeme + ETBİS ─── -->
+        <div class="footer-trust">
+          <div class="trust-chip trust-batu">
+            <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
+            <span>güvencesi ile</span>
+          </div>
+          <div class="trust-chip">
+            <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
+          </div>
+          <div class="trust-chip trust-etbis">
+            <img src="/assets/logo-tic-3.png" alt="T.C. Ticaret Bakanlığı" loading="lazy">
+            <span>ETBİS'E KAYITLIDIR</span>
+          </div>
+        </div>
+
+        <div class="footer-copy">© 2024 Hydrozid — Batu Medikal. FDA 510(k) onaylı. CE belgeli. MERSİS: 4016506204800017</div>
       </div>
     </div>
   </footer>
@@ -3772,6 +3831,34 @@
         ? '0 4px 30px rgba(0,0,0,0.4)'
         : 'none';
     });
+
+    // ─── Batu Teknoloji reveal videosu: tembel yükle + görünürlük kontrolü ───
+    (function initBtVideo() {
+      const v = document.querySelector('.bt-video');
+      if (!v) return;
+      // prefers-reduced-motion → animasyon hiç başlamaz, poster kalır
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let loaded = false;
+      const loadSources = () => {
+        if (loaded) return; loaded = true;
+        v.querySelectorAll('source[data-src]').forEach(s => { s.src = s.dataset.src; });
+        v.load();
+      };
+      // Footer'a ~600px yaklaşınca kaynakları bağla (sayfa açılışında indirilmez)
+      const near = new IntersectionObserver((es) => {
+        es.forEach(e => { if (e.isIntersecting) { loadSources(); near.disconnect(); } });
+      }, { rootMargin: '600px 0px' });
+      near.observe(v);
+      // Görünürken oynat, görünür alandan çıkınca durdur
+      const vis = new IntersectionObserver((es) => {
+        es.forEach(e => {
+          if (e.isIntersecting) { loadSources(); v.play().catch(() => {}); }
+          else { v.pause(); }
+        });
+      }, { threshold: 0.25 });
+      vis.observe(v);
+    })();
   </script>
 
   <!-- YouTube IFrame API — lazy loaded after page is interactive to avoid 820KB JS block -->
@@ -4345,6 +4432,61 @@
       background: #0D1421;
     }
 
+    .om-suggestions {
+      position: relative;
+      z-index: 30;
+      background: #0B1220;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      display: none;
+      max-height: 240px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+
+    .om-suggestions.show {
+      display: block;
+    }
+
+    .om-suggestion {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #E2E8F0;
+      text-align: left;
+      padding: 10px 12px;
+      cursor: pointer;
+      font: inherit;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .om-suggestion:last-child {
+      border-bottom: 0;
+    }
+
+    .om-suggestion.is-active,
+    .om-suggestion:hover,
+    .om-suggestion:focus {
+      background: rgba(0, 212, 255, 0.08);
+      outline: none;
+    }
+
+    .om-suggestion strong {
+      color: #00D4FF;
+      display: block;
+      font-size: 0.84rem;
+      margin-bottom: 2px;
+    }
+
+    .om-suggestion span {
+      color: #94A3B8;
+      font-size: 0.76rem;
+      line-height: 1.35;
+      display: block;
+    }
+
     .om-submit {
       width: 100%;
       background: #EF4444;
@@ -4439,13 +4581,20 @@
           </select>
         </div>
         <div class="om-field">
-          <label for="omAddress">Adres <span style="color:#EF4444">*</span></label>
-          <textarea id="omAddress" rows="2" placeholder="Mahalle, sokak, kapı no..." required minlength="10"
-            autocomplete="street-address"></textarea>
+          <label for="omDistrict">İlçe <span style="color:#EF4444">*</span></label>
+          <select id="omDistrict" required disabled autocomplete="address-level3">
+            <option value="" disabled selected>— Önce şehir seçiniz —</option>
+          </select>
         </div>
         <div class="om-field">
-          <label for="omDiploma">Doktor Diploma No <span style="color:#EF4444">*</span></label>
-          <input type="text" id="omDiploma" placeholder="Diploma numaranızı giriniz" required minlength="5">
+          <label for="omAddress">Adres <span style="color:#EF4444">*</span></label>
+          <textarea id="omAddress" rows="2" placeholder="abcdef Mah. ghijkl Sok. No: X/Y, PK: XXXXX, İlçe / Şehir" required minlength="10"
+            autocomplete="street-address"></textarea>
+          <div id="omAddressSuggestions" class="om-suggestions" aria-label="Adres önerileri"></div>
+        </div>
+        <div class="om-field">
+          <label for="omDiploma">Doktor Diploma Tescil No <span style="color:#EF4444">*</span></label>
+          <input type="text" id="omDiploma" placeholder="Diploma tescil numaranız" required minlength="4" maxlength="16">
         </div>
         <div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.3);border-radius:10px;padding:16px 18px;margin-bottom:16px;font-size:0.82rem;color:#94A3B8;line-height:1.7">
           <p style="margin:0 0 8px;font-weight:700;color:#00D4FF;font-size:0.88rem">🔒 Güvenli Ödeme Bilgilendirmesi</p>
@@ -4455,7 +4604,7 @@
             <li style="margin-top:6px">"Ödemeyi Tamamla" butonuna bastığınızda Halkbank güvenli ödeme sayfasına yönlendirilirsiniz. İşlem tamamlanınca otomatik olarak sitemize geri dönersiniz.</li>
           </ul>
         </div>
-        <div style="background:rgba(255,200,0,0.05);border:1px solid rgba(255,200,0,0.25);border-radius:10px;padding:16px 18px;margin-bottom:16px;font-size:0.85rem;color:#CBD5E1;line-height:1.7">
+        <div class="om-field" style="background:rgba(255,200,0,0.05);border:1px solid rgba(255,200,0,0.25);border-radius:10px;padding:16px 18px;margin-bottom:16px;font-size:0.85rem;color:#CBD5E1;line-height:1.7">
           <p style="margin:0 0 12px;font-weight:700;color:#FCD34D;font-size:0.88rem">📋 Sözleşmeler ve Bilgilendirme</p>
           <div style="display:flex;flex-direction:column;gap:10px">
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.84rem">
@@ -4473,6 +4622,21 @@
           </div>
         </div>
         <button type="submit" class="om-submit" id="omSubmit">Güvenli Ödemeye Geç →</button>
+
+        <!-- Güven rozetleri (footer ile aynı) -->
+        <div class="footer-trust" style="margin:18px 0 4px">
+          <div class="trust-chip trust-batu">
+            <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
+            <span>güvencesi ile</span>
+          </div>
+          <div class="trust-chip">
+            <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
+          </div>
+          <div class="trust-chip trust-etbis">
+            <img src="/assets/logo-tic-3.png" alt="T.C. Ticaret Bakanlığı" loading="lazy">
+            <span>ETBİS'E KAYITLIDIR</span>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -4550,32 +4714,272 @@
       }
     });
 
-    // Populate city select
-    const CITIES = ['Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan', 'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta', 'İstanbul', 'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kilis', 'Kırıkkale', 'Kırklareli', 'Kırşehir', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla', 'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Şanlıurfa', 'Siirt', 'Sinop', 'Şırnak', 'Sivas', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'];
+    // Şehir + İlçe: resmi TR il/ilçe veri setinden (assets/tr-il-ilce.json).
+    // İlçe şehre bağlı dropdown — serbest metin yok, yazım hatası imkansız,
+    // isimler kargo firmasının beklediği resmi isimlerle birebir eşleşir.
     const omSel = document.getElementById('omCity');
-    CITIES.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; omSel.appendChild(o); });
+    const omDist = document.getElementById('omDistrict');
+    let IL_ILCE = {};
+    fetch('/assets/tr-il-ilce.json')
+      .then(r => r.json())
+      .then(data => {
+        IL_ILCE = data;
+        // Türkçe alfabetik sıralama (Ç, Ş, İ vb. doğru yere düşsün)
+        Object.keys(data).sort((a, b) => a.localeCompare(b, 'tr')).forEach(il => {
+          const o = document.createElement('option');
+          o.value = il; o.textContent = il; omSel.appendChild(o);
+        });
+        restoreForm(); // veri seti hazır → geri dönülmüşse formu doldur
+      })
+      .catch(() => {
+        // Veri seti yüklenemezse ilçe serbest metne düşsün (akış kırılmasın)
+        omDist.outerHTML = '<input type="text" id="omDistrict" placeholder="İlçe" required minlength="2">';
+      });
+
+    omSel.addEventListener('change', function () {
+      const ilceler = (IL_ILCE[this.value] || []).slice().sort((a, b) => a.localeCompare(b, 'tr'));
+      omDist.innerHTML = '<option value="" disabled selected>— İlçe seçiniz —</option>';
+      ilceler.forEach(ilce => {
+        const o = document.createElement('option');
+        o.value = ilce; o.textContent = ilce; omDist.appendChild(o);
+      });
+      omDist.disabled = ilceler.length === 0;
+    });
+
+    // Adres arama: aynı-origin autocomplete endpoint'i, Google benzeri öneri akışı.
+    const omAddress = document.getElementById('omAddress');
+    const omAddressSuggestions = document.getElementById('omAddressSuggestions');
+    let addressTimer = null;
+    let addressAbort = null;
+    let addressSuggestions = [];
+    let activeSuggestionIndex = 0;
+
+    function hideAddressSuggestions() {
+      omAddressSuggestions.classList.remove('show');
+      omAddressSuggestions.innerHTML = '';
+      addressSuggestions = [];
+      activeSuggestionIndex = 0;
+    }
+
+    function applyAddressSuggestion(s) {
+      if (!s) return;
+      if (s.city) {
+        const cityExists = Array.from(omSel.options).some(o => o.value === s.city);
+        if (cityExists) {
+          omSel.value = s.city;
+          omSel.dispatchEvent(new Event('change'));
+        }
+      }
+      if (s.district) {
+        setTimeout(() => {
+          const districtExists = Array.from(omDist.options).some(o => o.value === s.district);
+          if (districtExists) omDist.value = s.district;
+        }, 0);
+      }
+      if (s.address) omAddress.value = s.address;
+      hideAddressSuggestions();
+    }
+
+    function renderAddressSuggestions(list, q) {
+      addressSuggestions = list;
+      activeSuggestionIndex = Math.max(0, Math.min(activeSuggestionIndex, list.length - 1));
+      omAddressSuggestions.innerHTML = list.map((s, idx) => `
+        <button type="button" class="om-suggestion${idx === activeSuggestionIndex ? ' is-active' : ''}" data-index="${idx}">
+          <strong>${s.city ? escHtml(s.city) : 'Adres önerisi'}</strong>
+          <span>${escHtml(s.label || s.address || q)}</span>
+        </button>
+      `).join('');
+      omAddressSuggestions.classList.add('show');
+      omAddressSuggestions.querySelectorAll('.om-suggestion').forEach((btn, idx) => {
+        btn.addEventListener('click', () => applyAddressSuggestion(list[idx]));
+      });
+    }
+
+    omAddress.addEventListener('input', function () {
+      const q = this.value.trim();
+      clearTimeout(addressTimer);
+      if (addressAbort) addressAbort.abort();
+      if (q.length < 3) {
+        hideAddressSuggestions();
+        return;
+      }
+      addressTimer = setTimeout(async () => {
+        addressAbort = new AbortController();
+        try {
+          const res = await fetch(`/api/address-suggest?q=${encodeURIComponent(q)}`, { signal: addressAbort.signal });
+          const data = await res.json().catch(() => ({ suggestions: [] }));
+          const list = Array.isArray(data.suggestions) ? data.suggestions : [];
+          if (!list.length) {
+            hideAddressSuggestions();
+            return;
+          }
+          renderAddressSuggestions(list, q);
+        } catch (e) {
+          if (e.name !== 'AbortError') hideAddressSuggestions();
+        }
+      }, 250);
+    });
+
+    omAddress.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && omAddressSuggestions.classList.contains('show') && addressSuggestions.length) {
+        e.preventDefault();
+        applyAddressSuggestion(addressSuggestions[activeSuggestionIndex] || addressSuggestions[0]);
+      }
+      if (e.key === 'ArrowDown' && omAddressSuggestions.classList.contains('show') && addressSuggestions.length) {
+        e.preventDefault();
+        activeSuggestionIndex = Math.min(addressSuggestions.length - 1, activeSuggestionIndex + 1);
+        renderAddressSuggestions(addressSuggestions, this.value.trim());
+      }
+      if (e.key === 'ArrowUp' && omAddressSuggestions.classList.contains('show') && addressSuggestions.length) {
+        e.preventDefault();
+        activeSuggestionIndex = Math.max(0, activeSuggestionIndex - 1);
+        renderAddressSuggestions(addressSuggestions, this.value.trim());
+      }
+    });
+
+    omAddress.addEventListener('focus', function () {
+      if (this.value.trim().length >= 3 && omAddressSuggestions.children.length) {
+        omAddressSuggestions.classList.add('show');
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      const field = omAddress.closest('.om-field');
+      if (field && !field.contains(e.target)) hideAddressSuggestions();
+    });
+
+    // Ödeme sayfasından geri dönülünce formu sessionStorage'dan geri doldur
+    function restoreForm() {
+      let s; try { s = JSON.parse(sessionStorage.getItem('omFormData') || 'null'); } catch (_) { s = null; }
+      if (!s) return;
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val != null && val !== '') el.value = val; };
+      set('omName', s.name); set('omEmail', s.email); set('omPhone', s.phone);
+      set('omAddress', s.address); set('omDiploma', s.diploma);
+      if (s.package) {
+        const ps = document.getElementById('omPackage');
+        if (ps) { ps.value = s.package; ps.dispatchEvent(new Event('change')); }
+      }
+      if (s.city) {
+        omSel.value = s.city;
+        omSel.dispatchEvent(new Event('change')); // ilçeleri doldur
+        if (s.district) omDist.value = s.district;
+      }
+      if (s.terms) {
+        ['omTermsOnBilgi', 'omTermsMesafeli', 'omTermsGizlilik'].forEach(id => {
+          const c = document.getElementById(id); if (c) c.checked = true;
+        });
+      }
+    }
+
+    function escHtml(value) {
+      const el = document.createElement('div');
+      el.textContent = value == null ? '' : String(value);
+      return el.innerHTML;
+    }
+
+    // ─── Inline validasyon altyapısı ───
+    (function initFormValidation() {
+      const style = document.createElement('style');
+      style.textContent =
+        '@keyframes omPulse{0%,100%{opacity:1}50%{opacity:.3}}' +
+        '@keyframes omBorderPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 0 3px rgba(239,68,68,0.3)}}' +
+        '.om-field .om-error{color:#F87171;font-size:0.8rem;font-weight:700;margin-top:6px;display:none;line-height:1.4}' +
+        '.om-field.om-invalid .om-error{display:block;animation:omPulse 0.9s ease-in-out infinite}' +
+        '.om-field.om-invalid input,.om-field.om-invalid select,.om-field.om-invalid textarea{border-color:#EF4444!important;animation:omBorderPulse 0.9s ease-in-out infinite}' +
+        '#omFormBanner{display:none;background:rgba(239,68,68,0.12);border:1px solid #EF4444;color:#FCA5A5;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.85rem;font-weight:700;line-height:1.5}' +
+        '#omFormBanner.show{display:block;animation:omPulse 0.9s ease-in-out infinite}';
+      document.head.appendChild(style);
+      document.querySelectorAll('#omForm .om-field').forEach(f => {
+        if (!f.querySelector('.om-error')) {
+          const e = document.createElement('div'); e.className = 'om-error'; f.appendChild(e);
+        }
+      });
+      const form = document.getElementById('omForm');
+      const banner = document.createElement('div');
+      banner.id = 'omFormBanner';
+      form.insertBefore(banner, form.firstChild);
+      // Kullanıcı düzeltmeye başlayınca o alanın hatası kalksın
+      form.addEventListener('input', e => { const f = e.target.closest('.om-field'); if (f) f.classList.remove('om-invalid'); });
+      form.addEventListener('change', e => { const f = e.target.closest('.om-field'); if (f) f.classList.remove('om-invalid'); });
+    })();
+
+    function omSetError(id, msg) {
+      const el = document.getElementById(id);
+      const field = el.closest('.om-field');
+      if (field) { field.classList.add('om-invalid'); const e = field.querySelector('.om-error'); if (e) e.textContent = '⚠️ ' + msg; }
+      return el;
+    }
+    function omClearErrors() {
+      document.querySelectorAll('#omForm .om-field.om-invalid').forEach(f => f.classList.remove('om-invalid'));
+      const b = document.getElementById('omFormBanner'); b.classList.remove('show'); b.textContent = '';
+    }
+    function omBanner(msg) {
+      const b = document.getElementById('omFormBanner'); b.textContent = msg; b.classList.add('show');
+      b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Alan kuralları — sunucudaki doğrulamayla birebir. Hatalı formatı SUNUCUYA
+    // GİTMEDEN burada eler; kalan (ödeme sağlayıcısı vb.) hataları sunucu döndürür.
+    function omValidate(v) {
+      const EMAIL = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+      const PHONE = /^0[5][0-9]{9}$/;
+      // Boş alan → "Lütfen ... giriniz"; dolu ama hatalı → format kuralı
+      if (!v.selectedPackage) return { id: 'omPackage', msg: 'Lütfen bir paket seçiniz.' };
+      if (!v.name) return { id: 'omName', msg: 'Lütfen ad soyad giriniz.' };
+      if (v.name.length < 3) return { id: 'omName', msg: 'Ad Soyad en az 3 karakter olmalıdır.' };
+      if (!v.email) return { id: 'omEmail', msg: 'Lütfen e-posta adresinizi giriniz.' };
+      if (!EMAIL.test(v.email)) return { id: 'omEmail', msg: 'Geçerli bir e-posta girin (örn. ornek@email.com, Türkçe karakter olmadan).' };
+      if (!v.phone) return { id: 'omPhone', msg: 'Lütfen telefon numaranızı giriniz.' };
+      if (!PHONE.test(v.phone)) return { id: 'omPhone', msg: 'Telefon 05XXXXXXXXX formatında, 11 rakam olmalıdır.' };
+      if (!v.city) return { id: 'omCity', msg: 'Lütfen şehir seçiniz.' };
+      if (!v.district) return { id: 'omDistrict', msg: 'Lütfen ilçe seçiniz.' };
+      if (!v.address) return { id: 'omAddress', msg: 'Lütfen adres giriniz.' };
+      if (v.address.length < 10) return { id: 'omAddress', msg: 'Adres en az 10 karakter olmalıdır (mahalle, sokak, kapı no).' };
+      if (!v.diploma) return { id: 'omDiploma', msg: 'Lütfen doktor diploma tescil numaranızı giriniz.' };
+      if (v.diploma.length < 4 || v.diploma.length > 16) return { id: 'omDiploma', msg: 'Diploma tescil numarası 4-16 hane olmalıdır (MEDULA drTescilNo).' };
+      if (!v.termsOnBilgi || !v.termsMesafeli || !v.termsGizlilik) return { id: 'omTermsOnBilgi', msg: 'Lütfen tüm sözleşmeleri onaylayınız.' };
+      return null;
+    }
 
     // Form submit → /api/payment/start
     document.getElementById('omForm').addEventListener('submit', async function (e) {
       e.preventDefault();
+      omClearErrors();
       const btn = document.getElementById('omSubmit');
-      const name = document.getElementById('omName').value.trim();
-      const email = document.getElementById('omEmail').value.trim();
-      const phone = document.getElementById('omPhone').value.trim();
-      const city = document.getElementById('omCity').value;
-      const address = document.getElementById('omAddress').value.trim();
-      const diploma = document.getElementById('omDiploma').value.trim();
-      const pkgSel = document.getElementById('omPackage');
-      const selectedPackage = pkgSel.value;
-      if (!selectedPackage) { alert('Lütfen bir paket seçiniz.'); return; }
-      const termsOnBilgi = document.getElementById('omTermsOnBilgi').checked;
-      const termsMesafeli = document.getElementById('omTermsMesafeli').checked;
-      const termsGizlilik = document.getElementById('omTermsGizlilik').checked;
-      if (!termsOnBilgi || !termsMesafeli || !termsGizlilik) {
-        alert('Lütfen Ön Bilgilendirme Formu, Mesafeli Satış Sözleşmesi ve Gizlilik Politikası kutularını işaretleyiniz.');
+      const v = {
+        name: document.getElementById('omName').value.trim(),
+        email: document.getElementById('omEmail').value.trim(),
+        phone: document.getElementById('omPhone').value.trim(),
+        city: document.getElementById('omCity').value,
+        district: document.getElementById('omDistrict').value.trim(),
+        address: document.getElementById('omAddress').value.trim(),
+        diploma: document.getElementById('omDiploma').value.trim(),
+        selectedPackage: document.getElementById('omPackage').value,
+        termsOnBilgi: document.getElementById('omTermsOnBilgi').checked,
+        termsMesafeli: document.getElementById('omTermsMesafeli').checked,
+        termsGizlilik: document.getElementById('omTermsGizlilik').checked,
+      };
+      const err = omValidate(v);
+      if (err) {
+        const el = omSetError(err.id, err.msg);
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        try { el.focus({ preventScroll: true }); } catch (_) {}
         return;
       }
-      if (!name || !email || !phone || !city || !address || !diploma) return;
+      // Ödeme sayfasından geri dönülürse form kaybolmasın (sessionStorage)
+      try {
+        sessionStorage.setItem('omFormData', JSON.stringify({
+          name: v.name,
+          email: v.email,
+          phone: v.phone,
+          city: v.city,
+          district: v.district,
+          address: v.address,
+          diploma: v.diploma,
+          package: v.selectedPackage,
+          terms: v.termsOnBilgi && v.termsMesafeli && v.termsGizlilik,
+        }));
+      } catch (_) {}
       btn.disabled = true;
       btn.textContent = 'Yönlendiriliyor...';
       try {
@@ -4583,22 +4987,23 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name, email, phone, city, address, diploma,
-            package: selectedPackage,
+            name: v.name, email: v.email, phone: v.phone, city: v.city, district: v.district,
+            address: v.address, diploma: v.diploma, package: v.selectedPackage,
             acceptedTerms: { onBilgi: true, mesafeli: true, gizlilik: true },
             acceptedAt: new Date().toISOString()
           })
         });
-        const data = await resp.json();
+        const data = await resp.json().catch(() => ({}));
         if (!resp.ok || !data.link) {
-          alert(data.error || 'Ödeme başlatılamadı. Lütfen tekrar deneyin.');
+          // Sunucudan / ödeme sağlayıcısından gelen hatayı uygun dille göster
+          omBanner(data.error || 'Ödeme başlatılamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.');
           btn.disabled = false;
           btn.textContent = 'Güvenli Ödemeye Geç →';
           return;
         }
         window.location.href = data.link;
       } catch {
-        alert('Bağlantı hatası. Lütfen tekrar deneyin.');
+        omBanner('İnternet bağlantısı kesildi veya sunucuya ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.');
         btn.disabled = false;
         btn.textContent = 'Güvenli Ödemeye Geç →';
       }

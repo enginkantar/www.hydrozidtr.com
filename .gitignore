@@ -2,3 +2,7 @@
 .gstack/
 seo-analiz/
 node_modules/
+.dev.vars
+.backups/
+.claude-flow/
+.wrangler/
