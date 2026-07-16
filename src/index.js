@@ -4,6 +4,7 @@
 import { kargoGonderiOlustur } from './kargo.js';
 import { qnbIrsaliyeliFaturaKes } from './fatura.js';
 import { buildBarcodeSvg, buildInvoicePdf, buildShippingCostPdf } from './documents.js';
+import { sendOrderNotifications, sendTelegram } from './notifications.js';
 //
 // Routes:
 //   POST /api/payment/start    → Ödeme linki oluşturur
@@ -29,6 +30,7 @@ import { buildBarcodeSvg, buildInvoicePdf, buildShippingCostPdf } from './docume
 
 const PLATFORMODE_DEFAULT_BASE = 'https://app.platformode.com.tr/ccpayment';
 const TOKEN_KV_KEY = 'token:halkode';
+const INDEXNOW_DEFAULT_KEY = 'dd6897a3dd6213540fa1b5d9a99652c2';
 
 const TEST_MODE = false;  // tek yerden kontrol
 
@@ -126,7 +128,10 @@ export default {
   // Render free plan uykuda olabilir: önce health ile uyandır,
   // sonra job'ı tetikle. Job async çalışır, yanıt hemen döner.
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(triggerDailyCampaign(env));
+    ctx.waitUntil(Promise.allSettled([
+      triggerDailyCampaign(env),
+      submitIndexNow(env),
+    ]));
   }
 };
 
@@ -168,6 +173,45 @@ async function triggerDailyCampaign(env) {
   } catch (e) {
     console.error('[cron] trigger hatası', e);
     await cronTelegram(env, `❌ CRON: job trigger istisna: ${e.message}`);
+  }
+}
+
+async function submitIndexNow(env) {
+  const baseUrl = (env.BASE_URL || 'https://www.hydrozidtr.com').replace(/\/+$/, '');
+  const key = String(env.INDEXNOW_KEY || INDEXNOW_DEFAULT_KEY).trim();
+  if (!key) return;
+
+  try {
+    const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, {
+      headers: { Accept: 'application/xml,text/xml;q=0.9,*/*;q=0.8' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!sitemapResponse.ok) {
+      throw new Error(`sitemap ${sitemapResponse.status}`);
+    }
+
+    const xml = await sitemapResponse.text();
+    const urlList = [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/gi)]
+      .map(match => match[1].trim())
+      .filter(value => /^https?:\/\//i.test(value));
+    if (!urlList.length) throw new Error('sitemap URL listesi boş');
+
+    const response = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: new URL(baseUrl).hostname,
+        key,
+        keyLocation: `${baseUrl}/${key}.txt`,
+        urlList,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    const body = await response.text();
+    if (!response.ok) throw new Error(`IndexNow ${response.status}: ${body.slice(0, 240)}`);
+    console.log(`[cron] IndexNow bildirimi gönderildi: ${urlList.length} URL (${response.status})`);
+  } catch (error) {
+    console.error('[cron] IndexNow bildirimi başarısız:', error.message);
   }
 }
 
@@ -277,33 +321,8 @@ async function handlePaymentStart(request, env) {
   }
 
   const invoiceId = crypto.randomUUID();
-  const platformodeBase = getPlatformodeBase(env);
   const baseUrl = env.BASE_URL || 'https://www.hydrozidtr.com';
-
-  const invoice = {
-    invoice_id: invoiceId,
-    invoice_description: `Hydrozid ${packageName} - ${qty} adet`,
-    total: Number(finalPriceNumber).toFixed(2),
-    return_url: `${baseUrl}/odeme-basarili.html`,
-    cancel_url: `${baseUrl}/odeme-hatasi.html`,
-    response_method: 'GET',
-    items: [{
-      name: `Hydrozid Kriyocerrahi Cihazi (${packageName})`,
-      price: Number(unitPriceNumber).toFixed(2),
-      quantity: qty,
-      description: `${packageName} - ${qty} adet paket`,
-    }],
-    bill_address1: address.trim().substring(0, 100),
-    bill_city: city.trim(),
-    bill_state: city.trim(),
-    bill_country: 'TURKEY',
-    bill_phone: phone.trim(),
-    bill_email: email.trim().toLowerCase(),
-  };
-
-  if (env.WEBHOOK_SECRET) {
-    invoice.sale_web_hook_key = env.WEBHOOK_SECRET;
-  }
+  const platformodeBase = getPlatformodeBase(env);
 
   await env.PAYMENT_KV.put(
     `order:${invoiceId}`,
@@ -327,12 +346,11 @@ async function handlePaymentStart(request, env) {
       createdAt: new Date().toISOString(),
       acceptedAt,
       termsVersion: '1.0',
+      platformodeInvoiceId: invoiceId,
     }),
     { expirationTtl: 604800 }
   );
 
-  const link = `/odeme-test.html?invoice_id=${encodeURIComponent(invoiceId)}&wl=1` +
-    `&amt=${finalPriceNumber}&pkg=${encodeURIComponent(packageName)}`;
   await env.PAYMENT_KV.put(`checkout:${invoiceId}`, JSON.stringify({
     invoiceId,
     orderId: '',
@@ -347,6 +365,8 @@ async function handlePaymentStart(request, env) {
     customerAddress: address.trim(),
   }), { expirationTtl: 604800 });
 
+  const link = `/odeme-test.html?invoice_id=${encodeURIComponent(invoiceId)}&wl=1` +
+    `&amt=${finalPriceNumber}&pkg=${encodeURIComponent(packageName)}`;
   return jsonResp(request, { link, order_id: invoiceId, invoice_id: invoiceId, white_label: true });
 }
 
@@ -394,6 +414,9 @@ async function handleWhiteLabelInit(request, env) {
     );
 
     return jsonResp(request, {
+      action: 'WL_REQUEST_PAY_SMART_3D',
+      api_name: 'PAY_SMART_3D',
+      payment_type: '3d',
       action_url: actionUrl,
       invoice_id: invoiceId,
       invoice_description: `Hydrozid ${order.package || '-'} - ${qty} adet`,
@@ -416,6 +439,10 @@ async function handleWhiteLabelInit(request, env) {
       bill_phone: String(order.customerPhone || '').trim(),
       sale_web_hook_key: env.WEBHOOK_SECRET || '',
       ip: request.headers.get('CF-Connecting-IP') || '',
+      referer_url: `${baseUrl}/odeme-test.html?invoice_id=${encodeURIComponent(invoiceId)}&wl=1`,
+      merchant_server_id: '',
+      is_pay_by_marketplace: 0,
+      installment: 1,
       saved_card: 0,
       maturity_period: 0,
       payment_frequency: 0,
@@ -431,6 +458,7 @@ async function handleWhiteLabelInit(request, env) {
     return jsonResp(request, { error: e.message }, 500);
   }
 }
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // /api/payment/webhook
@@ -729,15 +757,13 @@ async function handleNotifySuccess(request, env) {
     try { order = JSON.parse(orderRaw); }
     catch { return jsonResp(request, { error: 'Invalid order data' }, 500); }
 
-    const isSuccessHint = incomingPaymentStatus === '1' || incomingStatus === 'Completed';
-
     if (order.status === 'PENDING') {
       if (order.mock && env.MOCK_PAYMENT === '1') {
         order.status = 'PAID';
         order.paidAt = new Date().toISOString();
         order.paidVia = 'mock_browser_return';
-      } else if (isSuccessHint) {
-        if (hash_key && env.HALKODE_APP_SECRET) {
+      } else {
+        if (hash_key && env.HALKODE_APP_SECRET && incomingStatus) {
           const validated = await validateHash(hash_key, incomingStatus || 'Completed', incomingOrderId || order.orderId || '', invoiceId, env.HALKODE_APP_SECRET);
           if (!validated) {
             return jsonResp(request, { ok: false, note: 'hash validation failed' }, 400);
@@ -751,11 +777,9 @@ async function handleNotifySuccess(request, env) {
 
         order.status = 'PAID';
         order.paidAt = new Date().toISOString();
-        order.paidVia = 'whitelabel_return';
+        order.paidVia = incomingStatus ? 'whitelabel_return' : 'statuscheck';
         order.orderId = incomingOrderId || statusCheck.orderId || order.orderId || '';
         order.orderNo = order.orderId;
-      } else {
-        return jsonResp(request, { ok: false, note: 'payment confirmation pending' }, 409);
       }
     }
 
@@ -810,7 +834,8 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
       order.faturaNo = fatura.faturaNo;
       order.faturaUuid = fatura.uuid;
       order.faturaMock = !!fatura.mock;
-      console.log(`[notify:${source}] ✅ fatura:`, fatura.faturaNo, fatura.mock ? '(MOCK)' : '(gerçek)');
+      order.faturaLocal = !!fatura.local;
+      console.log(`[notify:${source}] ✅ fatura:`, fatura.faturaNo, fatura.local ? '(LOCAL)' : (fatura.mock ? '(MOCK)' : '(gerçek)'));
     } else {
       order.faturaError = fatura.error;
       order.faturaNo = fatura.faturaNo;
@@ -818,157 +843,9 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     }
   }
 
+  await sendOrderNotifications(env, order, invoiceId, orderId, source);
+
   const notifiedAt = new Date().toISOString();
-  const trDate = new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' });
-
-  const telegramText = `✅ HYDROZİD SİPARİŞ BİLGİSİ
-
-👤 ${order.customerName}
-📧 ${order.customerEmail}
-📱 ${order.customerPhone}
-📍 ${order.customerCity}
-🏥 Diploma: ${order.diploma}
-
-📦 ${order.package}
-💰 ${order.amount} ${order.currency}
-🆔 ${invoiceId}
-🔗 Order: ${orderId || '-'}
-🚚 Kargo: ${order.kargoBarcode || ('HATA: ' + (order.kargoError || '-'))}
-🚚 Kargo Firması: ${order.kargoFirma || order.kargoHandler || '-'}
-💸 Kargo Masrafı: ${Number(order.kargoMasraf || 0).toLocaleString('tr-TR')} TRY
-🧾 Fatura: ${order.faturaNo || '-'}${order.faturaMock ? ' (mock)' : ''}${order.faturaError ? ' HATA: ' + order.faturaError : ''}
-⏰ ${trDate}`;
-
-  await sendTelegram(env, telegramText);
-
-  if (env.RESEND_API_KEY || (env.ZOHO_REFRESH_TOKEN && env.ZOHO_CLIENT_ID && env.ZOHO_CLIENT_SECRET)) {
-    const adminHtml = `
-<div style="text-align: center; padding: 0 0 16px;">
-  <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 8px;"><br>
-  <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid" style="height: 60px; width: auto;">
-</div>
-<h2>Yeni Sipariş — Hydrozid</h2>
-<table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
-  <tr><td style="padding:6px 12px;color:#666">Müşteri</td><td style="padding:6px 12px"><strong>${order.customerName}</strong></td></tr>
-  <tr><td style="padding:6px 12px;color:#666">E-posta</td><td style="padding:6px 12px">${order.customerEmail}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Telefon</td><td style="padding:6px 12px">${order.customerPhone}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Şehir</td><td style="padding:6px 12px">${order.customerCity}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Adres</td><td style="padding:6px 12px">${order.customerAddress}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Diploma No</td><td style="padding:6px 12px">${order.diploma}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Paket</td><td style="padding:6px 12px">${order.package} (${order.quantity} adet)</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Tutar</td><td style="padding:6px 12px"><strong>${order.amount} ${order.currency}</strong> (${order.eurAmount} EUR × ${order.eurTryRate?.toFixed(2)})</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Sipariş No</td><td style="padding:6px 12px">${order.orderNo || orderId}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Kargo Firması</td><td style="padding:6px 12px">${order.kargoFirma || order.kargoHandler || '—'}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Kargo Masrafı</td><td style="padding:6px 12px"><strong>${Number(order.kargoMasraf || 0).toLocaleString('tr-TR')} TRY</strong></td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Kargo Barkod</td><td style="padding:6px 12px"><strong>${order.kargoBarcode || ('— ' + (order.kargoError || ''))}</strong> ${order.kargoHandler || ''}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Fatura No</td><td style="padding:6px 12px"><strong>${order.faturaNo || '—'}</strong>${order.faturaMock ? ' (mock)' : ''}${order.faturaError ? ' — ' + order.faturaError : ''}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Fatura PDF</td><td style="padding:6px 12px"><a href="https://www.hydrozidtr.com/api/invoice/pdf?order_id=${encodeURIComponent(orderId)}" target="_blank" rel="noopener">PDF'yi aç</a></td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Kargo Masraf PDF</td><td style="padding:6px 12px"><a href="https://www.hydrozidtr.com/api/shipping-cost/pdf?order_id=${encodeURIComponent(orderId)}" target="_blank" rel="noopener">Masraf özeti</a></td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Tarih</td><td style="padding:6px 12px">${trDate}</td></tr>
-</table>`;
-
-    const recipientSet = new Set(getOrderAlertEmails(env));
-    if (env.FATURA_KOPYA_EMAIL) recipientSet.add(env.FATURA_KOPYA_EMAIL);
-    recipientSet.add('enginkantar@gmail.com');
-
-    const emailJobs = Array.from(recipientSet).map(to => sendEmail(env, {
-      to,
-      subject: `[Hydrozid] Yeni Sipariş — ${order.customerName} / ${order.package}`,
-      html: adminHtml,
-    }));
-
-    const customerHtml = `
-<div style="font-family:'Nunito Sans',sans-serif;background:#070B14;color:#CBD5E1;padding:40px 24px;max-width:560px;margin:0 auto;border-radius:16px">
-  <div style="text-align: center; padding: 32px 0 24px; border-bottom: 1px solid #1e293b; margin-bottom: 24px;">
-    <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 12px;"><br>
-    <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid® Sprey" style="height: 100px; width: auto; display: inline-block;">
-  </div>
-  <h1 style="font-family:Rubik,sans-serif;color:#00D4FF;font-size:1.4rem;margin-bottom:8px">Siparişiniz Alındı!</h1>
-  <p style="color:#94A3B8;margin-bottom:24px">Sayın <strong style="color:#fff">${order.customerName}</strong>, ödemeniz başarıyla tamamlandı.</p>
-  <table style="font-size:14px;border-collapse:collapse;width:100%">
-    <tr><td style="padding:8px 0;color:#64748B;width:140px">Sipariş No</td><td style="padding:8px 0;color:#fff;font-weight:700">${order.orderNo || orderId}</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Ürün</td><td style="padding:8px 0;color:#fff">Hydrozid® ${order.package} — ${order.quantity} adet</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Tutar</td><td style="padding:8px 0;color:#22C55E;font-weight:700">${order.amount} ${order.currency}</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Teslimat Adresi</td><td style="padding:8px 0;color:#CBD5E1">${order.customerCity} — ${order.customerAddress}</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Kargo Firması</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoFirma || order.kargoHandler || '—'}</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Kargo Barkod</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoBarcode || '—'}</td></tr>
-  </table>
-  ${order.kargoBarcode ? `<div style="margin-top:18px;padding:14px;background:#fff;border-radius:12px;text-align:center"><img src="https://www.hydrozidtr.com/api/barcode.svg?code=${encodeURIComponent(order.kargoBarcode)}" alt="Kargo barkodu" style="width:100%;max-width:640px;display:block;margin:0 auto"></div>` : ''}
-  <p style="margin-top:24px;color:#94A3B8;font-size:0.9rem">Siparişiniz en kısa sürede kargoya verilecek ve kargo takip bilgileri ayrıca iletilecektir.</p>
-  <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Sorularınız için: <a href="mailto:bilgi@hydrozidtr.com" style="color:#00D4FF">bilgi@hydrozidtr.com</a> veya WhatsApp <a href="https://wa.me/905534759032" style="color:#00D4FF">+90 553 475 9032</a></p>
-  <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Fatura PDF: <a href="https://www.hydrozidtr.com/api/invoice/pdf?order_id=${encodeURIComponent(orderId)}" style="color:#00D4FF">indir</a></p>
-
-  <!-- DOKTOR ÖNER BÖLÜMÜ -->
-  <div style="margin: 32px 0 24px; padding: 24px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; text-align: center;">
-    <p style="color: #0c4a6e; font-size: 16px; font-weight: 700; margin: 0 0 8px;">
-      🎯 Hydrozid'den memnun kaldıysanız
-    </p>
-    <p style="color: #0369a1; font-size: 14px; margin: 0 0 20px;">
-      Doktor meslektaşlarınıza önerin, onlar da güvenilir kriyoterapi spreyine ulaşsın.
-    </p>
-    <a href="https://wa.me/?text=Hydrozid%20kriyoterapi%20cihaz%C4%B1n%C4%B1%20kullan%C4%B1yorum%2C%20doktor%20arkada%C5%9Flar%C4%B1ma%20da%20%C3%B6neriyorum%3A%20https%3A%2F%2Fhydrozidtr.com"
-       style="display: inline-block; background: #25D366; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 8px; margin: 4px; font-weight: 700; font-size: 13px;">
-      📱 WhatsApp ile Paylaş
-    </a>
-    <a href="mailto:?subject=Hydrozid%20%C3%96nerisi&body=Sevgili%20meslekta%C5%9F%C4%B1m%2C%0A%0AHydrozid%20kriyoterapi%20cihaz%C4%B1n%C4%B1%20kullanmaya%20ba%C5%9Flad%C4%B1m%20ve%20performans%C4%B1ndan%20%C3%A7ok%20memnunum.%20FDA%20510(k)%20onayl%C4%B1%2C%20CE%20belgeli.%20Size%20de%20%C3%B6neririm.%0A%0A%C3%9Cr%C3%BCn%20bilgisi%3A%20https%3A%2F%2Fhydrozidtr.com"
-       style="display: inline-block; background: #6366F1; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 8px; margin: 4px; font-weight: 700; font-size: 13px;">
-      ✉️ E-posta ile Paylaş
-    </a>
-  </div>
-
-  <!-- SOSYAL MEDYA BANDI -->
-  <div style="text-align: center; padding: 24px 0; border-top: 1px solid #e5e7eb; margin-top: 24px;">
-    <p style="color: #6b7280; font-size: 13px; margin: 0 0 16px; font-weight: 600;">
-      Bizi takip edin
-    </p>
-    <a href="https://wa.me/905534759032" style="display: inline-block; margin: 0 8px; text-decoration: none;">
-      <img src="https://img.icons8.com/color/48/whatsapp.png" alt="WhatsApp" style="width: 32px; height: 32px;">
-    </a>
-    <a href="https://instagram.com/batu_medikal" style="display: inline-block; margin: 0 8px; text-decoration: none;">
-      <img src="https://img.icons8.com/color/48/instagram-new.png" alt="Instagram" style="width: 32px; height: 32px;">
-    </a>
-    <a href="https://www.tiktok.com/@batu_medikal" style="display: inline-block; margin: 0 8px; text-decoration: none;">
-      <img src="https://img.icons8.com/color/48/tiktok--v1.png" alt="TikTok" style="width: 32px; height: 32px;">
-    </a>
-    <a href="https://youtube.com/@Batu_Medikal" style="display: inline-block; margin: 0 8px; text-decoration: none;">
-      <img src="https://img.icons8.com/color/48/youtube-play.png" alt="YouTube" style="width: 32px; height: 32px;">
-    </a>
-    <a href="https://facebook.com/medikal.batu" style="display: inline-block; margin: 0 8px; text-decoration: none;">
-      <img src="https://img.icons8.com/color/48/facebook-new.png" alt="Facebook" style="width: 32px; height: 32px;">
-    </a>
-  </div>
-
-  <!-- ŞİRKET BİLGİLERİ -->
-  <div style="text-align: center; padding: 16px 0 8px; font-size: 12px; color: #6b7280; line-height: 1.8;">
-    <p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Hydrozid® Türkiye</p>
-    <p style="margin: 4px 0;">Batu Medikal — Çorum, Türkiye</p>
-    <p style="margin: 4px 0;">MERSİS NO: 4016506204800017</p>
-    <p style="margin: 4px 0;">
-      <a href="https://wa.me/905534759032" style="color: #25D366; text-decoration: none; font-weight: 600;">WhatsApp: +90 553 475 9032</a> &nbsp;|&nbsp;
-      <a href="mailto:bilgi@hydrozidtr.com" style="color: #0369a1; text-decoration: none;">bilgi@hydrozidtr.com</a>
-    </p>
-    <p style="margin: 4px 0;">
-      <a href="https://www.hydrozidtr.com" style="color: #0369a1; text-decoration: none;">www.hydrozidtr.com</a> &nbsp;|&nbsp;
-      <a href="https://www.batumedikal.com" style="color: #6b7280; text-decoration: none;">batumedikal.com</a>
-    </p>
-    <p style="margin: 12px 0 0; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 11px;">
-      © 2026 Hydrozid® Türkiye — FDA 510(k) onaylı, CE belgeli
-    </p>
-  </div>
-</div>`;
-
-    emailJobs.push(sendEmail(env, {
-      to: order.customerEmail,
-      subject: 'Hydrozid® Siparişiniz Alındı',
-      html: customerHtml,
-      replyTo: env.RESEND_FROM_EMAIL || 'bilgi@hydrozidtr.com',
-    }));
-
-    const results = await Promise.allSettled(emailJobs);
-    const failures = results.filter(r => r.status === 'rejected' || r.value === false).length;
-    if (failures) console.warn(`[notify:${source}] mail failures:`, failures);
-  }
-
   await env.PAYMENT_KV.put(
     `order:${invoiceId}`,
     JSON.stringify({ ...order, notifiedAt }),
@@ -976,205 +853,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
   );
 
   return { ok: true, notifiedAt, siparis: siparisOzeti(order, orderId) };
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// sendEmail (Zoho Mail API → Resend fallback)
-// ══════════════════════════════════════════════════════════════════════════════
-async function sendEmail(env, { to, subject, html, replyTo }) {
-  if (env.ZOHO_REFRESH_TOKEN && env.ZOHO_CLIENT_ID && env.ZOHO_CLIENT_SECRET) {
-    const zoho = await sendZohoEmail(env, { to, subject, html, replyTo });
-    if (zoho.ok) return true;
-    console.warn('[zoho] fallback to resend:', zoho.error || 'unknown error');
-  }
-
-  if (!env.RESEND_API_KEY) return false;
-
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: env.RESEND_FROM_EMAIL || 'Hydrozid Sipariş <siparis@hydrozidtr.com>',
-        to: [to],
-        subject,
-        html,
-        reply_to: replyTo || 'bilgi@hydrozidtr.com',
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('[resend] failed:', res.status, err);
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error('[resend] exception:', e.message);
-    return false;
-  }
-}
-
-async function sendZohoEmail(env, { to, subject, html, replyTo }) {
-  try {
-    const accessToken = await getZohoAccessToken(env);
-    if (!accessToken) return { ok: false, error: 'access token alınamadı' };
-
-    const account = await getZohoAccount(env, accessToken);
-    if (!account?.accountId || !account?.email) {
-      return { ok: false, error: 'Zoho account bulunamadı' };
-    }
-
-    const sender = chooseZohoSender(env, account);
-    const body = {
-      fromAddress: sender,
-      toAddress: to,
-      subject,
-      content: html,
-      mailFormat: 'html',
-      askReceipt: 'no',
-      encoding: 'UTF-8',
-    };
-
-    const res = await fetch(`https://mail.zoho.com/api/accounts/${account.accountId}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Zoho-oauthtoken ${accessToken}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-    const text = await res.text();
-    if (!res.ok) return { ok: false, error: `HTTP ${res.status}: ${text.slice(0, 240)}` };
-    return { ok: true, raw: text };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
-}
-
-async function getZohoAccessToken(env) {
-  const cacheKey = 'zoho:access_token';
-  if (env.PAYMENT_KV) {
-    const cached = await env.PAYMENT_KV.get(cacheKey, { type: 'json' });
-    if (cached?.access_token && cached?.expires_at && cached.expires_at > Date.now() + 60000) {
-      return cached.access_token;
-    }
-  }
-
-  const tokenUrl = new URL('https://accounts.zoho.com/oauth/v2/token');
-  tokenUrl.searchParams.set('grant_type', 'refresh_token');
-  tokenUrl.searchParams.set('refresh_token', env.ZOHO_REFRESH_TOKEN);
-  tokenUrl.searchParams.set('client_id', env.ZOHO_CLIENT_ID);
-  tokenUrl.searchParams.set('client_secret', env.ZOHO_CLIENT_SECRET);
-  if (env.ZOHO_REDIRECT_URI) tokenUrl.searchParams.set('redirect_uri', env.ZOHO_REDIRECT_URI);
-
-  const res = await fetch(tokenUrl, { method: 'POST' });
-  const data = await res.json().catch(() => ({}));
-  const accessToken = data?.access_token || '';
-  const expiresIn = Number(data?.expires_in || 3600);
-  if (!accessToken) {
-    console.error('[zoho] token error:', res.status, JSON.stringify(data).slice(0, 240));
-    return '';
-  }
-
-  if (env.PAYMENT_KV) {
-    await env.PAYMENT_KV.put(cacheKey, JSON.stringify({
-      access_token: accessToken,
-      expires_at: Date.now() + Math.max(300, expiresIn - 60) * 1000,
-    }), { expirationTtl: Math.max(300, expiresIn - 60) });
-  }
-  return accessToken;
-}
-
-async function getZohoAccount(env, accessToken) {
-  const cacheKey = 'zoho:account';
-  if (env.PAYMENT_KV) {
-    const cached = await env.PAYMENT_KV.get(cacheKey, { type: 'json' });
-    if (cached?.accountId && cached?.email) return cached;
-  }
-
-  const res = await fetch('https://mail.zoho.com/api/accounts', {
-    headers: {
-      'Authorization': `Zoho-oauthtoken ${accessToken}`,
-      'Accept': 'application/json',
-    },
-  });
-  const data = await res.json().catch(() => ({}));
-  const list = Array.isArray(data?.data) ? data.data : [];
-  const wanted = (env.ZOHO_FROM_EMAIL || '').trim().toLowerCase();
-  const picked = (wanted && list.find(a => {
-    const emails = [
-      a.primaryEmailAddress,
-      a.mailboxAddress,
-      a.incomingUserName,
-      ...(Array.isArray(a.emailAddress) ? a.emailAddress.map(e => e.mailId) : []),
-    ].filter(Boolean).map(x => String(x).toLowerCase());
-    return emails.includes(wanted);
-  })) || list[0];
-  const account = picked ? {
-    accountId: picked.accountId || picked.id || picked.account_id || '',
-    email: picked.primaryEmailAddress
-      || picked.mailboxAddress
-      || picked.incomingUserName
-      || (Array.isArray(picked.emailAddress) ? picked.emailAddress.find(e => e.isPrimary)?.mailId : '')
-      || (Array.isArray(picked.emailAddress) ? picked.emailAddress[0]?.mailId : '')
-      || '',
-  } : null;
-
-  if (account?.accountId && account?.email && env.PAYMENT_KV) {
-    await env.PAYMENT_KV.put(cacheKey, JSON.stringify(account), { expirationTtl: 86400 });
-  }
-  return account;
-}
-
-function getOrderAlertEmails(env) {
-  const raw = env.ORDER_ALERT_EMAILS || '';
-  const parsed = raw
-    .split(/[\s,;]+/)
-    .map(s => s.trim())
-    .filter(Boolean);
-  if (parsed.length) return parsed;
-  return ['bilgi@hydrozidtr.com', 'enginkantar@gmail.com', 'medikalbatu@gmail.com'];
-}
-
-function chooseZohoSender(env, account) {
-  const preferred = (env.ZOHO_FROM_EMAIL || '').trim().toLowerCase();
-  const addresses = new Set([
-    account?.email,
-    account?.primaryEmailAddress,
-    account?.mailboxAddress,
-    account?.incomingUserName,
-    ...(Array.isArray(account?.emailAddress) ? account.emailAddress.map(e => e.mailId) : []),
-  ].filter(Boolean).map(x => String(x).toLowerCase()));
-
-  if (preferred && addresses.has(preferred)) return preferred;
-  if (addresses.has('bilgi@hydrozidtr.com')) return 'bilgi@hydrozidtr.com';
-  if (account?.primaryEmailAddress) return account.primaryEmailAddress;
-  if (account?.mailboxAddress) return account.mailboxAddress;
-  if (account?.incomingUserName) return account.incomingUserName;
-  return account?.email || '';
-}
-
-async function sendTelegram(env, text) {
-  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return false;
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text }),
-    });
-    if (!res.ok) {
-      console.error('[telegram] sendMessage failed:', res.status, await res.text());
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error('[telegram] sendMessage error:', e.message);
-    return false;
-  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1786,10 +1464,10 @@ function addSecurityHeaders(response) {
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com; " +
     "connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com; " +
-    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr; " +
+    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr https://testapp.platformode.com.tr; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
-    "form-action 'self' https://app.halkode.com.tr https://app.platformode.com.tr;"
+    "form-action 'self' https://app.halkode.com.tr https://app.platformode.com.tr https://testapp.platformode.com.tr;"
   );
   return new Response(response.body, {
     status: response.status,

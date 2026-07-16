@@ -66,7 +66,6 @@
     .trust-chip { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 10px; padding: 7px 12px; }
     .trust-chip img { display: block; height: 22px; width: auto; }
     .trust-chip span { font-size: 0.72rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
-    .trust-batu img { height: 26px; }
     .trust-etbis span { color: #7a5c1e; }
     .hidden { display: none !important; }
     .notice { margin-top: 14px; font-size: 12px; color: #94A3B8; line-height: 1.5; text-align: center; }
@@ -133,10 +132,6 @@
     </form>
     <div class="secure" id="secureNote">🛡️ Bu ekran ödeme sağlayıcısını taklit eder — canlıda HalkÖde 3D Secure kullanılır.</div>
     <div class="trust">
-      <div class="trust-chip trust-batu">
-        <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
-        <span>güvencesi ile</span>
-      </div>
       <div class="trust-chip">
         <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
       </div>
@@ -144,6 +139,9 @@
         <img src="/assets/logo-tic-3.png" alt="T.C. Ticaret Bakanlığı" loading="lazy">
         <span>ETBİS'E KAYITLIDIR</span>
       </div>
+    </div>
+    <div class="secure" style="margin-top:16px;color:#94A3B8;font-size:12px;">
+      Batu Teknoloji E-Commerce M Power altyapısı ile işlemler sağlanmıştır.
     </div>
   </div>
 
@@ -282,6 +280,9 @@
       form.action = state.actionUrl;
       form.style.display = 'none';
       addHidden(form, 'merchant_key', state.init.merchant_key);
+      addHidden(form, 'action', state.init.action || 'WL_REQUEST_PAY_SMART_3D');
+      addHidden(form, 'api_name', state.init.api_name || 'PAY_SMART_3D');
+      addHidden(form, 'payment_type', state.init.payment_type || '3d');
       addHidden(form, 'invoice_id', state.init.invoice_id);
       addHidden(form, 'invoice_description', state.init.invoice_description);
       addHidden(form, 'total', state.init.total);
@@ -291,6 +292,7 @@
       addHidden(form, 'return_url', state.init.return_url);
       addHidden(form, 'cancel_url', state.init.cancel_url);
       addHidden(form, 'response_method', state.init.response_method || 'GET');
+      addHidden(form, 'referer_url', state.init.referer_url || location.href);
       addHidden(form, 'name', state.init.name);
       addHidden(form, 'surname', state.init.surname);
       addHidden(form, 'bill_address1', state.init.bill_address1);
@@ -302,7 +304,10 @@
       addHidden(form, 'bill_email', state.init.bill_email);
       addHidden(form, 'bill_phone', state.init.bill_phone);
       addHidden(form, 'sale_web_hook_key', state.init.sale_web_hook_key);
+      addHidden(form, 'merchant_server_id', state.init.merchant_server_id || '');
       addHidden(form, 'ip', state.init.ip);
+      addHidden(form, 'is_pay_by_marketplace', String(state.init.is_pay_by_marketplace || 0));
+      addHidden(form, 'installment', String(state.init.installment || 1));
       addHidden(form, 'saved_card', state.init.saved_card || 0);
       addHidden(form, 'maturity_period', state.init.maturity_period || 0);
       addHidden(form, 'payment_frequency', state.init.payment_frequency || 0);
@@ -320,10 +325,12 @@
     }
 
     if (wl) {
-      modeBanner.textContent = '⚠️ White-label ödeme modu yükleniyor...';
+      modeBanner.textContent = '';
+      modeBanner.style.display = 'none';
       pageTitle.textContent = 'Güvenli Ödeme';
       pageDesc.textContent = 'White-label 3D Secure ödeme ekranı';
-      secureNote.innerHTML = '🛡️ Bu ekran doğrudan ödeme sağlayıcısının akışını kullanır.';
+      secureNote.innerHTML = '';
+      document.querySelector('.lock').style.display = 'none';
       failBtn.textContent = 'İptal Et';
       wlFields.classList.remove('hidden');
       initWhiteLabel().catch(err => {

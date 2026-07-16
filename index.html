@@ -2679,14 +2679,12 @@
     }
     .trust-chip img { display: block; height: 26px; width: auto; }
     .trust-chip span { font-size: 0.74rem; font-weight: 700; color: #1e293b; letter-spacing: .3px; white-space: nowrap; }
-    .trust-batu img { height: 34px; }
     .trust-etbis img { height: 30px; }
     .trust-etbis span { color: #7a5c1e; }
     @media (max-width: 560px) {
       .footer-trust { gap: 10px; }
       .trust-chip { padding: 7px 10px; }
       .trust-chip img { height: 22px; }
-      .trust-batu img { height: 28px; }
     }
 
     /* ─── Animations ─── */
@@ -3772,12 +3770,8 @@
               Destek</a></li>
         </ul>
 
-        <!-- ─── Güven rozetleri: Batu Medikal + ödeme + ETBİS ─── -->
+        <!-- ─── Güven rozetleri: ödeme + ETBİS ─── -->
         <div class="footer-trust">
-          <div class="trust-chip trust-batu">
-            <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
-            <span>güvencesi ile</span>
-          </div>
           <div class="trust-chip">
             <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
           </div>
@@ -4517,6 +4511,51 @@
       color: #475569;
       margin-top: 10px;
     }
+
+    .om-assurances {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 2px;
+    }
+
+    .om-assurance {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      min-width: 0;
+      padding: 9px 8px;
+      border: 1px solid rgba(0, 212, 255, 0.12);
+      border-radius: 8px;
+      background: rgba(0, 212, 255, 0.035);
+      color: #CBD5E1;
+      font-size: 0.68rem;
+      line-height: 1.25;
+    }
+
+    .om-assurance-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      flex: 0 0 15px;
+      border: 1px solid rgba(34, 197, 94, 0.65);
+      border-radius: 50%;
+      color: #4ADE80;
+      font-size: 0.62rem;
+      font-weight: 800;
+    }
+
+    .om-assurance strong,
+    .om-assurance small { display: block; }
+    .om-assurance strong { color: #E2E8F0; font-size: 0.7rem; }
+    .om-assurance small { margin-top: 2px; color: #64748B; }
+
+    @media (max-width: 560px) {
+      .om-assurances { grid-template-columns: 1fr; }
+      .om-assurance { align-items: center; }
+    }
   </style>
 
   <!-- ─── ORDER MODAL HTML ─── -->
@@ -4625,10 +4664,6 @@
 
         <!-- Güven rozetleri (footer ile aynı) -->
         <div class="footer-trust" style="margin:18px 0 4px">
-          <div class="trust-chip trust-batu">
-            <img src="/assets/batu-medikal-logo.jpg" alt="Batu Medikal" loading="lazy">
-            <span>güvencesi ile</span>
-          </div>
           <div class="trust-chip">
             <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
           </div>
@@ -4636,6 +4671,11 @@
             <img src="/assets/logo-tic-3.png" alt="T.C. Ticaret Bakanlığı" loading="lazy">
             <span>ETBİS'E KAYITLIDIR</span>
           </div>
+        </div>
+        <div class="om-assurances" aria-label="Ödeme güvenceleri">
+          <div class="om-assurance"><span class="om-assurance-icon">✓</span><span><strong>3D Secure</strong><small>Banka doğrulaması</small></span></div>
+          <div class="om-assurance"><span class="om-assurance-icon">✓</span><span><strong>Kart bilgisi</strong><small>Sitemizde saklanmaz</small></span></div>
+          <div class="om-assurance"><span class="om-assurance-icon">✓</span><span><strong>WhatsApp destek</strong><small>Satış sonrası iletişim</small></span></div>
         </div>
       </form>
     </div>

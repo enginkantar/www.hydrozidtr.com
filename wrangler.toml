@@ -8,6 +8,8 @@ binding = "ASSETS"
 
 [vars]
 BASE_URL = "https://www.hydrozidtr.com"
+PLATFORMODE_ACCESS_URL = "https://app.halkode.com.tr/ccpayment"
+INDEXNOW_KEY = "dd6897a3dd6213540fa1b5d9a99652c2"
 TELEGRAM_CHAT_ID = "6014598776"
 HYDROZID_API_URL = "https://hydrozid-pazarlama.onrender.com"
 KARGO_SAGLAYICI = "kargonomi"

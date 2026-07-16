@@ -7,10 +7,14 @@
 //   connectorService: QNB_EFATURA_CONNECTOR_WS → belgeGonderExt(parametreler)
 // Test: erpefaturatest1 (gönderici VKN 4016562048) → erpefaturatest2 (alıcı VKN 4016562049)
 // ERP kodu: BTU31425 (sabit, gidenBelgeParametreleri.erpKodu)
+// Prod Uyumsoft tabanı: https://api.hepsiburadaefaturam.com/Services/Integration
+// Not: CreateOrder/CreatePackage/InTransit/Deliver/Undeliver adları public e-Fatura servis listesinde görünmedi;
+// bunları ayrı bir order/shipping lifecycle webhook katmanı olarak ele almak daha güvenli.
 //
 // İKİ MOD:
 //   QNB_MOCK=1 → gerçek servise gitmez, sahte fatura no/UUID üretir (local QA).
 //   QNB_MOCK=0 → gerçek belgeGonderExt (UBL-TR imzasını QNB server-side ekler).
+//   FATURA_PROVIDER=local veya QNB eksikse yerel proforma fatura üretir.
 
 // ── Yardımcılar ───────────────────────────────────────────────────────────────
 function xmlEsc(s) {
@@ -104,6 +108,29 @@ function faturaKalemleri(order) {
   return {
     adet, kdvOran, matrah, kdv, toplam, birimMatrah,
     ad: `Hydrozid Kriyoterapi Cihazi (${order.package || '-'})`,
+  };
+}
+
+function localFaturaNo(invoiceId) {
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const suffix = String(invoiceId || crypto.randomUUID()).replace(/-/g, '').slice(0, 10).toUpperCase();
+  return `HYZ-${date}-${suffix}`;
+}
+
+function localInvoiceResult(env, order) {
+  const uuid = crypto.randomUUID();
+  const faturaNo = localFaturaNo(order.invoiceId);
+  const ozet = faturaKalemleri(order);
+  console.log(`[fatura] LOCAL proforma → ${faturaNo} (${env.SATICI_UNVAN || 'Batu Medikal'} → ${order.customerName}, ${ozet.toplam} ${order.currency || 'TRY'})`);
+  return {
+    ok: true,
+    mock: true,
+    local: true,
+    faturaNo,
+    uuid,
+    ettn: uuid,
+    ozet,
+    raw: { mode: 'local', invoiceNo: faturaNo, uuid },
   };
 }
 
@@ -269,16 +296,13 @@ export async function qnbIrsaliyeliFaturaKes(env, order) {
   const yil = new Date().getFullYear();
   const faturaNo = `BTU${yil}${String(Date.now()).slice(-9)}`;
 
-  const gercek = env.QNB_MOCK !== '1'
+  const gercek = String(env.FATURA_PROVIDER || '').toLowerCase() === 'qnb'
+    && env.QNB_MOCK !== '1'
     && env.QNB_WS_KULLANICI && env.QNB_WS_SIFRE
     && env.QNB_EFATURA_USER_WS && env.QNB_EFATURA_CONNECTOR_WS;
 
   if (!gercek) {
-    console.log(`[fatura] MOCK irsaliyeli fatura → ${faturaNo} (${env.SATICI_UNVAN || 'Batu Medikal'} → ${order.customerName}, ${order.amount} ${order.currency})`);
-    return {
-      ok: true, mock: true, faturaNo, uuid, ettn: uuid,
-      ozet: faturaKalemleri(order),
-    };
+    return localInvoiceResult(env, order);
   }
 
   try {
