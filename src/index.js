@@ -126,66 +126,9 @@ export default {
 
     return new Response('Not found', { status: 404 });
   },
-
-  // ── CRON: her gün 05:00 UTC (08:00 TR) — otomatik kampanya ──
-  // Render free plan uykuda olabilir: önce health ile uyandır,
-  // sonra job'ı tetikle. Job async çalışır, yanıt hemen döner.
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(triggerDailyCampaign(env));
-  }
+  // Not: günlük kampanya artık Oracle crond ile tetikleniyor (docker exec).
+  // Cloudflare scheduled handler kaldırıldı — Render backend silindi.
 };
-
-async function triggerDailyCampaign(env) {
-  const api = env.HYDROZID_API_URL || 'https://hydrozid-pazarlama.onrender.com';
-
-  // 1) Uyandır: 6 deneme × 20 sn ara (soğuk başlangıç ~1-2 dk)
-  let awake = false;
-  for (let i = 0; i < 6; i++) {
-    try {
-      const r = await fetch(`${api}/api/health`, { signal: AbortSignal.timeout(30000) });
-      if (r.ok) { awake = true; break; }
-    } catch (_) { /* uyanıyor, bekle */ }
-    await new Promise(res => setTimeout(res, 20000));
-  }
-
-  if (!awake) {
-    console.error('[cron] Render uyandırılamadı');
-    await cronTelegram(env, '❌ CRON: Render backend uyandırılamadı, otomatik kampanya çalışmadı!');
-    return;
-  }
-
-  // 2) Job'ı tetikle
-  try {
-    const r = await fetch(`${api}/api/job/trigger`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': env.HYDROZID_JOB_KEY,
-      },
-      body: JSON.stringify({ manual: false }),
-      signal: AbortSignal.timeout(30000),
-    });
-    const body = await r.text();
-    console.log(`[cron] trigger yanıtı ${r.status}: ${body}`);
-    if (!r.ok) {
-      await cronTelegram(env, `❌ CRON: job trigger hatası ${r.status}: ${body}`);
-    }
-  } catch (e) {
-    console.error('[cron] trigger hatası', e);
-    await cronTelegram(env, `❌ CRON: job trigger istisna: ${e.message}`);
-  }
-}
-
-async function cronTelegram(env, text) {
-  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return;
-  try {
-    await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text }),
-    });
-  } catch (_) { /* rapor edilemedi, sessiz geç */ }
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // /api/payment/start
