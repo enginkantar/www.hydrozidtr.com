@@ -1050,7 +1050,7 @@ async function getZohoAccount(env, accessToken) {
   const cacheKey = 'zoho:account';
   if (env.PAYMENT_KV) {
     const cached = await env.PAYMENT_KV.get(cacheKey, { type: 'json' });
-    if (cached?.accountId && cached?.email) return cached;
+    if (cached?.accountId && cached?.email && cached?.emailAddress) return cached;
   }
 
   const res = await fetch('https://mail.zoho.com/api/accounts', {
@@ -1079,8 +1079,12 @@ async function getZohoAccount(env, accessToken) {
       || (Array.isArray(picked.emailAddress) ? picked.emailAddress.find(e => e.isPrimary)?.mailId : '')
       || (Array.isArray(picked.emailAddress) ? picked.emailAddress[0]?.mailId : '')
       || '',
+    // chooseZohoSender'ın bilgi@hydrozidtr.com'u görebilmesi için TÜM adresleri taşı
+    mailboxAddress: picked.mailboxAddress || '',
+    emailAddress: Array.isArray(picked.emailAddress) ? picked.emailAddress : [],
   } : null;
 
+  // Cache formatı mailboxAddress içermeli (eski format reddedilsin, yeniden çekilsin)
   if (account?.accountId && account?.email && env.PAYMENT_KV) {
     await env.PAYMENT_KV.put(cacheKey, JSON.stringify(account), { expirationTtl: 86400 });
   }
