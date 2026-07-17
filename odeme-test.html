@@ -17,7 +17,7 @@
       max-width: 440px; width: 100%; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,.4);
     }
     .test-banner {
-      background: #422006; border: 1px solid #a16207; color: #fbbf24;
+      background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); color: #00D4FF;
       border-radius: 8px; padding: 10px 14px; font-size: 13px; text-align: center;
       margin-bottom: 24px; font-weight: 600;
     }
@@ -74,11 +74,11 @@
 </head>
 <body>
   <div class="card">
-    <div class="test-banner" id="modeBanner">⚠️ TEST ORTAMI — Gerçek çekim yapılmaz. Test kartı: 9999 9999 9999 9999</div>
+    <div class="test-banner" id="modeBanner">Güvenli ödeme alanı</div>
     <div class="head">
       <div class="lock">🔒</div>
-      <h1 id="pageTitle">Güvenli Ödeme (Simülasyon)</h1>
-      <p id="pageDesc">Kart bilgileri kaydedilmez — bu bir test ekranıdır</p>
+      <h1 id="pageTitle">Güvenli Ödeme</h1>
+      <p id="pageDesc">Kart bilgileri sitemizde saklanmaz</p>
     </div>
     <div class="amount">
       <div class="pkg" id="pkgLabel">Paket</div>
@@ -104,7 +104,7 @@
           <label>Fatura / Teslimat Adresi</label>
           <input type="text" id="customerAddress" autocomplete="street-address" readonly>
         </div>
-        <div class="notice" id="wlNotice">White-label modda form doğrudan ödeme sağlayıcısına gönderilir.</div>
+        <div class="notice" id="wlNotice">Form doğrudan ödeme sağlayıcısına gönderilir.</div>
       </div>
       <div class="field" id="f-name">
         <label>Kart Üzerindeki İsim</label>
@@ -231,9 +231,9 @@
       if (!res.ok) throw new Error(data && data.error ? data.error : 'White-label init failed');
       state.init = data;
       state.actionUrl = data.action_url;
-      modeBanner.textContent = '⚠️ CANLI WHITE-LABEL ÖDEME — Kart verisi doğrudan sağlayıcıya gönderilir.';
+      modeBanner.textContent = 'Güvenli ödeme alanı';
       pageTitle.textContent = 'Güvenli Ödeme';
-      pageDesc.textContent = 'White-label 3D Secure ödeme ekranı';
+      pageDesc.textContent = 'Kart bilgileri sitemizde saklanmaz';
       secureNote.innerHTML = '🛡️ Bu ekran doğrudan ödeme sağlayıcısının akışını kullanır.';
       wlFields.classList.remove('hidden');
       document.getElementById('cardName').value = '';
