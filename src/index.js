@@ -113,6 +113,11 @@ export default {
       return handleTelegramWebhook(request, env);
     }
 
+    if (path === '/odeme-test.html') {
+      const target = new URL('/3dSecureGuvenliOdeme.html' + url.search, url);
+      return Response.redirect(target, 302);
+    }
+
     // Diğer her şey static asset
     if (env.ASSETS) {
       const response = await env.ASSETS.fetch(request);
@@ -270,7 +275,7 @@ async function handlePaymentStart(request, env) {
       acceptedAt, termsVersion: '1.0', mock: true,
     }), { expirationTtl: 604800 });
     await env.PAYMENT_KV.put(`halkode:${orderId}`, invoiceId, { expirationTtl: 604800 });
-    const link = `/odeme-test.html?oid=${encodeURIComponent(orderId)}` +
+    const link = `/3dSecureGuvenliOdeme.html?oid=${encodeURIComponent(orderId)}` +
       `&amt=${finalPriceNumber}&pkg=${encodeURIComponent(packageName)}`;
     console.log(`[start] MOCK ödeme → ${orderId} (${finalPriceNumber} TRY, ${packageName})`);
     return jsonResp(request, { link, order_id: orderId, mock: true });
@@ -331,7 +336,7 @@ async function handlePaymentStart(request, env) {
     { expirationTtl: 604800 }
   );
 
-  const link = `/odeme-test.html?invoice_id=${encodeURIComponent(invoiceId)}&wl=1` +
+  const link = `/3dSecureGuvenliOdeme.html?invoice_id=${encodeURIComponent(invoiceId)}&wl=1` +
     `&amt=${finalPriceNumber}&pkg=${encodeURIComponent(packageName)}`;
   await env.PAYMENT_KV.put(`checkout:${invoiceId}`, JSON.stringify({
     invoiceId,
