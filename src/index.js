@@ -799,6 +799,14 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
   await sendTelegram(env, telegramText);
 
   if (env.RESEND_API_KEY || (env.ZOHO_REFRESH_TOKEN && env.ZOHO_CLIENT_ID && env.ZOHO_CLIENT_SECRET)) {
+    // Kullanıcı girdisini HTML mail'e koymadan önce escape et (HTML/link injection önleme)
+    const eName = escapeHtmlAttr(order.customerName);
+    const eEmail = escapeHtmlAttr(order.customerEmail);
+    const ePhone = escapeHtmlAttr(order.customerPhone);
+    const eCity = escapeHtmlAttr(order.customerCity);
+    const eAddress = escapeHtmlAttr(order.customerAddress);
+    const eDiploma = escapeHtmlAttr(order.diploma);
+    const ePackage = escapeHtmlAttr(order.package);
     const adminHtml = `
 <div style="text-align: center; padding: 0 0 16px;">
   <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 8px;"><br>
@@ -806,13 +814,13 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
 </div>
 <h2>Yeni Sipariş — Hydrozid</h2>
 <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
-  <tr><td style="padding:6px 12px;color:#666">Müşteri</td><td style="padding:6px 12px"><strong>${order.customerName}</strong></td></tr>
-  <tr><td style="padding:6px 12px;color:#666">E-posta</td><td style="padding:6px 12px">${order.customerEmail}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Telefon</td><td style="padding:6px 12px">${order.customerPhone}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Şehir</td><td style="padding:6px 12px">${order.customerCity}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Adres</td><td style="padding:6px 12px">${order.customerAddress}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Diploma No</td><td style="padding:6px 12px">${order.diploma}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666">Paket</td><td style="padding:6px 12px">${order.package} (${order.quantity} adet)</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Müşteri</td><td style="padding:6px 12px"><strong>${eName}</strong></td></tr>
+  <tr><td style="padding:6px 12px;color:#666">E-posta</td><td style="padding:6px 12px">${eEmail}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Telefon</td><td style="padding:6px 12px">${ePhone}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Şehir</td><td style="padding:6px 12px">${eCity}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Adres</td><td style="padding:6px 12px">${eAddress}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Diploma No</td><td style="padding:6px 12px">${eDiploma}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666">Paket</td><td style="padding:6px 12px">${ePackage} (${order.quantity} adet)</td></tr>
   <tr><td style="padding:6px 12px;color:#666">Tutar</td><td style="padding:6px 12px"><strong>${order.amount} ${order.currency}</strong> (${order.eurAmount} EUR × ${order.eurTryRate?.toFixed(2)})</td></tr>
   <tr><td style="padding:6px 12px;color:#666">Sipariş No</td><td style="padding:6px 12px">${order.orderNo || orderId}</td></tr>
   <tr><td style="padding:6px 12px;color:#666">Kargo Firması</td><td style="padding:6px 12px">${order.kargoFirma || order.kargoHandler || '—'}</td></tr>
@@ -830,7 +838,7 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
 
     const emailJobs = Array.from(recipientSet).map(to => sendEmail(env, {
       to,
-      subject: `[Hydrozid] Yeni Sipariş — ${order.customerName} / ${order.package}`,
+      subject: `[Hydrozid] Yeni Sipariş — ${eName} / ${ePackage}`,
       html: adminHtml,
     }));
 
@@ -841,12 +849,12 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid® Sprey" style="height: 100px; width: auto; display: inline-block;">
   </div>
   <h1 style="font-family:Rubik,sans-serif;color:#00D4FF;font-size:1.4rem;margin-bottom:8px">Siparişiniz Alındı!</h1>
-  <p style="color:#94A3B8;margin-bottom:24px">Sayın <strong style="color:#fff">${order.customerName}</strong>, ödemeniz başarıyla tamamlandı.</p>
+  <p style="color:#94A3B8;margin-bottom:24px">Sayın <strong style="color:#fff">${eName}</strong>, ödemeniz başarıyla tamamlandı.</p>
   <table style="font-size:14px;border-collapse:collapse;width:100%">
     <tr><td style="padding:8px 0;color:#64748B;width:140px">Sipariş No</td><td style="padding:8px 0;color:#fff;font-weight:700">${order.orderNo || orderId}</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Ürün</td><td style="padding:8px 0;color:#fff">Hydrozid® ${order.package} — ${order.quantity} adet</td></tr>
+    <tr><td style="padding:8px 0;color:#64748B">Ürün</td><td style="padding:8px 0;color:#fff">Hydrozid® ${ePackage} — ${order.quantity} adet</td></tr>
     <tr><td style="padding:8px 0;color:#64748B">Tutar</td><td style="padding:8px 0;color:#22C55E;font-weight:700">${order.amount} ${order.currency}</td></tr>
-    <tr><td style="padding:8px 0;color:#64748B">Teslimat Adresi</td><td style="padding:8px 0;color:#CBD5E1">${order.customerCity} — ${order.customerAddress}</td></tr>
+    <tr><td style="padding:8px 0;color:#64748B">Teslimat Adresi</td><td style="padding:8px 0;color:#CBD5E1">${eCity} — ${eAddress}</td></tr>
     <tr><td style="padding:8px 0;color:#64748B">Kargo Firması</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoFirma || order.kargoHandler || '—'}</td></tr>
     <tr><td style="padding:8px 0;color:#64748B">Kargo Barkod</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoBarcode || '—'}</td></tr>
   </table>
