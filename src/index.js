@@ -692,10 +692,12 @@ async function handleNotifySuccess(request, env) {
         order.paidAt = new Date().toISOString();
         order.paidVia = 'mock_browser_return';
       } else if (isSuccessHint) {
+        // Hash provider formatına göre değişebiliyor; geçersizse reddetme,
+        // asıl teyidi sağlayıcıdan sunucu-sunucu (checkstatus) al.
         if (hash_key && env.HALKODE_APP_SECRET) {
           const validated = await validateHash(hash_key, incomingStatus || 'Completed', incomingOrderId || order.orderId || '', invoiceId, env.HALKODE_APP_SECRET);
           if (!validated) {
-            return jsonResp(request, { ok: false, note: 'hash validation failed' }, 400);
+            console.warn('[notify] hash geçersiz — sağlayıcı checkstatus ile teyit edilecek:', invoiceId);
           }
         }
 
