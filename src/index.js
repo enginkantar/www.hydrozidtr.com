@@ -27,7 +27,7 @@ import { buildBarcodeSvg, buildInvoicePdf, buildShippingCostPdf } from './docume
 //   PAYMENT_KV             (KV namespace)
 //   ASSETS                 (static asset binding, otomatik)
 
-const PLATFORMODE_DEFAULT_BASE = 'https://app.platformode.com.tr/ccpayment';
+const PLATFORMODE_DEFAULT_BASE = 'https://app.halkode.com.tr/ccpayment';
 const TOKEN_KV_KEY = 'token:halkode';
 
 const TEST_MODE = false;  // tek yerden kontrol
@@ -471,21 +471,16 @@ async function handleWebhook(request, env) {
       return ack({ success: false, error: 'Not configured' });
     }
 
+    // Hash doğrulama: geçersiz/eksik hash ile gelen "başarılı" webhook'lar
+    // sahte olabilir (müşteri kendi invoice_id'sini bilir). Hash geçmezse
+    // ödeme durumu sağlayıcıdan sunucu-sunucu (checkstatus) teyit edilir.
+    let hashValid = false;
     if (hash_key) {
       const decrypted = await validateHash(hash_key, status, order_id, invoice_id, env.HALKODE_APP_SECRET);
-      if (!decrypted) {
+      hashValid = !!decrypted;
+      if (!hashValid) {
         console.error('[webhook] ❌ HASH VALIDATION FAILED:', invoice_id);
-        // Hash hata verse de devam et — debug için Telegram'a bildir
-        if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
-          try {
-            await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text: `⚠️ HASH VALIDATION FAILED\ninvoice_id: ${invoice_id}\norder_id: ${order_id}\nstatus: ${status}` }),
-            });
-          } catch (e) {}
-        }
-        // Hash hatası olsa bile devam et (geçici — doğrulandıktan sonra return eklenecek)
+        await sendTelegram(env, `⚠️ HASH VALIDATION FAILED\ninvoice_id: ${invoice_id}\norder_id: ${order_id}\nstatus: ${status}`);
       } else {
         console.log('[webhook] ✅ hash validated:', invoice_id);
       }
@@ -526,7 +521,19 @@ async function handleWebhook(request, env) {
       return ack({ success: true, invoice_id, status: order.status, idempotent: true });
     }
 
-    const isSuccess = (payment_status == 1 || status === 'Completed');
+    let isSuccess = (payment_status == 1 || status === 'Completed');
+
+    // Sahte "ödendi" webhook koruması: hash doğrulanamadıysa sağlayıcıdan teyit al
+    if (isSuccess && !hashValid) {
+      const statusCheck = await checkPlatformodeOrderStatus(env, invoice_id);
+      if (!statusCheck.ok) {
+        console.error('[webhook] ❌ ödeme sağlayıcıdan teyit edilemedi:', invoice_id, statusCheck.error);
+        await sendTelegram(env, `🚨 SAHTE WEBHOOK ŞÜPHESİ\ninvoice_id: ${invoice_id}\nHash geçersiz + sağlayıcı teyidi başarısız: ${statusCheck.error || '-'}\nSipariş PAID yapılmadı.`);
+        return ack({ success: false, error: 'Payment not confirmed by provider' });
+      }
+      console.log('[webhook] ✅ sağlayıcı checkstatus teyidi alındı:', invoice_id);
+    }
+
     const updatedOrder = isSuccess
       ? { ...order, status: 'PAID', orderNo: order_id, paidAt: new Date().toISOString(),
           transactionType: transaction_type || 'Auth',
