@@ -2836,11 +2836,77 @@
 
     @media (max-width: 640px) {
       .hero {
-        padding: 48px 0 40px;
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+        padding: 28px 0 28px;
+      }
+
+      .hero::before {
+        width: 260px;
+        height: 260px;
+      }
+
+      .hero-grid {
+        gap: 24px;
+      }
+
+      .hero-left {
+        gap: 10px;
+      }
+
+      .specialty-pills,
+      .hz-trust-pills {
+        justify-content: center;
+      }
+
+      .badge-pill {
+        font-size: 0.66rem;
+        padding: 5px 12px;
+        letter-spacing: 0.04em;
       }
 
       .hero-h1 {
-        font-size: clamp(2.2rem, 8vw, 3rem);
+        font-size: clamp(1.75rem, 8.5vw, 2.55rem);
+        line-height: 1.12;
+      }
+
+      .hero-sub {
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }
+
+      .indication-row {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .indication-sub-row {
+        text-align: center;
+        line-height: 1.45;
+      }
+
+      .hero-ctas {
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .hero-ctas .btn-primary,
+      .hero-ctas .btn-secondary {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .trust-mini {
+        flex-wrap: wrap;
+        gap: 8px 10px;
+        justify-content: center;
+      }
+
+      .trust-mini .dot {
+        display: none;
       }
 
       .features-grid {
@@ -2861,8 +2927,17 @@
       }
 
       .device-wrap {
-        width: 260px;
-        height: 340px;
+        width: 220px;
+        height: 290px;
+        margin: 0 auto;
+      }
+
+      .device-product-img {
+        width: 170px;
+      }
+
+      .hero-right {
+        min-height: 300px;
       }
 
       .stat-card-time {
@@ -2875,6 +2950,22 @@
 
       .stat-card-clinics {
         left: -10px;
+      }
+
+      .hero-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .hz-etbis-bottom-row {
+        white-space: normal;
+        width: 100%;
+      }
+
+      .hz-etbis-badge {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
