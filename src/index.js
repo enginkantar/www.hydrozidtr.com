@@ -155,6 +155,14 @@ async function handlePaymentStart(request, env) {
   try { input = await request.json(); }
   catch { return jsonResp(request, { error: 'Geçersiz istek formatı.' }, 400); }
 
+  // Turnstile bot doğrulaması (secret varsa zorunlu)
+  if (env.TURNSTILE_SECRET) {
+    const tsToken = input.turnstileToken || input['cf-turnstile-response'] || '';
+    if (!(await verifyTurnstile(env.TURNSTILE_SECRET, tsToken, clientIP))) {
+      return jsonResp(request, { error: 'Güvenlik doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.' }, 403);
+    }
+  }
+
   const { name, email, phone, city, district, address, diploma, package: packageName, acceptedTerms, acceptedAt } = input;
 
   if (!acceptedTerms?.onBilgi || !acceptedTerms?.mesafeli || !acceptedTerms?.gizlilik) {
@@ -1200,6 +1208,24 @@ function handleOptions(request) {
   return new Response(null, { status: 204, headers: corsHeaders(request) });
 }
 
+async function verifyTurnstile(secret, token, ip) {
+  if (!token) return false;
+  try {
+    const form = new URLSearchParams();
+    form.append('secret', secret);
+    form.append('response', token);
+    if (ip) form.append('remoteip', ip);
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST', body: form,
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch (e) {
+    console.error('[turnstile] verify error:', e.message);
+    return false;
+  }
+}
+
 async function checkRateLimit(kv, ip) {
   const key = `rl:hydrozid:start:${ip}`;
   const raw = await kv.get(key);
@@ -1750,12 +1776,12 @@ function addSecurityHeaders(response) {
   newHeaders.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   newHeaders.set('Content-Security-Policy',
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; " +
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com; " +
     "connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com; " +
-    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr; " +
+    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr https://challenges.cloudflare.com; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
     "form-action 'self' https://app.halkode.com.tr https://app.platformode.com.tr;"
