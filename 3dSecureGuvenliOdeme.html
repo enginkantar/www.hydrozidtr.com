@@ -68,6 +68,10 @@
     .trust-chip span { font-size: 0.72rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
     .trust-batu img { height: 26px; }
     .trust-etbis span { color: #7a5c1e; }
+    .trust-3ds { animation: tds3dPulse 1.6s ease-in-out infinite; }
+    .trust-3ds svg, .trust-3ds span { color: #0891b2; }
+    .trust-3ds span { font-weight: 800; }
+    @keyframes tds3dPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(8,145,178,.55); } 50% { box-shadow: 0 0 0 5px rgba(8,145,178,0); } }
     .hidden { display: none !important; }
     .notice { margin-top: 14px; font-size: 12px; color: #94A3B8; line-height: 1.5; text-align: center; }
   </style>
@@ -139,6 +143,10 @@
       </div>
       <div class="trust-chip">
         <img src="/assets/odeme-logolari.png" alt="Mastercard · Visa · Troy · tüm kredi ve banka kartları" loading="lazy">
+      </div>
+      <div class="trust-chip trust-3ds">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>3D Secure</span>
       </div>
       <div class="trust-chip trust-etbis">
         <img src="/assets/logo-tic-3.png" alt="T.C. Ticaret Bakanlığı" loading="lazy">
