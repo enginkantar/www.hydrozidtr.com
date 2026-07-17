@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Test Ödeme — Hydrozid®</title>
+  <title>Güvenli Ödeme — Hydrozid®</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -223,7 +223,7 @@
     async function initWhiteLabel() {
       const invoiceId = p.get('invoice_id');
       if (!invoiceId) {
-        modeBanner.textContent = '⚠️ White-label mod için invoice_id gerekiyor.';
+        modeBanner.textContent = 'Ödeme modu için invoice_id gerekiyor.';
         return;
       }
       const res = await fetch('/api/payment/whitelabel-init?invoice_id=' + encodeURIComponent(invoiceId));
@@ -320,14 +320,14 @@
     }
 
     if (wl) {
-      modeBanner.textContent = '⚠️ White-label ödeme modu yükleniyor...';
+      modeBanner.textContent = 'Ödeme modu yükleniyor...';
       pageTitle.textContent = 'Güvenli Ödeme';
-      pageDesc.textContent = 'White-label 3D Secure ödeme ekranı';
+      pageDesc.textContent = 'Kart bilgileriniz sitemizde saklanmaz';
       secureNote.innerHTML = '🛡️ Bu ekran doğrudan ödeme sağlayıcısının akışını kullanır.';
       failBtn.textContent = 'İptal Et';
       wlFields.classList.remove('hidden');
       initWhiteLabel().catch(err => {
-        modeBanner.textContent = '⚠️ White-label init hata verdi: ' + err.message;
+        modeBanner.textContent = 'Ödeme modu hata verdi: ' + err.message;
         document.getElementById('banner').textContent = err.message;
         document.getElementById('banner').classList.add('show');
       });
