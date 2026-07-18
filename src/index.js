@@ -155,6 +155,14 @@ async function handlePaymentStart(request, env) {
   try { input = await request.json(); }
   catch { return jsonResp(request, { error: 'Geçersiz istek formatı.' }, 400); }
 
+  // Turnstile bot doğrulaması (secret varsa zorunlu)
+  if (env.TURNSTILE_SECRET) {
+    const tsToken = input.turnstileToken || input['cf-turnstile-response'] || '';
+    if (!(await verifyTurnstile(env.TURNSTILE_SECRET, tsToken, clientIP))) {
+      return jsonResp(request, { error: 'Güvenlik doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.' }, 403);
+    }
+  }
+
   const { name, email, phone, city, district, address, diploma, package: packageName, acceptedTerms, acceptedAt } = input;
 
   if (!acceptedTerms?.onBilgi || !acceptedTerms?.mesafeli || !acceptedTerms?.gizlilik) {
@@ -809,7 +817,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     const ePackage = escapeHtmlAttr(order.package);
     const adminHtml = `
 <div style="text-align: center; padding: 0 0 16px;">
-  <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 8px;"><br>
   <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid" style="height: 60px; width: auto;">
 </div>
 <h2>Yeni Sipariş — Hydrozid</h2>
@@ -845,7 +852,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     const customerHtml = `
 <div style="font-family:'Nunito Sans',sans-serif;background:#070B14;color:#CBD5E1;padding:40px 24px;max-width:560px;margin:0 auto;border-radius:16px">
   <div style="text-align: center; padding: 32px 0 24px; border-bottom: 1px solid #1e293b; margin-bottom: 24px;">
-    <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 12px;"><br>
     <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid® Sprey" style="height: 100px; width: auto; display: inline-block;">
   </div>
   <h1 style="font-family:Rubik,sans-serif;color:#00D4FF;font-size:1.4rem;margin-bottom:8px">Siparişiniz Alındı!</h1>
@@ -858,7 +864,7 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     <tr><td style="padding:8px 0;color:#64748B">Kargo Firması</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoFirma || order.kargoHandler || '—'}</td></tr>
     <tr><td style="padding:8px 0;color:#64748B">Kargo Barkod</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoBarcode || '—'}</td></tr>
   </table>
-  ${order.kargoBarcode ? `<div style="margin-top:18px;padding:14px;background:#fff;border-radius:12px;text-align:center"><img src="https://www.hydrozidtr.com/api/barcode.svg?code=${encodeURIComponent(order.kargoBarcode)}" alt="Kargo barkodu" style="width:100%;max-width:640px;display:block;margin:0 auto"></div>` : ''}
+  ${order.kargoBarcode ? `<div style="margin-top:18px;padding:14px;background:#fff;border-radius:12px;text-align:center"><img src="https://www.hydrozidtr.com/api/barcode.svg?code=${encodeURIComponent(order.kargoBarcode)}" alt="Kargo barkodu" style="width:100%;max-width:640px;display:block;margin:0 auto"><div style="font-family:monospace;font-size:16px;font-weight:700;color:#0f172a;margin-top:8px;letter-spacing:2px">${order.kargoBarcode}</div></div>` : ''}
   <p style="margin-top:24px;color:#94A3B8;font-size:0.9rem">Siparişiniz en kısa sürede kargoya verilecek ve kargo takip bilgileri ayrıca iletilecektir.</p>
   <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Sorularınız için: <a href="mailto:bilgi@hydrozidtr.com" style="color:#00D4FF">bilgi@hydrozidtr.com</a> veya WhatsApp <a href="https://wa.me/905534759032" style="color:#00D4FF">+90 553 475 9032</a></p>
   <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Fatura PDF: <a href="https://www.hydrozidtr.com/api/invoice/pdf?order_id=${encodeURIComponent(orderId)}" style="color:#00D4FF">indir</a></p>
@@ -1198,6 +1204,24 @@ function handleOptions(request) {
     return new Response(null, { status: 403 });
   }
   return new Response(null, { status: 204, headers: corsHeaders(request) });
+}
+
+async function verifyTurnstile(secret, token, ip) {
+  if (!token) return false;
+  try {
+    const form = new URLSearchParams();
+    form.append('secret', secret);
+    form.append('response', token);
+    if (ip) form.append('remoteip', ip);
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST', body: form,
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch (e) {
+    console.error('[turnstile] verify error:', e.message);
+    return false;
+  }
 }
 
 async function checkRateLimit(kv, ip) {
@@ -1750,12 +1774,12 @@ function addSecurityHeaders(response) {
   newHeaders.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   newHeaders.set('Content-Security-Policy',
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; " +
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com; " +
     "connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com; " +
-    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr; " +
+    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr https://challenges.cloudflare.com; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
     "form-action 'self' https://app.halkode.com.tr https://app.platformode.com.tr;"

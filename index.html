@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17613782027"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -4723,6 +4724,7 @@
             </label>
           </div>
         </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD33mMwsjQJVrnhN" data-language="tr" style="margin:0 0 14px"></div>
         <button type="submit" class="om-submit" id="omSubmit">Güvenli Ödemeye Geç →</button>
 
         <!-- Güven rozetleri (footer ile aynı) -->
@@ -4746,6 +4748,7 @@
             <span>ETBİS'E KAYITLIDIR</span>
           </div>
         </div>
+        <div style="text-align:center;margin-top:10px;font-size:.68rem;color:#475569;letter-spacing:.4px">Batu Teknoloji E-Commerce M Power</div>
       </form>
     </div>
   </div>
@@ -5055,6 +5058,11 @@
       e.preventDefault();
       omClearErrors();
       const btn = document.getElementById('omSubmit');
+      const tsToken = (window.turnstile ? window.turnstile.getResponse() : '');
+      if (!tsToken) {
+        omBanner('Güvenlik doğrulaması yükleniyor, lütfen bekleyip tekrar deneyin.');
+        return;
+      }
       const v = {
         name: document.getElementById('omName').value.trim(),
         email: document.getElementById('omEmail').value.trim(),
@@ -5099,7 +5107,8 @@
             name: v.name, email: v.email, phone: v.phone, city: v.city, district: v.district,
             address: v.address, diploma: v.diploma, package: v.selectedPackage,
             acceptedTerms: { onBilgi: true, mesafeli: true, gizlilik: true },
-            acceptedAt: new Date().toISOString()
+            acceptedAt: new Date().toISOString(),
+            turnstileToken: tsToken
           })
         });
         const data = await resp.json().catch(() => ({}));
