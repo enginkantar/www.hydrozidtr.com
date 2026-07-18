@@ -1,8 +1,8 @@
-# Kampanya paneli — Google'a kapalı, API sadece Render backend'e bağlanır
+# Kampanya paneli — Google'a kapalı, API sadece Oracle backend'e (panel-api) bağlanır
 /panel/*
   X-Robots-Tag: noindex, nofollow
   ! Content-Security-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://hydrozid-pazarlama.onrender.com; frame-ancestors 'none'; base-uri 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://panel-api.hydrozidtr.com; frame-ancestors 'none'; base-uri 'self'
 
 # Statik varlıklar — uzun cache (video, logo, poster, veri seti). Değişirse dosya adı değişmeli.
 /assets/*
