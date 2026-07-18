@@ -817,7 +817,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     const ePackage = escapeHtmlAttr(order.package);
     const adminHtml = `
 <div style="text-align: center; padding: 0 0 16px;">
-  <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 8px;"><br>
   <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid" style="height: 60px; width: auto;">
 </div>
 <h2>Yeni Sipariş — Hydrozid</h2>
@@ -853,7 +852,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     const customerHtml = `
 <div style="font-family:'Nunito Sans',sans-serif;background:#070B14;color:#CBD5E1;padding:40px 24px;max-width:560px;margin:0 auto;border-radius:16px">
   <div style="text-align: center; padding: 32px 0 24px; border-bottom: 1px solid #1e293b; margin-bottom: 24px;">
-    <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 12px;"><br>
     <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid® Sprey" style="height: 100px; width: auto; display: inline-block;">
   </div>
   <h1 style="font-family:Rubik,sans-serif;color:#00D4FF;font-size:1.4rem;margin-bottom:8px">Siparişiniz Alındı!</h1>
