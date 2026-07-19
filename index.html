@@ -3598,10 +3598,19 @@
             v.muted = !v.muted;
             btn.textContent = v.muted ? '🔇' : '🔊';
             btn.setAttribute('aria-label', v.muted ? 'Sesi aç' : 'Sesi kapat');
+            if (v.paused) v.play();
           });
-          if (!('IntersectionObserver' in window)) { v.autoplay = true; v.play(); return; }
+          function oynat() {
+            // Sesli otomatik oynatma engellenirse sessize dönüp oynat
+            v.play().catch(function () {
+              v.muted = true;
+              btn.textContent = '🔇';
+              v.play();
+            });
+          }
+          if (!('IntersectionObserver' in window)) { v.autoplay = true; oynat(); return; }
           new IntersectionObserver(function (entries) {
-            if (entries[0].isIntersecting) { v.play(); } else { v.pause(); }
+            if (entries[0].isIntersecting) { oynat(); } else { v.pause(); }
           }, { threshold: 0.3 }).observe(v);
         })();
       </script>
