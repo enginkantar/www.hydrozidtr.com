@@ -3582,14 +3582,23 @@
       </div>
 
       <div class="how-video-wrap reveal" id="vimeoWrap">
-        <!-- Kendi Cloudflare asset'imizden yerli video — Vimeo player yükü yok -->
-        <video id="howVideo" src="/assets/hydrozid-uygulama.mp4" poster="/assets/hydrozid-uygulama-poster.jpg"
+        <!-- Kendi Cloudflare asset'imizden yerli video — Vimeo player yükü yok.
+             Müzik: Satie, Gymnopédie No.1 (Robin Alciatore icrası, Public Domain / Musopen) -->
+        <video id="howVideo" src="/assets/hydrozid-uygulama-v2.mp4" poster="/assets/hydrozid-uygulama-poster.jpg"
           muted loop playsinline preload="metadata" title="Hydrozid Uygulama Talimatı"></video>
+        <button id="howVideoSes" type="button" aria-label="Sesi aç"
+          style="position:absolute;right:14px;bottom:14px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,212,255,0.5);background:rgba(7,11,20,0.75);color:#00D4FF;font-size:1.15rem;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">🔇</button>
       </div>
       <script>
         // Görünür olunca oynat, görünümden çıkınca durdur (bant genişliği tasarrufu)
         (function () {
           var v = document.getElementById('howVideo');
+          var btn = document.getElementById('howVideoSes');
+          btn.addEventListener('click', function () {
+            v.muted = !v.muted;
+            btn.textContent = v.muted ? '🔇' : '🔊';
+            btn.setAttribute('aria-label', v.muted ? 'Sesi aç' : 'Sesi kapat');
+          });
           if (!('IntersectionObserver' in window)) { v.autoplay = true; v.play(); return; }
           new IntersectionObserver(function (entries) {
             if (entries[0].isIntersecting) { v.play(); } else { v.pause(); }
