@@ -3,14 +3,52 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- Google Consent Mode v2 — kullanıcı "Kabul Et" demeden analytics/ads storage kapalı -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      wait_for_update: 500
+    });
+  </script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17613782027"></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'AW-17613782027');
+    gtag('config', 'G-3FQS0GE06T');
+
+    function hideCookieBanner() {
+      var b = document.getElementById('hzCookieBanner');
+      if (b) b.style.display = 'none';
+    }
+    function grantAnalyticsConsent() {
+      gtag('consent', 'update', {
+        ad_storage: 'granted',
+        ad_user_data: 'granted',
+        ad_personalization: 'granted',
+        analytics_storage: 'granted'
+      });
+      try { localStorage.setItem('hz_consent', 'granted'); } catch (e) {}
+      hideCookieBanner();
+    }
+    function denyAnalyticsConsent() {
+      try { localStorage.setItem('hz_consent', 'denied'); } catch (e) {}
+      hideCookieBanner();
+    }
+    // WhatsApp tıklamalarını dataLayer'a işle
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('a[href*="wa.me"]').forEach(function (a) {
+        a.addEventListener('click', function () {
+          dataLayer.push({ event: 'whatsapp_tiklama', whatsapp_link: a.href });
+        });
+      });
+    });
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Favicons -->
@@ -5311,6 +5349,29 @@
         updatePriceDisplay();
       } catch (e) {
         // API'ye ulaşılamazsa EUR gösterimi olduğu gibi kalır
+      }
+    })();
+  </script>
+  <!-- Çerez onay bandı -->
+  <div id="hzCookieBanner" style="display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:560px;margin:0 auto;background:rgba(7,11,20,0.97);border:1px solid rgba(0,212,255,0.25);border-radius:16px;padding:18px 20px;box-shadow:0 12px 34px rgba(0,0,0,0.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);">
+    <div style="font-size:0.85rem;color:#CBD5E1;line-height:1.5;margin-bottom:12px;">
+      Sitemizde deneyiminizi iyileştirmek için çerezler kullanıyoruz.
+      <a href="/gizlilik-politikasi.html" style="color:#00D4FF;text-decoration:underline;">Gizlilik Politikası</a>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+      <button type="button" onclick="denyAnalyticsConsent()" style="padding:9px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94A3B8;font-size:0.82rem;cursor:pointer;">Reddet</button>
+      <button type="button" onclick="grantAnalyticsConsent()" style="padding:9px 18px;border-radius:8px;border:none;background:#00D4FF;color:#070B14;font-weight:700;font-size:0.82rem;cursor:pointer;">Kabul Et</button>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('hz_consent'); } catch (e) {}
+      if (saved === 'granted') {
+        grantAnalyticsConsent();
+      } else if (saved !== 'denied') {
+        var b = document.getElementById('hzCookieBanner');
+        if (b) b.style.display = 'block';
       }
     })();
   </script>
