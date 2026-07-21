@@ -5446,10 +5446,17 @@
         var log = document.getElementById('hzChatLog');
         var d = document.createElement('div');
         d.className = 'hzMsg ' + (role === 'user' ? 'user' : 'bot');
-        d.textContent = text;
+        d.innerHTML = hzLinkify(text);
         log.appendChild(d);
         log.scrollTop = log.scrollHeight;
         return d;
+      }
+      var HZ_WA = 'https://wa.me/905534759032';
+      function hzLinkify(text) {
+        var esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return esc.replace(/https?:\/\/wa\.me\/\S+/g, function (u) {
+          return '<a href="' + u + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;font-weight:700;">WhatsApp\'tan yazın</a>';
+        });
       }
       window.hzSendChat = function (e) {
         e.preventDefault();
@@ -5467,13 +5474,13 @@
           body: JSON.stringify({ message: msg, history: hist })
         }).then(function (r) { return r.json(); }).then(function (data) {
           loading.remove();
-          var reply = data.reply || data.error || 'Şu anda yanıt veremiyorum, WhatsApp\'tan yazabilirsiniz.';
+          var reply = data.reply || ('Şu anda yanıt veremiyorum. ' + HZ_WA);
           hzAppendMsg('bot', reply);
           hist.push({ role: 'user', content: msg });
           hist.push({ role: 'assistant', content: reply });
         }).catch(function () {
           loading.remove();
-          hzAppendMsg('bot', 'Bağlantı hatası. WhatsApp\'tan (0553 475 9032) yazabilirsiniz.');
+          hzAppendMsg('bot', 'Bağlantı hatası. ' + HZ_WA);
         }).finally(function () { btn.disabled = false; });
         return false;
       };
