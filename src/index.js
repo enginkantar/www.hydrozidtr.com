@@ -113,6 +113,12 @@ export default {
       return handleTelegramWebhook(request, env);
     }
 
+    if (path === '/api/chat') {
+      if (request.method === 'OPTIONS') return handleOptions(request);
+      if (request.method === 'POST') return handleChat(request, env);
+      return new Response('Method not allowed', { status: 405 });
+    }
+
     if (path === '/odeme-test.html') {
       const target = new URL('/3dSecureGuvenliOdeme.html' + url.search, url);
       return Response.redirect(target, 302);
@@ -1155,6 +1161,97 @@ async function sendTelegram(env, text) {
 // ══════════════════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// /api/chat — DeepSeek destekli, site içeriğiyle beslenen müşteri sohbeti
+// ══════════════════════════════════════════════════════════════════════════════
+const CHAT_SYSTEM_PROMPT = (kb) => `Sen Hydrozid Türkiye'nin (www.hydrozidtr.com) marka sahibisin ve ziyaretçilerle doğrudan sohbet ediyorsun.
+Yalnızca aşağıdaki site içeriğindeki bilgileri kullan. Bilmediğin veya sitede yer almayan bir şey sorulursa
+uydurma — "Bu konuda net bilgim yok, WhatsApp'tan (0553 475 9032) bize yazarsanız hemen yanıtlarız" de.
+ASLA tıbbi teşhis koyma veya "bu lezyon şudur" gibi tıbbi tavsiye verme — kullanıcı kendi lezyonunu tarif ederse
+nazikçe bir hekime danışmasını öner, ürünün genel bilgisini ver.
+Kısa, sıcak, samimi ama profesyonel bir Türkçeyle cevap ver (2-4 cümle, gerekmedikçe madde işareti kullanma).
+
+=== SİTE İÇERİĞİ ===
+${kb}
+=== SİTE İÇERİĞİ SONU ===`;
+
+async function handleChat(request, env) {
+  if (!isAllowedOrigin(request)) {
+    return new Response('Forbidden', { status: 403 });
+  }
+  if (!env.DEEPSEEK_API_KEY) {
+    return jsonResp(request, { error: 'Sohbet şu anda yapılandırılmamış.' }, 503);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResp(request, { error: 'Geçersiz istek.' }, 400);
+  }
+
+  const message = typeof body.message === 'string' ? body.message.trim().slice(0, 800) : '';
+  if (!message) return jsonResp(request, { error: 'Mesaj boş olamaz.' }, 400);
+
+  const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
+
+  // Basit IP başına saatlik hız sınırı (KV, kota patlamasını önler)
+  if (env.PAYMENT_KV) {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const hourKey = `chatrate:${ip}:${new Date().toISOString().slice(0, 13)}`;
+    const count = parseInt((await env.PAYMENT_KV.get(hourKey)) || '0', 10);
+    if (count >= 20) {
+      return jsonResp(request, { error: 'Çok fazla mesaj gönderildi, birazdan tekrar deneyin.' }, 429);
+    }
+    await env.PAYMENT_KV.put(hourKey, String(count + 1), { expirationTtl: 3600 });
+  }
+
+  let kb = '';
+  try {
+    if (env.ASSETS) {
+      const kbResp = await env.ASSETS.fetch(new URL('/assets/chatbot-kb.txt', request.url));
+      if (kbResp.ok) kb = await kbResp.text();
+    }
+  } catch (e) {
+    console.error('KB okuma hatası:', e.message);
+  }
+
+  const messages = [
+    { role: 'system', content: CHAT_SYSTEM_PROMPT(kb) },
+    ...history
+      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+      .map((m) => ({ role: m.role, content: m.content.slice(0, 800) })),
+    { role: 'user', content: message },
+  ];
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages,
+        max_tokens: 400,
+        temperature: 0.4,
+      }),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      console.error('DeepSeek hatası:', resp.status, errText);
+      return jsonResp(request, { error: 'Şu anda yanıt veremiyorum, WhatsApp\'tan yazabilirsiniz.' }, 502);
+    }
+    const data = await resp.json();
+    const reply = data.choices?.[0]?.message?.content?.trim() || 'Şu anda yanıt veremiyorum.';
+    return jsonResp(request, { reply });
+  } catch (e) {
+    console.error('Chat hatası:', e.message);
+    return jsonResp(request, { error: 'Bağlantı hatası, tekrar deneyin.' }, 502);
+  }
+}
+
 function isAllowedOrigin(request) {
   const origin = request.headers.get('Origin');
   if (!origin) return true;
