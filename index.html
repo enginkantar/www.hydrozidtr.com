@@ -5364,8 +5364,8 @@
     }
     #hzChatBubble:hover { transform: scale(1.06); }
     #hzChatPanel {
-      display: none; position: fixed; right: 20px; bottom: 90px; z-index: 9998;
-      width: min(360px, calc(100vw - 32px)); height: min(520px, calc(100vh - 140px));
+      display: none; position: fixed; left: 20px; right: 20px; bottom: 90px; z-index: 9998;
+      width: auto; max-width: 360px; margin-left: auto; height: min(520px, calc(100vh - 140px));
       background: rgba(10,15,26,0.98); border: 1px solid rgba(0,212,255,0.25); border-radius: 18px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.55); backdrop-filter: blur(14px);
       flex-direction: column; overflow: hidden;
