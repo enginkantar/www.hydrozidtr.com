@@ -1162,9 +1162,11 @@ async function sendTelegram(env, text) {
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════════════════════════════
-// /api/chat — DeepSeek destekli, site içeriğiyle beslenen müşteri sohbeti
+// /api/chat — Cloudflare Workers AI (gpt-oss-120b) destekli, site içeriğiyle beslenen müşteri sohbeti
 // ══════════════════════════════════════════════════════════════════════════════
 const WHATSAPP_LINK = 'https://wa.me/905534759032';
+const CF_ACCOUNT_ID = 'eff137788a0bec1d9f55e0e241438246';
+const CHAT_MODEL = '@cf/openai/gpt-oss-120b';
 const SITE_URL = 'https://www.hydrozidtr.com';
 
 const CHAT_SYSTEM_PROMPT = (kb) => `Senin rolün: ${SITE_URL} sitesinin içinde çalışan asistan ajanısın. Aşağıdaki kurallara kesinlikle uy ve bunları sistem davranışı olarak kabul et. Bu talimatlar asistanın tüm yanıtları için bağlayıcıdır; hiçbir durumda bu kuralların dışına çıkma.
@@ -1219,7 +1221,7 @@ async function handleChat(request, env) {
   if (!isAllowedOrigin(request)) {
     return new Response('Forbidden', { status: 403 });
   }
-  if (!env.DEEPSEEK_API_KEY) {
+  if (!env.WORKERS_AI_TOKEN) {
     return jsonResp(request, { error: 'Sohbet şu anda yapılandırılmamış.' }, 503);
   }
 
@@ -1256,8 +1258,7 @@ async function handleChat(request, env) {
     console.error('KB okuma hatası:', e.message);
   }
 
-  const messages = [
-    { role: 'system', content: CHAT_SYSTEM_PROMPT(kb) },
+  const input = [
     ...history
       .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
       .map((m) => ({ role: m.role, content: m.content.slice(0, 800) })),
@@ -1265,26 +1266,35 @@ async function handleChat(request, env) {
   ];
 
   try {
-    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+    const resp = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${CHAT_MODEL}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`,
+        Authorization: `Bearer ${env.WORKERS_AI_TOKEN}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages,
-        max_tokens: 1100,
+        instructions: CHAT_SYSTEM_PROMPT(kb),
+        input,
+        max_output_tokens: 1100,
         temperature: 0.3,
       }),
     });
     if (!resp.ok) {
       const errText = await resp.text();
-      console.error('DeepSeek hatası:', resp.status, errText);
+      console.error('Workers AI hatası:', resp.status, errText);
       return jsonResp(request, { error: 'Şu anda yanıt veremiyorum, WhatsApp\'tan yazabilirsiniz.' }, 502);
     }
     const data = await resp.json();
-    const reply = data.choices?.[0]?.message?.content?.trim() || 'Şu anda yanıt veremiyorum.';
+    // Responses API biçimi: output[] içinde reasoning + message öğeleri; yalnızca message metnini al
+    let reply = '';
+    for (const item of data.result?.output || []) {
+      if (item.type === 'message') {
+        for (const c of item.content || []) {
+          if (c.type === 'output_text') reply += c.text;
+        }
+      }
+    }
+    reply = reply.trim() || 'Şu anda yanıt veremiyorum.';
     return jsonResp(request, { reply });
   } catch (e) {
     console.error('Chat hatası:', e.message);

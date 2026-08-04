@@ -1550,6 +1550,33 @@
       padding: 20px 0 90px;
     }
 
+    /* Doktor bölümü foto sırası — 3 dikey görsel yan yana, orta boy */
+    .doctor-photos {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      margin: 8px 0 48px;
+    }
+
+    .doctor-photos img {
+      width: min(30%, 260px);
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-lg);
+      object-fit: cover;
+    }
+
+    @media (max-width: 720px) {
+      .doctor-photos {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .doctor-photos img {
+        width: min(80%, 300px);
+      }
+    }
+
     .how-video-wrap {
       position: relative;
       width: 100%;
@@ -1561,6 +1588,16 @@
       overflow: hidden;
       border: 1px solid var(--color-border);
       box-shadow: var(--shadow-lg), var(--glow-sm);
+    }
+
+    /* Dikey (720x1280) video: 16:9 padding hilesi yerine gerçek oran, ortalanmış dar sütun */
+    .how-video-wrap.dikey {
+      padding-bottom: 0;
+      height: auto;
+      aspect-ratio: 720 / 1280;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .how-video-wrap iframe,
@@ -3562,6 +3599,46 @@
           <span class="feature-tag">Klinik Güvenlik</span>
         </div>
       </div>
+
+      <div class="how-video-wrap reveal" id="vimeoWrap">
+        <!-- Kendi Cloudflare asset'imizden yerli video — Vimeo player yükü yok.
+             Müzik: Massenet, Méditation (Thaïs) — Bomsori Kim, CC BY 3.0 (atıf satırı videonun altında) -->
+        <video id="howVideo" src="/assets/hydrozid-uygulama-v3.mp4" poster="/assets/hydrozid-uygulama-poster.jpg"
+          muted loop playsinline preload="metadata" title="Hydrozid Uygulama Talimatı"></video>
+        <button id="howVideoSes" type="button" aria-label="Sesi aç"
+          style="position:absolute;right:14px;bottom:14px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,212,255,0.5);background:rgba(7,11,20,0.75);color:#00D4FF;font-size:1.15rem;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">🔇</button>
+      </div>
+      <div style="text-align:right;margin-top:8px;font-size:0.68rem;color:#64748B;">
+        Müzik: Massenet — <a href="https://commons.wikimedia.org/wiki/File:Meditation_from_Thais_-_Bomsori_Kim.opus"
+          target="_blank" rel="noopener" style="color:#64748B;">Méditation (Thaïs), Bomsori Kim</a> ·
+        <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener"
+          style="color:#64748B;">CC BY 3.0</a>
+      </div>
+      <script>
+        // Görünür olunca oynat, görünümden çıkınca durdur (bant genişliği tasarrufu)
+        (function () {
+          var v = document.getElementById('howVideo');
+          var btn = document.getElementById('howVideoSes');
+          btn.addEventListener('click', function () {
+            v.muted = !v.muted;
+            btn.textContent = v.muted ? '🔇' : '🔊';
+            btn.setAttribute('aria-label', v.muted ? 'Sesi aç' : 'Sesi kapat');
+            if (v.paused) v.play();
+          });
+          function oynat() {
+            // Sesli otomatik oynatma engellenirse sessize dönüp oynat
+            v.play().catch(function () {
+              v.muted = true;
+              btn.textContent = '🔇';
+              v.play();
+            });
+          }
+          if (!('IntersectionObserver' in window)) { v.autoplay = true; oynat(); return; }
+          new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) { oynat(); } else { v.pause(); }
+          }, { threshold: 0.3 }).observe(v);
+        })();
+      </script>
     </div>
   </section>
 
@@ -3619,25 +3696,18 @@
         </div>
       </div>
 
-      <div class="how-video-wrap reveal" id="vimeoWrap">
-        <!-- Kendi Cloudflare asset'imizden yerli video — Vimeo player yükü yok.
-             Müzik: Massenet, Méditation (Thaïs) — Bomsori Kim, CC BY 3.0 (atıf satırı videonun altında) -->
-        <video id="howVideo" src="/assets/hydrozid-uygulama-v3.mp4" poster="/assets/hydrozid-uygulama-poster.jpg"
-          muted loop playsinline preload="metadata" title="Hydrozid Uygulama Talimatı"></video>
-        <button id="howVideoSes" type="button" aria-label="Sesi aç"
+      <div class="how-video-wrap dikey reveal">
+        <!-- hydrozid.eu resmi kullanım videosu — kendi Cloudflare asset'imizden, dikey format -->
+        <video id="howToUseVideo" src="/assets/hydrozid-how-to-use.mp4" poster="/assets/hydrozid-how-to-use-poster.jpg"
+          muted loop playsinline preload="metadata" title="Hydrozid Nasıl Kullanılır"></video>
+        <button id="howToUseVideoSes" type="button" aria-label="Sesi aç"
           style="position:absolute;right:14px;bottom:14px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,212,255,0.5);background:rgba(7,11,20,0.75);color:#00D4FF;font-size:1.15rem;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">🔇</button>
-      </div>
-      <div style="text-align:right;margin-top:8px;font-size:0.68rem;color:#64748B;">
-        Müzik: Massenet — <a href="https://commons.wikimedia.org/wiki/File:Meditation_from_Thais_-_Bomsori_Kim.opus"
-          target="_blank" rel="noopener" style="color:#64748B;">Méditation (Thaïs), Bomsori Kim</a> ·
-        <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener"
-          style="color:#64748B;">CC BY 3.0</a>
       </div>
       <script>
         // Görünür olunca oynat, görünümden çıkınca durdur (bant genişliği tasarrufu)
         (function () {
-          var v = document.getElementById('howVideo');
-          var btn = document.getElementById('howVideoSes');
+          var v = document.getElementById('howToUseVideo');
+          var btn = document.getElementById('howToUseVideoSes');
           btn.addEventListener('click', function () {
             v.muted = !v.muted;
             btn.textContent = v.muted ? '🔇' : '🔊';
@@ -3645,7 +3715,6 @@
             if (v.paused) v.play();
           });
           function oynat() {
-            // Sesli otomatik oynatma engellenirse sessize dönüp oynat
             v.play().catch(function () {
               v.muted = true;
               btn.textContent = '🔇';
@@ -3764,6 +3833,12 @@
           Dermatoloji, pratisyen ve podiyatri pratiğinde kriyoterapi gerektiren
           birçok endikasyonu tek ürünle yönetin.
         </p>
+      </div>
+
+      <div class="doctor-photos reveal">
+        <img src="/assets/lezyon-1-uygulama.jpg" alt="Hydrozid uygulatörünün lezyona hassas uygulanışı" loading="lazy" />
+        <img src="/assets/lezyon-2-doktor.jpg" alt="Klinisyen Hydrozid ile el üzerindeki lezyonu tedavi ediyor" loading="lazy" />
+        <img src="/assets/lezyon-3-sprey.jpg" alt="Hydrozid kriyoterapi spreyi elde" loading="lazy" />
       </div>
 
       <div class="doctor-grid">
