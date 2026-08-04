@@ -1246,6 +1246,15 @@ async function handleChat(request, env) {
       return jsonResp(request, { error: 'Çok fazla mesaj gönderildi, birazdan tekrar deneyin.' }, 429);
     }
     await env.PAYMENT_KV.put(hourKey, String(count + 1), { expirationTtl: 3600 });
+
+    // Site geneli günlük tavan — Workers AI maliyeti plan ne olursa olsun sınırlı kalsın
+    // ponytail: KV oku-yaz atomik değil, eşzamanlı isteklerde tavan birkaç mesaj aşılabilir; maliyet tavanı için yeterli
+    const dayKey = `chatday:${new Date().toISOString().slice(0, 10)}`;
+    const dayCount = parseInt((await env.PAYMENT_KV.get(dayKey)) || '0', 10);
+    if (dayCount >= 50) {
+      return jsonResp(request, { error: 'Sohbet bugünlük kapasitesine ulaştı, WhatsApp\'tan yazabilirsiniz.' }, 429);
+    }
+    await env.PAYMENT_KV.put(dayKey, String(dayCount + 1), { expirationTtl: 172800 });
   }
 
   let kb = '';
