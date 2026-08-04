@@ -113,6 +113,12 @@ export default {
       return handleTelegramWebhook(request, env);
     }
 
+    if (path === '/api/chat') {
+      if (request.method === 'OPTIONS') return handleOptions(request);
+      if (request.method === 'POST') return handleChat(request, env);
+      return new Response('Method not allowed', { status: 405 });
+    }
+
     if (path === '/odeme-test.html') {
       const target = new URL('/3dSecureGuvenliOdeme.html' + url.search, url);
       return Response.redirect(target, 302);
@@ -154,6 +160,14 @@ async function handlePaymentStart(request, env) {
   let input;
   try { input = await request.json(); }
   catch { return jsonResp(request, { error: 'Geçersiz istek formatı.' }, 400); }
+
+  // Turnstile bot doğrulaması (secret varsa zorunlu)
+  if (env.TURNSTILE_SECRET) {
+    const tsToken = input.turnstileToken || input['cf-turnstile-response'] || '';
+    if (!(await verifyTurnstile(env.TURNSTILE_SECRET, tsToken, clientIP))) {
+      return jsonResp(request, { error: 'Güvenlik doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.' }, 403);
+    }
+  }
 
   const { name, email, phone, city, district, address, diploma, package: packageName, acceptedTerms, acceptedAt } = input;
 
@@ -809,7 +823,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     const ePackage = escapeHtmlAttr(order.package);
     const adminHtml = `
 <div style="text-align: center; padding: 0 0 16px;">
-  <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 8px;"><br>
   <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid" style="height: 60px; width: auto;">
 </div>
 <h2>Yeni Sipariş — Hydrozid</h2>
@@ -845,7 +858,6 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     const customerHtml = `
 <div style="font-family:'Nunito Sans',sans-serif;background:#070B14;color:#CBD5E1;padding:40px 24px;max-width:560px;margin:0 auto;border-radius:16px">
   <div style="text-align: center; padding: 32px 0 24px; border-bottom: 1px solid #1e293b; margin-bottom: 24px;">
-    <img src="https://www.hydrozidtr.com/assets/favicon-96x96.png" alt="Hydrozid®" style="height: 48px; width: 48px; display: inline-block; margin-bottom: 12px;"><br>
     <img src="https://www.hydrozidtr.com/assets/hydrozid-product-nobg.png" alt="Hydrozid® Sprey" style="height: 100px; width: auto; display: inline-block;">
   </div>
   <h1 style="font-family:Rubik,sans-serif;color:#00D4FF;font-size:1.4rem;margin-bottom:8px">Siparişiniz Alındı!</h1>
@@ -858,7 +870,7 @@ async function fulfillPaidOrder(env, order, invoiceId, orderId, source) {
     <tr><td style="padding:8px 0;color:#64748B">Kargo Firması</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoFirma || order.kargoHandler || '—'}</td></tr>
     <tr><td style="padding:8px 0;color:#64748B">Kargo Barkod</td><td style="padding:8px 0;color:#CBD5E1">${order.kargoBarcode || '—'}</td></tr>
   </table>
-  ${order.kargoBarcode ? `<div style="margin-top:18px;padding:14px;background:#fff;border-radius:12px;text-align:center"><img src="https://www.hydrozidtr.com/api/barcode.svg?code=${encodeURIComponent(order.kargoBarcode)}" alt="Kargo barkodu" style="width:100%;max-width:640px;display:block;margin:0 auto"></div>` : ''}
+  ${order.kargoBarcode ? `<div style="margin-top:18px;padding:14px;background:#fff;border-radius:12px;text-align:center"><img src="https://www.hydrozidtr.com/api/barcode.svg?code=${encodeURIComponent(order.kargoBarcode)}" alt="Kargo barkodu" style="width:100%;max-width:640px;display:block;margin:0 auto"><div style="font-family:monospace;font-size:16px;font-weight:700;color:#0f172a;margin-top:8px;letter-spacing:2px">${order.kargoBarcode}</div></div>` : ''}
   <p style="margin-top:24px;color:#94A3B8;font-size:0.9rem">Siparişiniz en kısa sürede kargoya verilecek ve kargo takip bilgileri ayrıca iletilecektir.</p>
   <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Sorularınız için: <a href="mailto:bilgi@hydrozidtr.com" style="color:#00D4FF">bilgi@hydrozidtr.com</a> veya WhatsApp <a href="https://wa.me/905534759032" style="color:#00D4FF">+90 553 475 9032</a></p>
   <p style="margin-top:8px;color:#94A3B8;font-size:0.9rem">Fatura PDF: <a href="https://www.hydrozidtr.com/api/invoice/pdf?order_id=${encodeURIComponent(orderId)}" style="color:#00D4FF">indir</a></p>
@@ -1149,6 +1161,156 @@ async function sendTelegram(env, text) {
 // ══════════════════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// /api/chat — Cloudflare Workers AI (gpt-oss-120b) destekli, site içeriğiyle beslenen müşteri sohbeti
+// ══════════════════════════════════════════════════════════════════════════════
+const WHATSAPP_LINK = 'https://wa.me/905534759032';
+const CF_ACCOUNT_ID = 'eff137788a0bec1d9f55e0e241438246';
+const CHAT_MODEL = '@cf/openai/gpt-oss-120b';
+const SITE_URL = 'https://www.hydrozidtr.com';
+
+const CHAT_SYSTEM_PROMPT = (kb) => `Senin rolün: ${SITE_URL} sitesinin içinde çalışan asistan ajanısın. Aşağıdaki kurallara kesinlikle uy ve bunları sistem davranışı olarak kabul et. Bu talimatlar asistanın tüm yanıtları için bağlayıcıdır; hiçbir durumda bu kuralların dışına çıkma.
+
+Kapsam ve hedef — genel prensipler
+- Amacın: ${SITE_URL} sitesindeki içerikler (aşağıda === SİTE İÇERİĞİ === bölümünde verilir) ve kullanıcının sağladığı kanıt/ek bilgiler temelinde doğru, kanıta dayalı ve ihtiyatlı cevaplar üretmektir.
+- Kısıtlama: Cevaplar yalnızca mevcut site içeriği ve kullanıcı tarafından sağlanan doğrudan kanıtlara dayanmalıdır. Harici bilgi, spekülasyon veya doğrulanmamış iddia eklemeyeceksin.
+- Halüsinasyon yasağı: Bilgiye dayanmayan, doğrulanmamış, uydurma veya çıkarımsal ifadeler kesinlikle kullanma. Eğer bir iddia net bir kaynaktan doğrulanmıyorsa bunu açıkça belirt ve ihtiyatlı dil kullan.
+- Kanıt gerekliliği: Kesin ifadeler yalnızca açıkça doğrulanmış kanıtlara dayanmalıdır. Aksi halde "muhtemelen", "eldeki verilere göre", "doğrulanmamış" gibi ihtiyatlı/olasılık ifadelerini kullan.
+- Tıbbi sınır (bu site için özel kural): Hydrozid tıbbi bir cihazdır. ASLA tıbbi teşhis koyma veya "bu lezyon şudur" gibi tıbbi tavsiye verme — kullanıcı kendi lezyonunu tarif ederse nazikçe bir hekime danışmasını öner, yalnızca ürünün site içeriğindeki genel bilgisini paylaş.
+
+İş akışı (adım adım ve ayrıntılı talimatlar)
+1. İlk adım — kısa özet ve bilgi ihtiyacı:
+   - Kullanıcının isteğini önce 1-2 cümlelik kısa bir özetle yanıtla. Bu özet, kullanıcının talebinin özünü ve senin hangi kanıtlara dayanacağını içermeli.
+   - Aynı yanıtta, hangi ek bilgiye ihtiyaç duyduğunu açıkça ve net şekilde belirt (varsa).
+
+2. Eksik bilgi varsa — somut, yönlendirici sorular sor:
+   - Eğer eksik bilgi varsa kullanıcıdan doğrudan ve açık maddeler halinde soru iste: her soru kısa, tek konu üzerine odaklı ve cevaplanması kolay olmalıdır.
+   - Talepleri öncelikle açık uçlu değil kapalı uçlu yap: "Evet/Hayır" veya "Aşağıdakilerden hangisi?" gibi seçenekler ekleyebilirsin.
+
+3. Kanıt sağlandığında — sadece site verisi ve kullanıcı kanıtıyla analiz:
+   - Kullanıcı gerekli bilgiyi sağladığında, yalnızca site içindeki içerik ve kullanıcının sağladığı doğrudan kanıtlara dayanarak analiz yap.
+   - Harici veya üçüncü taraf veri kullanma.
+   - Cevapta mutlaka kaynak göster: hangi bölüm/başlık (aşağıdaki SİTE İÇERİĞİ'nden). Sayfanın tam adresi ${SITE_URL} olarak kabul edilir.
+
+4. Kesin cevap verilemiyorsa — bildirim, yönlendirme, WhatsApp prosedürü:
+   - Eğer mevcut kanıtlarla kesin bir cevap verilemiyorsa kullanıcının net biçimde bilgilendirilmesi zorunludur: "Mevcut verilerle kesin cevap verilemiyor; ek kanıt veya doğrulama gerekiyor."
+   - Bu durumda hangi ek kanıtların gerektiğini maddele.
+   - Destek hattı/iletişim: Yalnızca ve yalnızca bu durumda ve yalnızca kullanıcının açık onayı varsa önceden belirlenmiş WhatsApp destek linkini paylaşabilirsin: ${WHATSAPP_LINK}
+   - WhatsApp paylaşım adımları:
+     - Önce kullanıcıya sor: "WhatsApp üzerinden destek almayı tercih ediyor musunuz? Onay verirseniz linki paylaşırım."
+     - Kullanıcı açık "evet/onay" verirse linki paylaş. Kullanıcının onayı yoksa linki paylaşma.
+   - Asla eksik kanıtı tamamlamak için tahmin veya uydurma bilgi verme.
+
+Güvenlik, yetkilendirme ve reddetme kuralları
+- Site ile ilişkisi olmayan, kimlik doğrulaması yapmamış veya yetki sınırları dışındaki taleplere (ör. başka bir müşterinin siparişi/bilgisi) doğrudan cevap verme; doğrulama iste, sağlanmazsa reddet.
+- Hassas kişisel veri talep edilirse (TCKN, kredi kartı, şifre, sağlık bilgisi, adres vb.) asla paylaşma; kullanıcıyı WhatsApp desteğine yönlendir.
+
+Yanıt formatı — HER yanıtında bu dört başlığı bu sırayla ve Türkçe kullan:
+1. Kısa Özet — Kullanıcının sorusuna kısa, öz ve ihtiyatlı cevap (kanıta dayalıysa net; değilse ihtiyatlı ifade). 1-3 cümle.
+2. Destekleyen Kanıtlar — SİTE İÇERİĞİ'nden hangi bölüme dayandığını madde madde belirt. Dış kaynak kullanılmadıysa şunu yaz: "Yanıt site içeriği ve kullanıcı tarafından sağlanan bilgiler temelindedir."
+3. Gerekli Ek Bilgiler — Cevap için eksik olan bilgileri madde madde belirt (yoksa "Ek bilgiye gerek yok" yaz).
+4. Sonuç / Öneri — Öneriler ve gerektiğinde WhatsApp onayı isteği (yalnızca kural 4'teki koşullar sağlanıyorsa).
+
+Dil ve üslup: Kısa, nazik, profesyonel ve tarafsız. Kesin olmayan durumlarda "muhtemelen", "eldeki verilere göre", "doğrulanmamış" gibi ihtiyatlı ifadeler kullan.
+
+=== SİTE İÇERİĞİ (${SITE_URL}) ===
+${kb}
+=== SİTE İÇERİĞİ SONU ===`;
+
+async function handleChat(request, env) {
+  if (!isAllowedOrigin(request)) {
+    return new Response('Forbidden', { status: 403 });
+  }
+  if (!env.WORKERS_AI_TOKEN) {
+    return jsonResp(request, { error: 'Sohbet şu anda yapılandırılmamış.' }, 503);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResp(request, { error: 'Geçersiz istek.' }, 400);
+  }
+
+  const message = typeof body.message === 'string' ? body.message.trim().slice(0, 800) : '';
+  if (!message) return jsonResp(request, { error: 'Mesaj boş olamaz.' }, 400);
+
+  const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
+
+  // Basit IP başına saatlik hız sınırı (KV, kota patlamasını önler)
+  if (env.PAYMENT_KV) {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const hourKey = `chatrate:${ip}:${new Date().toISOString().slice(0, 13)}`;
+    const count = parseInt((await env.PAYMENT_KV.get(hourKey)) || '0', 10);
+    if (count >= 20) {
+      return jsonResp(request, { error: 'Çok fazla mesaj gönderildi, birazdan tekrar deneyin.' }, 429);
+    }
+    await env.PAYMENT_KV.put(hourKey, String(count + 1), { expirationTtl: 3600 });
+
+    // Site geneli günlük tavan — Workers AI maliyeti plan ne olursa olsun sınırlı kalsın
+    // ponytail: KV oku-yaz atomik değil, eşzamanlı isteklerde tavan birkaç mesaj aşılabilir; maliyet tavanı için yeterli
+    const dayKey = `chatday:${new Date().toISOString().slice(0, 10)}`;
+    const dayCount = parseInt((await env.PAYMENT_KV.get(dayKey)) || '0', 10);
+    if (dayCount >= 50) {
+      return jsonResp(request, { error: 'Sohbet bugünlük kapasitesine ulaştı, WhatsApp\'tan yazabilirsiniz.' }, 429);
+    }
+    await env.PAYMENT_KV.put(dayKey, String(dayCount + 1), { expirationTtl: 172800 });
+  }
+
+  let kb = '';
+  try {
+    if (env.ASSETS) {
+      const kbResp = await env.ASSETS.fetch(new URL('/assets/chatbot-kb.txt', request.url));
+      if (kbResp.ok) kb = await kbResp.text();
+    }
+  } catch (e) {
+    console.error('KB okuma hatası:', e.message);
+  }
+
+  const input = [
+    ...history
+      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+      .map((m) => ({ role: m.role, content: m.content.slice(0, 800) })),
+    { role: 'user', content: message },
+  ];
+
+  try {
+    const resp = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${CHAT_MODEL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.WORKERS_AI_TOKEN}`,
+      },
+      body: JSON.stringify({
+        instructions: CHAT_SYSTEM_PROMPT(kb),
+        input,
+        max_output_tokens: 1100,
+        temperature: 0.3,
+      }),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      console.error('Workers AI hatası:', resp.status, errText);
+      return jsonResp(request, { error: 'Şu anda yanıt veremiyorum, WhatsApp\'tan yazabilirsiniz.' }, 502);
+    }
+    const data = await resp.json();
+    // Responses API biçimi: output[] içinde reasoning + message öğeleri; yalnızca message metnini al
+    let reply = '';
+    for (const item of data.result?.output || []) {
+      if (item.type === 'message') {
+        for (const c of item.content || []) {
+          if (c.type === 'output_text') reply += c.text;
+        }
+      }
+    }
+    reply = reply.trim() || 'Şu anda yanıt veremiyorum.';
+    return jsonResp(request, { reply });
+  } catch (e) {
+    console.error('Chat hatası:', e.message);
+    return jsonResp(request, { error: 'Bağlantı hatası, tekrar deneyin.' }, 502);
+  }
+}
+
 function isAllowedOrigin(request) {
   const origin = request.headers.get('Origin');
   if (!origin) return true;
@@ -1198,6 +1360,24 @@ function handleOptions(request) {
     return new Response(null, { status: 403 });
   }
   return new Response(null, { status: 204, headers: corsHeaders(request) });
+}
+
+async function verifyTurnstile(secret, token, ip) {
+  if (!token) return false;
+  try {
+    const form = new URLSearchParams();
+    form.append('secret', secret);
+    form.append('response', token);
+    if (ip) form.append('remoteip', ip);
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST', body: form,
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch (e) {
+    console.error('[turnstile] verify error:', e.message);
+    return false;
+  }
 }
 
 async function checkRateLimit(kv, ip) {
@@ -1750,12 +1930,12 @@ function addSecurityHeaders(response) {
   newHeaders.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   newHeaders.set('Content-Security-Policy',
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; " +
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "img-src 'self' data: https://img.icons8.com https://www.google-analytics.com https://www.googletagmanager.com; " +
     "connect-src 'self' https://www.tcmb.gov.tr https://api.telegram.org https://api.resend.com https://www.google-analytics.com; " +
-    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr; " +
+    "frame-src https://app.halkode.com.tr https://app.platformode.com.tr https://challenges.cloudflare.com; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
     "form-action 'self' https://app.halkode.com.tr https://app.platformode.com.tr;"

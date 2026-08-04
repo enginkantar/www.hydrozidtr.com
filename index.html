@@ -3,13 +3,52 @@
 
 <head>
   <meta charset="UTF-8" />
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17613782027"></script>
+  <!-- Google Consent Mode v2 — kullanıcı "Kabul Et" demeden analytics/ads storage kapalı -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      wait_for_update: 500
+    });
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17613782027"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script>
     gtag('js', new Date());
     gtag('config', 'AW-17613782027');
+    gtag('config', 'G-3FQS0GE06T');
+
+    function hideCookieBanner() {
+      var b = document.getElementById('hzCookieBanner');
+      if (b) b.style.display = 'none';
+    }
+    function grantAnalyticsConsent() {
+      gtag('consent', 'update', {
+        ad_storage: 'granted',
+        ad_user_data: 'granted',
+        ad_personalization: 'granted',
+        analytics_storage: 'granted'
+      });
+      try { localStorage.setItem('hz_consent', 'granted'); } catch (e) {}
+      hideCookieBanner();
+    }
+    function denyAnalyticsConsent() {
+      try { localStorage.setItem('hz_consent', 'denied'); } catch (e) {}
+      hideCookieBanner();
+    }
+    // WhatsApp tıklamalarını dataLayer'a işle
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('a[href*="wa.me"]').forEach(function (a) {
+        a.addEventListener('click', function () {
+          dataLayer.push({ event: 'whatsapp_tiklama', whatsapp_link: a.href });
+        });
+      });
+    });
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Favicons -->
@@ -667,17 +706,40 @@
       height: 360px;
     }
 
-    /* Floating stat cards */
+    /* Floating stat cards — parlak 3D cam görünümü */
     .stat-card {
       position: absolute;
-      background: rgba(13, 20, 33, 0.75);
+      background: linear-gradient(165deg,
+          rgba(0, 212, 255, 0.18) 0%,
+          rgba(13, 20, 33, 0.88) 42%,
+          rgba(7, 11, 20, 0.94) 100%);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(0, 212, 255, 0.22);
-      border-radius: 14px;
+      border: 1px solid rgba(0, 212, 255, 0.38);
+      border-top-color: rgba(255, 255, 255, 0.45);
+      border-bottom-color: rgba(0, 80, 110, 0.6);
+      border-radius: 18px;
       padding: 12px 16px;
       z-index: 10;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.55),
+        0 4px 18px rgba(0, 212, 255, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -12px 20px rgba(0, 212, 255, 0.12);
+    }
+
+    /* Üst cam yansıması */
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      right: 1px;
+      top: 1px;
+      height: 46%;
+      border-radius: 17px 17px 50% 50%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.01));
+      pointer-events: none;
     }
 
     .stat-card .stat-num {
@@ -1488,6 +1550,33 @@
       padding: 20px 0 90px;
     }
 
+    /* Doktor bölümü foto sırası — 3 dikey görsel yan yana, orta boy */
+    .doctor-photos {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      margin: 8px 0 48px;
+    }
+
+    .doctor-photos img {
+      width: min(30%, 260px);
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-lg);
+      object-fit: cover;
+    }
+
+    @media (max-width: 720px) {
+      .doctor-photos {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .doctor-photos img {
+        width: min(80%, 300px);
+      }
+    }
+
     .how-video-wrap {
       position: relative;
       width: 100%;
@@ -1501,13 +1590,25 @@
       box-shadow: var(--shadow-lg), var(--glow-sm);
     }
 
-    .how-video-wrap iframe {
+    /* Dikey (720x1280) video: 16:9 padding hilesi yerine gerçek oran, ortalanmış dar sütun */
+    .how-video-wrap.dikey {
+      padding-bottom: 0;
+      height: auto;
+      aspect-ratio: 720 / 1280;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .how-video-wrap iframe,
+    .how-video-wrap video {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       border: 0;
+      object-fit: cover;
     }
 
     .steps-row {
@@ -2838,12 +2939,72 @@
       }
     }
 
+    /* ─── Parlak 3D cam yüzeyi — stat-card ile aynı dil, ana sayfa kutuları ─── */
+    .feature-card,
+    .ind-card,
+    .pricing-card {
+      background: linear-gradient(165deg,
+          rgba(0, 212, 255, 0.10) 0%,
+          rgba(13, 20, 33, 0.92) 42%,
+          rgba(7, 11, 20, 0.96) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.28);
+      border-top-color: rgba(255, 255, 255, 0.32);
+      border-bottom-color: rgba(0, 80, 110, 0.5);
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.45),
+        0 3px 14px rgba(0, 212, 255, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.22),
+        inset 0 -10px 18px rgba(0, 212, 255, 0.07);
+    }
+
+    /* Üst cam yansıması (::before'lar dolu, ::after boş) */
+    .feature-card::after,
+    .ind-card::after,
+    .pricing-card::after {
+      content: "";
+      position: absolute;
+      left: 1px;
+      right: 1px;
+      top: 1px;
+      height: 40%;
+      border-radius: 15px 15px 50% 50%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01));
+      pointer-events: none;
+    }
+
+    .ind-card, .pricing-card { position: relative; }
+
+    /* Öne çıkan fiyat kartının vurgusu üstte kalsın */
+    .pricing-card--featured {
+      border-color: rgba(0, 212, 255, 0.5);
+      border-top-color: rgba(255, 255, 255, 0.45);
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.45),
+        0 0 32px rgba(0, 212, 255, 0.16),
+        inset 0 1px 1px rgba(255, 255, 255, 0.28),
+        inset 0 -10px 18px rgba(0, 212, 255, 0.1);
+    }
+
     @media (max-width: 640px) {
       .hero {
         min-height: auto;
         max-height: none;
         overflow: visible;
         padding: 28px 0 28px;
+      }
+
+      /* Mobilde stat kutuları biraz küçülsün — birbirine değmesin */
+      .stat-card {
+        padding: 9px 12px;
+        border-radius: 14px;
+      }
+
+      .stat-card .stat-num {
+        font-size: 1.45rem;
+      }
+
+      .stat-card .stat-label {
+        font-size: 0.68rem;
       }
 
       .hero::before {
@@ -3352,7 +3513,7 @@
           <svg class="proof-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
             <path d="M7.5 1L9.5 5.5H14L10.5 8.5L12 13L7.5 10.5L3 13L4.5 8.5L1 5.5H5.5L7.5 1Z" fill="currentColor" />
           </svg>
-          Türkiye'de 50+ klinik kullanıyor
+          50.000+ klinik uygulaması
         </div>
         <div class="proof-item">
           <svg class="proof-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
@@ -3438,6 +3599,46 @@
           <span class="feature-tag">Klinik Güvenlik</span>
         </div>
       </div>
+
+      <div class="how-video-wrap reveal" id="vimeoWrap">
+        <!-- Kendi Cloudflare asset'imizden yerli video — Vimeo player yükü yok.
+             Müzik: Massenet, Méditation (Thaïs) — Bomsori Kim, CC BY 3.0 (atıf satırı videonun altında) -->
+        <video id="howVideo" src="/assets/hydrozid-uygulama-v3.mp4" poster="/assets/hydrozid-uygulama-poster.jpg"
+          muted loop playsinline preload="metadata" title="Hydrozid Uygulama Talimatı"></video>
+        <button id="howVideoSes" type="button" aria-label="Sesi aç"
+          style="position:absolute;right:14px;bottom:14px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,212,255,0.5);background:rgba(7,11,20,0.75);color:#00D4FF;font-size:1.15rem;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">🔇</button>
+      </div>
+      <div style="text-align:right;margin-top:8px;font-size:0.68rem;color:#64748B;">
+        Müzik: Massenet — <a href="https://commons.wikimedia.org/wiki/File:Meditation_from_Thais_-_Bomsori_Kim.opus"
+          target="_blank" rel="noopener" style="color:#64748B;">Méditation (Thaïs), Bomsori Kim</a> ·
+        <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener"
+          style="color:#64748B;">CC BY 3.0</a>
+      </div>
+      <script>
+        // Görünür olunca oynat, görünümden çıkınca durdur (bant genişliği tasarrufu)
+        (function () {
+          var v = document.getElementById('howVideo');
+          var btn = document.getElementById('howVideoSes');
+          btn.addEventListener('click', function () {
+            v.muted = !v.muted;
+            btn.textContent = v.muted ? '🔇' : '🔊';
+            btn.setAttribute('aria-label', v.muted ? 'Sesi aç' : 'Sesi kapat');
+            if (v.paused) v.play();
+          });
+          function oynat() {
+            // Sesli otomatik oynatma engellenirse sessize dönüp oynat
+            v.play().catch(function () {
+              v.muted = true;
+              btn.textContent = '🔇';
+              v.play();
+            });
+          }
+          if (!('IntersectionObserver' in window)) { v.autoplay = true; oynat(); return; }
+          new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) { oynat(); } else { v.pause(); }
+          }, { threshold: 0.3 }).observe(v);
+        })();
+      </script>
     </div>
   </section>
 
@@ -3495,34 +3696,36 @@
         </div>
       </div>
 
-      <div class="how-video-wrap reveal" id="vimeoWrap">
-        <!-- Poster — video gelene kadar gösterilir, tıklanınca Vimeo yüklenir -->
-        <div id="vimeoPoster" style="position:absolute;inset:0;background:#0d1a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:inherit;" onclick="loadVimeo()">
-          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.9">
-            <circle cx="36" cy="36" r="36" fill="rgba(0,212,255,0.15)"/>
-            <circle cx="36" cy="36" r="28" fill="rgba(0,212,255,0.25)" stroke="#00D4FF" stroke-width="1.5"/>
-            <polygon points="30,24 54,36 30,48" fill="#00D4FF"/>
-          </svg>
-        </div>
-        <iframe id="vimeoIframe" src="" data-src="https://player.vimeo.com/video/889158223?h=79852c7756&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0&background=1&dnt=1"
-          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Hydrozid Uygulama Talimatı" style="display:none">
-        </iframe>
+      <div class="how-video-wrap dikey reveal">
+        <!-- hydrozid.eu resmi kullanım videosu — kendi Cloudflare asset'imizden, dikey format -->
+        <video id="howToUseVideo" src="/assets/hydrozid-how-to-use.mp4" poster="/assets/hydrozid-how-to-use-poster.jpg"
+          muted loop playsinline preload="metadata" title="Hydrozid Nasıl Kullanılır"></video>
+        <button id="howToUseVideoSes" type="button" aria-label="Sesi aç"
+          style="position:absolute;right:14px;bottom:14px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,212,255,0.5);background:rgba(7,11,20,0.75);color:#00D4FF;font-size:1.15rem;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">🔇</button>
       </div>
       <script>
-        function loadVimeo() {
-          var iframe = document.getElementById('vimeoIframe');
-          var poster = document.getElementById('vimeoPoster');
-          iframe.src = iframe.dataset.src;
-          iframe.style.display = '';
-          poster.style.display = 'none';
-        }
-        // Masaüstünde IntersectionObserver ile otomatik yükle
-        if (!('ontouchstart' in window) && 'IntersectionObserver' in window) {
-          var vimeoObs = new IntersectionObserver(function(entries) {
-            if (entries[0].isIntersecting) { loadVimeo(); vimeoObs.disconnect(); }
-          }, { threshold: 0.3 });
-          vimeoObs.observe(document.getElementById('vimeoWrap'));
-        }
+        // Görünür olunca oynat, görünümden çıkınca durdur (bant genişliği tasarrufu)
+        (function () {
+          var v = document.getElementById('howToUseVideo');
+          var btn = document.getElementById('howToUseVideoSes');
+          btn.addEventListener('click', function () {
+            v.muted = !v.muted;
+            btn.textContent = v.muted ? '🔇' : '🔊';
+            btn.setAttribute('aria-label', v.muted ? 'Sesi aç' : 'Sesi kapat');
+            if (v.paused) v.play();
+          });
+          function oynat() {
+            v.play().catch(function () {
+              v.muted = true;
+              btn.textContent = '🔇';
+              v.play();
+            });
+          }
+          if (!('IntersectionObserver' in window)) { v.autoplay = true; oynat(); return; }
+          new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) { oynat(); } else { v.pause(); }
+          }, { threshold: 0.3 }).observe(v);
+        })();
       </script>
 
       <div class="ifu-download reveal">
@@ -3537,7 +3740,7 @@
           <div class="ifu-download-label">Kullanım Talimatı (IFU)</div>
           <div class="ifu-download-desc">Resmi FDA onaylı uygulama protokolü ve güvenlik bilgilerini indirin.</div>
         </div>
-        <a href="mailto:bilgi@hydrozidtr.com?subject=IFU%20Talebi&body=Merhaba%2C%20Hydrozid%20IFU%20dok%C3%BCman%C4%B1n%C4%B1%20almak%20istiyorum."
+        <a href="/assets/hydrozid-ifu.pdf" download="Hydrozid-IFU.pdf" target="_blank" rel="noopener"
           class="ifu-download-btn">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
@@ -3630,6 +3833,12 @@
           Dermatoloji, pratisyen ve podiyatri pratiğinde kriyoterapi gerektiren
           birçok endikasyonu tek ürünle yönetin.
         </p>
+      </div>
+
+      <div class="doctor-photos reveal">
+        <img src="/assets/lezyon-1-uygulama.jpg" alt="Hydrozid uygulatörünün lezyona hassas uygulanışı" loading="lazy" />
+        <img src="/assets/lezyon-2-doktor.jpg" alt="Klinisyen Hydrozid ile el üzerindeki lezyonu tedavi ediyor" loading="lazy" />
+        <img src="/assets/lezyon-3-sprey.jpg" alt="Hydrozid kriyoterapi spreyi elde" loading="lazy" />
       </div>
 
       <div class="doctor-grid">
@@ -3727,6 +3936,18 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- Dondurma süreleri tablosu (IFU önerileri) + marka logosu -->
+      <div class="reveal" style="display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:center;margin-top:56px;">
+        <div style="background:#fff;border-radius:16px;padding:28px 32px;box-shadow:0 12px 30px rgba(0,0,0,0.45);">
+          <img src="/assets/hydrozid-logo-gri.jpg" alt="Hydrozid" width="348" height="102"
+            style="display:block;max-width:280px;height:auto;" loading="lazy" />
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 12px 30px rgba(0,0,0,0.45);">
+          <img src="/assets/freeze-times-tablosu.jpg" alt="Recommended freeze times table (IFU)" width="480" height="664"
+            style="display:block;max-width:min(480px,100%);height:auto;border-radius:8px;" loading="lazy" />
+        </div>
       </div>
     </div>
   </section>
@@ -3831,7 +4052,7 @@
             </svg>
             Satın Al
           </a>
-          <a href="https://notebooklm.google.com/" class="btn-outline" id="teknik" target="_blank" rel="noopener">
+          <a href="javascript:void(0)" class="btn-outline" id="teknik" onclick="openHzChat()">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5" />
               <path d="M9 6v4M9 12.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
@@ -3852,7 +4073,7 @@
       <div class="footer-inner">
         <div class="footer-brand">
           <a href="#" class="footer-logo">Hydrozid<span class="reg">®</span></a>
-          <div class="ec-power">E-Commerce M Power</div>
+          <div class="ec-power">Batu Teknoloji E-Commerce M Power</div>
           <video class="bt-video" playsinline muted loop preload="none"
                  poster="/assets/batutech-poster.jpg" aria-label="Batu Teknoloji">
             <source data-src="/assets/batutech.webm" type="video/webm">
@@ -3980,10 +4201,19 @@
           modestbranding: 1,
           disablekb: 1,
           fs: 0,
-          iv_load_policy: 3
+          iv_load_policy: 3,
+          playsinline: 1
         },
         events: {
-          onReady: function (e) { e.target.playVideo(); }
+          // Safari, playerVars.mute'u her zaman saymıyor — autoplay için önce kodla sustur
+          onReady: function (e) { e.target.mute(); e.target.playVideo(); },
+          onStateChange: function (e) {
+            // Safari autoplay'i ilk denemede engellerse bir kez daha dene
+            if (e.data === YT.PlayerState.CUED || e.data === YT.PlayerState.PAUSED) {
+              e.target.mute();
+              e.target.playVideo();
+            }
+          }
         }
       });
     }
@@ -4723,6 +4953,7 @@
             </label>
           </div>
         </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD33mMwsjQJVrnhN" data-language="tr" style="margin:0 0 14px"></div>
         <button type="submit" class="om-submit" id="omSubmit">Güvenli Ödemeye Geç →</button>
 
         <!-- Güven rozetleri (footer ile aynı) -->
@@ -4746,6 +4977,7 @@
             <span>ETBİS'E KAYITLIDIR</span>
           </div>
         </div>
+        <div style="text-align:center;margin-top:10px;font-size:.68rem;color:#475569;letter-spacing:.4px">Batu Teknoloji E-Commerce M Power</div>
       </form>
     </div>
   </div>
@@ -5055,6 +5287,11 @@
       e.preventDefault();
       omClearErrors();
       const btn = document.getElementById('omSubmit');
+      const tsToken = (window.turnstile ? window.turnstile.getResponse() : '');
+      if (!tsToken) {
+        omBanner('Güvenlik doğrulaması yükleniyor, lütfen bekleyip tekrar deneyin.');
+        return;
+      }
       const v = {
         name: document.getElementById('omName').value.trim(),
         email: document.getElementById('omEmail').value.trim(),
@@ -5099,7 +5336,8 @@
             name: v.name, email: v.email, phone: v.phone, city: v.city, district: v.district,
             address: v.address, diploma: v.diploma, package: v.selectedPackage,
             acceptedTerms: { onBilgi: true, mesafeli: true, gizlilik: true },
-            acceptedAt: new Date().toISOString()
+            acceptedAt: new Date().toISOString(),
+            turnstileToken: tsToken
           })
         });
         const data = await resp.json().catch(() => ({}));
@@ -5186,6 +5424,164 @@
         updatePriceDisplay();
       } catch (e) {
         // API'ye ulaşılamazsa EUR gösterimi olduğu gibi kalır
+      }
+    })();
+  </script>
+  <!-- ─── Hydrozid Sohbet Widget'ı (DeepSeek destekli) ─── -->
+  <style>
+    #hzChatBubble {
+      position: fixed; right: 20px; bottom: 20px; z-index: 9998;
+      width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
+      background: linear-gradient(160deg, #00D4FF, #0099CC);
+      box-shadow: 0 8px 26px rgba(0,212,255,0.4), 0 2px 8px rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    #hzChatBubble:hover { transform: scale(1.06); }
+    #hzChatPanel {
+      display: none; position: fixed; left: 20px; right: 20px; bottom: 90px; z-index: 9998;
+      width: auto; max-width: 360px; margin-left: auto; height: min(520px, calc(100vh - 140px));
+      background: rgba(10,15,26,0.98); border: 1px solid rgba(0,212,255,0.25); border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.55); backdrop-filter: blur(14px);
+      flex-direction: column; overflow: hidden;
+    }
+    #hzChatPanel.open { display: flex; }
+    #hzChatHead {
+      padding: 14px 16px; border-bottom: 1px solid rgba(0,212,255,0.15);
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(0,212,255,0.06);
+    }
+    #hzChatHead .t { font-family:'Rubik',sans-serif; font-weight:700; color:#fff; font-size:0.92rem; }
+    #hzChatHead .s { color:#64748B; font-size:0.72rem; margin-top:2px; }
+    #hzChatClose { background:none; border:none; color:#94A3B8; font-size:1.3rem; cursor:pointer; line-height:1; padding:4px; }
+    #hzChatLog { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; }
+    .hzMsg { max-width:85%; padding:9px 13px; border-radius:14px; font-size:0.85rem; line-height:1.5; white-space:pre-wrap; }
+    .hzMsg.bot { align-self:flex-start; background:rgba(255,255,255,0.06); color:#E2E8F0; border-bottom-left-radius:4px; }
+    .hzMsg.user { align-self:flex-end; background:#00D4FF; color:#070B14; font-weight:500; border-bottom-right-radius:4px; }
+    #hzChatForm { display:flex; gap:8px; padding:12px; border-top:1px solid rgba(0,212,255,0.15); }
+    #hzChatInput {
+      flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+      padding:9px 12px; color:#fff; font-size:0.85rem; font-family:inherit; resize:none;
+    }
+    #hzChatInput:focus { outline:none; border-color:#00D4FF; }
+    #hzChatSend {
+      background:#00D4FF; border:none; border-radius:10px; width:38px; color:#070B14; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    #hzChatSend:disabled { opacity:0.5; cursor:default; }
+    #hzChatHint {
+      position:fixed; right:20px; bottom:86px; z-index:9997;
+      background:#0D1421; color:#E2E8F0; padding:8px 14px; border-radius:14px;
+      border:1px solid rgba(0,212,255,0.3); font-size:0.8rem; white-space:nowrap;
+      box-shadow:0 4px 14px rgba(0,0,0,0.35);
+    }
+  </style>
+  <div id="hzChatHint">Sorunuz varsa burada bekliyorum🤗</div>
+  <button id="hzChatBubble" type="button" aria-label="Sohbet başlat" onclick="openHzChat()">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <path d="M4 12a8 8 0 1 1 3.2 6.4L4 20l1.1-3.5A7.96 7.96 0 0 1 4 12Z" stroke="#070B14" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div id="hzChatPanel">
+    <div id="hzChatHead">
+      <div>
+        <div class="t">Hydrozid Destek</div>
+        <div class="s">Genellikle hemen yanıtlar</div>
+      </div>
+      <button id="hzChatClose" type="button" aria-label="Kapat" onclick="closeHzChat()">✕</button>
+    </div>
+    <div id="hzChatLog"></div>
+    <form id="hzChatForm" onsubmit="return hzSendChat(event)">
+      <textarea id="hzChatInput" rows="1" placeholder="Sorunuzu yazın..." maxlength="800"></textarea>
+      <button id="hzChatSend" type="submit" aria-label="Gönder">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+  </div>
+  <script>
+    (function () {
+      var hist = [];
+      var opened = false;
+      window.openHzChat = function () {
+        document.getElementById('hzChatPanel').classList.add('open');
+        document.getElementById('hzChatBubble').style.display = 'none';
+        document.getElementById('hzChatHint').style.display = 'none';
+        if (!opened) {
+          opened = true;
+          hzAppendMsg('bot', 'Sorunuz varsa burada bekliyorum🤗');
+        }
+        document.getElementById('hzChatInput').focus();
+      };
+      window.closeHzChat = function () {
+        document.getElementById('hzChatPanel').classList.remove('open');
+        document.getElementById('hzChatBubble').style.display = 'flex';
+        document.getElementById('hzChatHint').style.display = 'block';
+      };
+      function hzAppendMsg(role, text) {
+        var log = document.getElementById('hzChatLog');
+        var d = document.createElement('div');
+        d.className = 'hzMsg ' + (role === 'user' ? 'user' : 'bot');
+        d.innerHTML = hzLinkify(text);
+        log.appendChild(d);
+        log.scrollTop = log.scrollHeight;
+        return d;
+      }
+      var HZ_WA = 'https://wa.me/905534759032';
+      function hzLinkify(text) {
+        var esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return esc.replace(/https?:\/\/wa\.me\/\S+/g, function (u) {
+          return '<a href="' + u + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;font-weight:700;">WhatsApp\'tan yazın</a>';
+        });
+      }
+      window.hzSendChat = function (e) {
+        e.preventDefault();
+        var input = document.getElementById('hzChatInput');
+        var msg = input.value.trim();
+        if (!msg) return false;
+        var btn = document.getElementById('hzChatSend');
+        input.value = '';
+        btn.disabled = true;
+        hzAppendMsg('user', msg);
+        var loading = hzAppendMsg('bot', '…');
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg, history: hist })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+          loading.remove();
+          var reply = data.reply || ('Şu anda yanıt veremiyorum. ' + HZ_WA);
+          hzAppendMsg('bot', reply);
+          hist.push({ role: 'user', content: msg });
+          hist.push({ role: 'assistant', content: reply });
+        }).catch(function () {
+          loading.remove();
+          hzAppendMsg('bot', 'Bağlantı hatası. ' + HZ_WA);
+        }).finally(function () { btn.disabled = false; });
+        return false;
+      };
+    })();
+  </script>
+
+  <!-- Çerez onay bandı -->
+  <div id="hzCookieBanner" style="display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:560px;margin:0 auto;background:rgba(7,11,20,0.97);border:1px solid rgba(0,212,255,0.25);border-radius:16px;padding:18px 20px;box-shadow:0 12px 34px rgba(0,0,0,0.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);">
+    <div style="font-size:0.85rem;color:#CBD5E1;line-height:1.5;margin-bottom:12px;">
+      Sitemizde deneyiminizi iyileştirmek için çerezler kullanıyoruz.
+      <a href="/gizlilik-politikasi.html" style="color:#00D4FF;text-decoration:underline;">Gizlilik Politikası</a>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+      <button type="button" onclick="denyAnalyticsConsent()" style="padding:9px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94A3B8;font-size:0.82rem;cursor:pointer;">Reddet</button>
+      <button type="button" onclick="grantAnalyticsConsent()" style="padding:9px 18px;border-radius:8px;border:none;background:#00D4FF;color:#070B14;font-weight:700;font-size:0.82rem;cursor:pointer;">Kabul Et</button>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('hz_consent'); } catch (e) {}
+      if (saved === 'granted') {
+        grantAnalyticsConsent();
+      } else if (saved !== 'denied') {
+        var b = document.getElementById('hzCookieBanner');
+        if (b) b.style.display = 'block';
       }
     })();
   </script>

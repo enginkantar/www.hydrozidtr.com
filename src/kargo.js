@@ -134,55 +134,98 @@ async function kargonomiListe(env, yol, kvKey) {
   return list;
 }
 
+function kargonomiHeaders(env) {
+  const h = {
+    'Authorization': `Bearer ${env.KARGONOMI_TOKEN}`,
+    'Content-Type': 'application/json', 'Accept': 'application/json',
+  };
+  if (env.KARGONOMI_APP_KEY) h['X-App-Key'] = env.KARGONOMI_APP_KEY; // sadece partner firmalar için
+  return h;
+}
+
+async function kargonomiCagri(env, metod, yol, govde) {
+  const res = await fetch(`${KARGONOMI_KOK}${yol}`, {
+    method: metod, headers: kargonomiHeaders(env),
+    body: govde ? JSON.stringify(govde) : undefined,
+  });
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch { data = { _raw: text }; }
+  console.log(`[kargo] kargonomi ${metod} ${yol} → HTTP ${res.status}: ${text.slice(0, 300)}`);
+  return { status: res.status, data, text };
+}
+
+// Doğrulanmış akış (18 Tem, resmi doküman + canlı /states testi):
+//   1) POST /shipments  {shipment:{buyer_*, packages:[{content,desi}]}} → taslak, id döner
+//   2) GET  /shipment-price-comparison/{id} → sağlayıcı+fiyat listesi
+//   3) POST /confirm-shipping-price {shipment_id, shipping_provider_id} → gönderi hazır
+//   4) GET  /shipments/{id} → shipping_webservice_tracking_code/barcode (asenkron dolabilir)
 async function kargonomiGonderiOlustur(env, order) {
   if (!env.KARGONOMI_TOKEN) {
     console.warn('[kargo] KARGONOMI_TOKEN yok → elle mod');
     return { ok: false, error: 'kargonomi token yok', manual: true };
   }
   try {
-    // 1) İl adı → state_id
+    // 1) İl/ilçe adı → ID (KV cache'li listeden)
     const iller = await kargonomiListe(env, '/states', 'kargonomi:states');
     const il = iller.find(s => trNorm(s.name) === trNorm(order.customerCity));
     if (!il) return { ok: false, error: `il eşleşmedi: ${order.customerCity}` };
-    // 2) İlçe adı → city_id
     const ilceler = await kargonomiListe(env, `/cities/${il.id}`, `kargonomi:cities:${il.id}`);
     const ilce = ilceler.find(c => trNorm(c.name) === trNorm(order.customerTown));
     if (!ilce) return { ok: false, error: `ilçe eşleşmedi: ${order.customerTown} (${order.customerCity})` };
-    // 3) Gönderi oluştur (ID'lerle)
-    const headers = {
-      'Authorization': `Bearer ${env.KARGONOMI_TOKEN}`,
-      'Content-Type': 'application/json', 'Accept': 'application/json',
-    };
-    if (env.KARGONOMI_APP_KEY) headers['X-App-Key'] = env.KARGONOMI_APP_KEY;
-    const body = {
-      // TODO(kargonomi): tam alan seti token+doküman ile netleşecek; ID'ler kesin.
-      buyer_name: order.customerName,
-      buyer_phone: order.customerPhone,
-      buyer_state_id: il.id,
-      buyer_city_id: ilce.id,
-      buyer_address: order.customerAddress,
-      order_number: order.orderNo || order.invoiceId,
-      desi: Math.max(1, Number(order.quantity) || 1),
-    };
-    const res = await fetch(`${KARGONOMI_KOK}/shipments`, {
-      method: 'POST', headers, body: JSON.stringify(body),
+
+    // 2) Taslak gönderi
+    // Canlı 422 testleriyle doğrulandı (18 Tem): sender_* alanları zorunlu,
+    // telefonlar başındaki 0'sız 10 hane, sender_tax_number checksum'lı gerçek VKN/TCKN olmalı.
+    const tel10 = (t) => String(t || '').replace(/\D/g, '').replace(/^0/, '');
+    const olustur = await kargonomiCagri(env, 'POST', '/shipments', {
+      shipment: {
+        sender_name: env.KARGO_GONDERICI_UNVAN || 'Engin Kantar Batu Ticaret',
+        sender_tax_number: env.KARGO_GONDERICI_VKN,
+        sender_phone: tel10(env.KARGO_GONDERICI_TEL),
+        sender_address: env.KARGO_GONDERICI_ADRES,
+        sender_state_id: Number(env.KARGO_GONDERICI_STATE_ID),
+        sender_city_id: Number(env.KARGO_GONDERICI_CITY_ID),
+        buyer_name: order.customerName,
+        buyer_email: order.customerEmail || undefined,
+        buyer_phone: tel10(order.customerPhone),
+        buyer_address: order.customerAddress,
+        buyer_state_id: il.id,
+        buyer_city_id: ilce.id,
+        packages: [{
+          content: kisalt(`Hydrozid ${order.package || ''} - ${order.orderNo || order.invoiceId || ''}`, 100),
+          desi: Math.max(1, Number(order.quantity) || 1),
+        }],
+      },
     });
-    const text = await res.text();
-    let data; try { data = JSON.parse(text); } catch { data = { _raw: text }; }
-    console.log(`[kargo] kargonomi → HTTP ${res.status}: ${text.slice(0, 300)}`);
-    if (res.status >= 400) return { ok: false, error: `HTTP ${res.status}`, detay: data?.message || text.slice(0, 200) };
-    const barcode = data?.data?.tracking_number || data?.tracking_number || data?.data?.barcode || '';
-    const masraf = Number(
-      data?.price ??
-      data?.fee ??
-      data?.shipping_fee ??
-      data?.data?.price ??
-      data?.data?.fee ??
-      data?.data?.shipping_fee ??
-      0
-    ) || 0;
-    return barcode ? { ok: true, barcode, handler: 'KARGONOMI', raw: data, cost: masraf }
-                   : { ok: false, error: 'takip no dönmedi', raw: data };
+    if (olustur.status >= 400) return { ok: false, error: `HTTP ${olustur.status}`, detay: olustur.data?.message || olustur.text.slice(0, 200) };
+    const gonderiId = olustur.data?.data?.id ?? olustur.data?.id;
+    if (!gonderiId) return { ok: false, error: 'gönderi id dönmedi', raw: olustur.data };
+
+    // 3) Fiyat karşılaştır → sağlayıcı seç (env pin varsa o, yoksa en ucuz)
+    const fiyatlar = await kargonomiCagri(env, 'GET', `/shipment-price-comparison/${gonderiId}`);
+    const liste = (fiyatlar.data?.shipping_provider_with_price
+      || fiyatlar.data?.data?.shipping_provider_with_price || [])
+      .map(p => ({ ...p, fiyat: parseFloat(String(p.price)) }))   // "22.67 + KDV" → 22.67
+      .filter(p => Number.isFinite(p.fiyat));                      // "Hizmet Dışı Bölge" elenir
+    if (!liste.length) return { ok: false, error: 'uygun kargo sağlayıcısı yok', raw: fiyatlar.data };
+    const pin = trNorm(env.KARGONOMI_SAGLAYICI || '');
+    const secilen = liste.find(p => trNorm(p.slug) === pin) || liste.sort((a, b) => a.fiyat - b.fiyat)[0];
+
+    // 4) Onayla
+    const onay = await kargonomiCagri(env, 'POST', '/confirm-shipping-price', {
+      shipment_id: gonderiId, shipping_provider_id: secilen.id,
+    });
+    if (onay.status >= 400) return { ok: false, error: `onay HTTP ${onay.status}`, detay: onay.data?.message || onay.text.slice(0, 200) };
+
+    // 5) Takip kodu (asenkron dolabilir; boşsa gönderi id'si takip referansı olur)
+    const detay = await kargonomiCagri(env, 'GET', `/shipments/${gonderiId}`);
+    const d = detay.data?.data ?? detay.data ?? {};
+    const barcode = d.shipping_webservice_tracking_code || d.shipping_webservice_barcode || '';
+    const masraf = Number(d.real_price ?? d.estimated_price ?? secilen.fiyat) || 0;
+    const handler = (secilen.name || secilen.slug || 'KARGONOMI').toUpperCase();
+    if (barcode) return { ok: true, barcode, id: gonderiId, handler, cost: masraf, raw: d };
+    console.log('[kargo] kargonomi takip kodu asenkron — gönderi id takip olarak kullanılıyor:', gonderiId);
+    return { ok: true, barcode: `KRG-${gonderiId}`, id: gonderiId, handler, asyncBarcode: true, cost: masraf, raw: d };
   } catch (e) {
     console.error('[kargo] kargonomi hata:', e.message);
     return { ok: false, error: `bağlantı: ${e.message}` };
